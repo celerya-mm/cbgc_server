@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="en">
+
+    <head>
+        <!-- Condiviso con tutte le views con barra di navigazione-->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>{% block title %}{% endblock %}ConsBueGrasso_WebApp</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+        <!-- CSS only boostrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+        <!-- FONT -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet">
+
+        <!-- link a file .css -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
+
+        <!-- import plugin script -->
+        <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="/functions.js"></script>
+
+    </head>
+
+    <body>
+        <div>
+            <nav class="navbar navbar-expand-lg navbar-light navbar-bg-white">
+                <div class="container navbar-container">
+                    <a class="navbar-brand" title="Account" href="{{ url_for('account') }}">
+                        <img src="{{ url_for('static', filename='Logo_white.svg') }}" alt="" width="100" height="47" />
+                    </a>
+
+                    <button class="navbar-toggler" style="color: white" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon" style="color: white"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <div class="navbar-nav ml-auto">
+                            <a class="nav-item nav-link {% if request.path == '/account' %} active {% endif %}"
+                                title="Account" href="{{ url_for('account') }}">
+                                {% if request.path == '/account' %}
+                                <img  src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
+                                {% else %}
+                                <img  src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
+                                {% endif %}
+                                Account
+                            </a>
+                            <a class="nav-item nav-link {% if request.path == '/network' %} active {% endif %}"
+                                title="Network" href="{{ url_for('network') }}">
+                                {% if request.path == '/network' %}
+                                <img  src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
+                                {% else %}
+                                <img  src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
+                                {% endif %}
+                                Network
+                            </a>
+                            <a class="nav-item nav-link {% if request.path == '/subscription' %} active {% endif %}"
+                                title="Subscriptio" href="{{ url_for('subscription') }}">
+                                {% if request.path == '/subscription' %}
+                                <img  src="{{ url_for('static', filename='icons/patch-check-active.svg') }}" alt="">
+                                {% else %}
+                                <img  src="{{ url_for('static', filename='icons/patch-check.svg') }}" alt="">
+                                {% endif %}
+                                Subscription
+                            </a>
+                            <a class="nav-item nav-link {% if request.path == '/resource' %} active {% endif %}"
+                                title="Resources" href="{{ url_for('resource') }}">
+                                {% if request.path == '/resource' %}
+                                <img  src="{{ url_for('static', filename='icons/cloud-download-active.svg') }}" alt="">
+                                {% else %}
+                                <img  src="{{ url_for('static', filename='icons/cloud-download-white.svg') }}" alt="">
+                                {% endif %}
+                                Resource
+                            </a>
+                            <a class="nav-item nav-link {% if request.path == '/logout' %} active {% endif %}"
+                                title="Log-out" href="{{ url_for('logout') }}">
+                                <img class="{% if request.path == '/resource' %} active {% endif %}"
+                                     src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <!-- Messaggio gestione errori std -->
+        <div class="container text-center mt-3">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p style="color: #ED6666">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}
+        {% endblock %}
+
+        <!-- JavaScript Bundle with Popper for boostrap -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+            </script>
+        <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
+
+        {% block scripts %}
+        {% endblock %}
+    </body>
+    <footer class="footer">
+        <th class="footer-text"> © 2021 Celerya S.r.l. - Tutti i diritti riservati – I marchi riportati in questo sito
+            appartengono ai legittimi proprietari </th>
+    </footer>
+
+</html>
