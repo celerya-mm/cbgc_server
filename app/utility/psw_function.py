@@ -1,6 +1,5 @@
 from password_strength import PasswordPolicy
 
-
 # definisco la policy per le password
 PSW_POLICY = PasswordPolicy.from_names(
     length=8,  # min length: 8

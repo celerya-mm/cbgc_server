@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.app import db
 
 
@@ -8,6 +9,8 @@ class Administrator(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(40), index=False, unique=True, nullable=False)
     password = db.Column(db.String(64), index=False, unique=False, nullable=False)
+    name = db.Column(db.String(25), index=False, unique=False, nullable=False)
+    last_name = db.Column(db.String(25), index=False, unique=False, nullable=False)
     email = db.Column(db.String(80), index=False, unique=True, nullable=False)
 
     auth_token = db.relationship('AuthToken', backref='administrator')
@@ -18,11 +21,12 @@ class Administrator(db.Model):
     def __repr(self):
         return '<Administrator {}>'.format(self.username)
 
-    def __init__(self, username, password, email, created_at, updated_at):
+    def __init__(self, username, password, name, last_name, email, created_at, updated_at):
         self.username = username
-        self.username = password
+        self.password = password
         self.email = email
-        # self.auth_token = auth_token
+        self.name = name
+        self.last_name = last_name
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -30,7 +34,11 @@ class Administrator(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'email': self.email
+            'name': self.name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S")
         }
 
 
@@ -41,6 +49,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), index=False, unique=True, nullable=False)
     password = db.Column(db.String(64), index=False, unique=False, nullable=False)
+    name = db.Column(db.String(25), index=False, unique=False, nullable=False)
+    last_name = db.Column(db.String(25), index=False, unique=False, nullable=False)
     email = db.Column(db.String(80), index=False, unique=True, nullable=False)
 
     farmer = db.relationship('Farmer', backref='farmer')
@@ -54,13 +64,12 @@ class User(db.Model):
     def __repr(self):
         return '<User {}>'.format(self.username)
 
-    def __init__(self, username, password, email, created_at, updated_at):
+    def __init__(self, username, password, name, last_name, email, created_at, updated_at):
         self.username = username
         self.password = password
+        self.name = name
+        self.last_name = last_name
         self.email = email
-        # self.farmer = farmer
-        # self.buyer = buyer
-        # self.auth_token = auth_token
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -68,5 +77,9 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'email': self.email
+            'name': self.name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S")
         }

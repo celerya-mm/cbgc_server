@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.app import db
 
 
@@ -29,7 +30,7 @@ class Head(db.Model):
         return '<Head {}>'.format(self.headset)
 
     def __init__(self, headset, bird_date, castration_date, castration_compliance, slaughter_date, sale_date, sale_year,
-                 note, farmer_id, buyer_id, dna_cert, cons_cert):
+                 note, farmer_id, buyer_id, dna_cert, cons_cert, created_at, updated_at):
         self.headset = headset
         self.bird_date = bird_date
         self.castration_date = castration_date
@@ -42,8 +43,18 @@ class Head(db.Model):
         self.buyer_id = buyer_id
         self.dna_cert = dna_cert
         self.cons_cert = cons_cert
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     def to_dict(self):
+        if self.bird_date:
+            self.bird_date = datetime.strftime(self.bird_date, "%Y-%m-%d")
+        if self.castration_date:
+            self.castration_date = datetime.strftime(self.castration_date, "%Y-%m-%d")
+        if self.slaughter_date:
+            self.slaughter_date = datetime.strftime(self.slaughter_date, "%Y-%m-%d")
+        if self.sale_date:
+            self.sale_date = datetime.strftime(self.sale_date, "%Y-%m-%d")
         return {
             'id': self.id,
             'headset': self.headset,
@@ -56,6 +67,6 @@ class Head(db.Model):
             'note': self.note,
             'farmer_id': self.farmer_id,
             'buyer_id': self.buyer_id,
-            # 'dna_cert': self.dna_cert,
-            # 'cons_cert': self.cons_cert,
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

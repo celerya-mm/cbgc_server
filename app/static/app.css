@@ -120,8 +120,8 @@ body {
 .bi,
 .bi-globe2 {
     color: #3976C6;
-    height: 42px;
-    width: 42px;
+    height: 38px;
+    width: 38px;
     margin: 0px;
     padding: 2px;
 }
@@ -146,6 +146,12 @@ input,
     box-shadow: #9BB5E8;
     padding-left: 2px;
     text-align: center;
+}
+
+.message {
+    color: #ED6666;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
 }
 
 .nav-item {

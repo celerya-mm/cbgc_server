@@ -1,8 +1,7 @@
 import hashlib
 from datetime import datetime
 
-from flask import request, jsonify, make_response
-from flask import current_app as app
+from flask import request, jsonify, make_response, current_app as app
 
 from app.app import db
 from app.models.accounts import Administrator
@@ -17,6 +16,8 @@ def administrator_signup():
     data_received = request.get_json()
     username = data_received['username']
     password = data_received['password']
+    name = data_received['name']
+    last_name = data_received['last_name']
     email = data_received['email']
 
     verify_password = pswf.psw_verify(password)
@@ -36,6 +37,8 @@ def administrator_signup():
                     new_admin = Administrator(
                         username=username,
                         password=hashlib.sha256(str(password).encode('utf-8')).hexdigest(),
+                        name=name,
+                        last_name=last_name,
                         email=email,
                         created_at=datetime.now(),
                         updated_at=datetime.now()
@@ -99,21 +102,20 @@ def authenticate_administrator():
     ).first()
     try:
         if authenticated not in [None, ""]:
-            token = __generate_auth_token()
-            if len(authenticated.auth_token) > 0:
-                token = authenticated.auth_token[0].token \
-                    if authenticated.auth_token[0].expires_at <= datetime.now()\
-                    else authenticated.auth_token[0].token
+            record = len(authenticated.auth_token) - 1
+            if authenticated.auth_token[record].expires_at > datetime.now():
+                token = authenticated.auth_token[record].token
                 data = {
                     '01_status': 'success',
                     'token': token,
-                    'expiration': authenticated.auth_token[0].expires_at,
+                    'expiration': authenticated.auth_token[record].expires_at,
                     'id': authenticated.id,
                     'username': authenticated.username,
                     'email': authenticated.email
                 }
                 response = make_response(jsonify(data), 201)
             else:
+                token = __generate_auth_token()
                 save = __save_auth_token(authenticated.id, "", token)
                 data = {
                     '01_status': 'success',
@@ -172,6 +174,8 @@ def get_admin(admin_id):
                 return jsonify(
                     id=admin.id,
                     username=admin.username,
+                    name=admin.name,
+                    last_name=admin.last_name,
                     email=admin.email,
                     created_at=datetime.strftime(admin.created_at, "%Y-%m-%d %H:%M:%S"),
                     updated_at=datetime.strftime(admin.updated_at, "%Y-%m-%d %H:%M:%S")

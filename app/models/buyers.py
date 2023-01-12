@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.app import db
 
 
@@ -29,7 +30,7 @@ class Buyer(db.Model):
         return '<Buyer {}>'.format(self.buyer_name)
 
     def __init__(self, buyer_name, buyer_type, email, phone, address, cap, city, affiliation_start_date,
-                 affiliation_end_date, affiliation_status, note, head, cons_cert):
+                 affiliation_end_date, affiliation_status, note, head, cons_cert, created_at, updated_at):
         self.buyer_name = buyer_name
         self.buyer_type = buyer_type
         self.email = email
@@ -43,8 +44,14 @@ class Buyer(db.Model):
         self.note = note
         self.head = head
         self.cons_cert = cons_cert
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     def to_dict(self):
+        if self.affiliation_start_date:
+            self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
+        if self.affiliation_end_date:
+            self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
         return {
             'id': self.id,
             'buyer_name': self.buyer_name,
@@ -58,7 +65,6 @@ class Buyer(db.Model):
             'affiliation_end_date': self.affiliation_end_date,
             'affiliation_status': self.affiliation_status,
             'note': self.note,
-            # 'head': self.head,
-            # 'cons_cert': self.cons_cert,
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }
-

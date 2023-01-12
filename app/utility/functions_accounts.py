@@ -1,8 +1,8 @@
-import hashlib
 import random
 import string
-from email_validator import validate_email, EmailNotValidError
 from datetime import datetime, timedelta
+
+from email_validator import validate_email, EmailNotValidError
 
 from app.app import db
 from app.models.tokens import AuthToken
@@ -23,7 +23,7 @@ def __save_auth_token(admin_id, user_id, token):
     EXPIRATION = datetime.now() + timedelta(days=1)
     EXPIRATION = EXPIRATION.replace(hour=0, minute=0, second=0, microsecond=0)
     auth_token = AuthToken(
-        administrator_id=admin_id,
+        admin_id=admin_id,
         user_id=user_id,
         token=token,
         expires_at=EXPIRATION,
@@ -41,4 +41,3 @@ def is_valid_email(_email):
         return v["email"]
     except EmailNotValidError as e:
         return False
-

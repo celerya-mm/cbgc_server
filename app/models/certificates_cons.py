@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.app import db
 
 
@@ -27,7 +28,7 @@ class CertificateCons(db.Model):
         return '<CertificateCons {}>'.format(self.headset)
 
     def __init__(self, certificate_nr, certificate_date, certificate_year, cockade_id, sale_type, sale_quantity, note,
-                 head_id, farmer_id, buyer_id):
+                 head_id, farmer_id, buyer_id, created_at, updated_at):
         self.certificate_nr = certificate_nr
         self.certificate_date = certificate_date
         self.certificate_year = certificate_year
@@ -39,8 +40,12 @@ class CertificateCons(db.Model):
         self.head_id = head_id
         self.farmer_id = farmer_id
         self.buyer_id = buyer_id
+        self.buyer_id = created_at
+        self.buyer_id = updated_at
 
     def to_dict(self):
+        if self.certificate_date:
+            self.certificate_date = datetime.strftime(self.certificate_date, "%Y-%m-%d")
         return {
             'id': self.id,
             'certificate_nr': self.certificate_nr,
@@ -53,4 +58,6 @@ class CertificateCons(db.Model):
             'head_id': self.head_id,
             'farmer_id': self.farmer_id,
             'buyer_id': self.buyer_id,
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

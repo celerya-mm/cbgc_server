@@ -1,8 +1,6 @@
 from datetime import datetime
-import json
 
-from flask import request, jsonify, make_response
-from flask import current_app as app
+from flask import request, jsonify, current_app as app
 
 from app.models.certificates_dna import CertificateDna
 from app.models.tokens import AuthToken

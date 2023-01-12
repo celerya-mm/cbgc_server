@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.app import db
 
 
@@ -29,7 +30,7 @@ class Farmer(db.Model):
         return '<Farmer {}>'.format(self.farmer_name)
 
     def __init__(self, farmer_name, email, phone, address, cap, city, affiliation_start_date, affiliation_end_date,
-                 affiliation_status, note, head, dna_cert, cons_cert):
+                 affiliation_status, note, head, dna_cert, cons_cert, created_at, updated_at):
         self.farmer_name = farmer_name
         self.email = email
         self.phone = phone
@@ -43,8 +44,14 @@ class Farmer(db.Model):
         self.head = head
         self.dna_cert = dna_cert
         self.cons_cert = cons_cert
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     def to_dict(self):
+        if self.affiliation_start_date:
+            self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
+        if self.affiliation_end_date:
+            self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
         return {
             'id': self.id,
             'farmer_name': self.farmer_name,
@@ -57,7 +64,6 @@ class Farmer(db.Model):
             'affiliation_end_date': self.affiliation_end_date,
             'affiliation_status': self.affiliation_status,
             'note': self.note,
-            # 'head': self.head,
-            # 'dna_cert': self.dna_cert,
-            # 'cons_cert': self.cons_cert,
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

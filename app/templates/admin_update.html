@@ -1,0 +1,77 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="POST">
+    <div class="container text-center mt-3">
+        <h5 class="card-title">Attenzione stai modificando l'utente con username: "{{admin.username}}"
+            <a class="btn btn-update" type="button" title="Annulla" href="{{ url_for('admin_view') }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/trash-fill.svg') }}" alt=""/>
+            </a>
+        </h5>
+    </div>
+
+    <div class="container text-center mt-3">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-md-3 order-first">
+                <div class="form-group">
+                    {{ admin.username.label }}
+                    {{ admin.username(class="form-control") }}
+                    {% if admin.username.errors %}
+                    {% for error in admin.username.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="form-group">
+                    <h6> email </h6>
+                    <p style="font-weight: bold">{{ admin.email }}</p>
+                </div>
+                <hr>
+            </div>
+            <div class="col-md-3 order-first">
+                <div class="form-group">
+                    <h6> Name </h6>
+                    <p style="font-weight: bold">{{ admin.name }}</p>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <h6> Last Name </h6>
+                    <p style="font-weight: bold">{{ admin.last_name }}</p>
+                </div>
+                <hr>
+            </div>
+        </div>
+        <a class="btn btn-update" type="button" title="Salva" href="{{ url_for('admin_view', admin=admin) }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}" alt=""/>
+        </a>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#data').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+
+
+</script>
+{% endblock %}
