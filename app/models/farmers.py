@@ -22,6 +22,7 @@ class Farmer(db.Model):
     head = db.relationship('Head', backref='farmer')
     dna_cert = db.relationship('CertificateDna', backref='farmer')
     cons_cert = db.relationship('CertificateCons', backref='farmer')
+    event = db.relationship('EventDB', backref='farmer')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -30,7 +31,7 @@ class Farmer(db.Model):
         return '<Farmer {}>'.format(self.farmer_name)
 
     def __init__(self, farmer_name, email, phone, address, cap, city, affiliation_start_date, affiliation_end_date,
-                 affiliation_status, note, head, dna_cert, cons_cert, created_at, updated_at):
+                 affiliation_status, note, head, dna_cert, cons_cert, updated_at):
         self.farmer_name = farmer_name
         self.email = email
         self.phone = phone
@@ -44,7 +45,7 @@ class Farmer(db.Model):
         self.head = head
         self.dna_cert = dna_cert
         self.cons_cert = cons_cert
-        self.created_at = created_at
+        self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):

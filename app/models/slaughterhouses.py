@@ -21,6 +21,7 @@ class Slaughterhouse(db.Model):
 
     head = db.relationship('Head', backref='slaughterhouse')
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse')
+    event = db.relationship('EventDB', backref='slaughterhouse')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -29,7 +30,7 @@ class Slaughterhouse(db.Model):
         return '<Slaughterhouse {}>'.format(self.farmer_name)
 
     def __init__(self, slaughterhouse, email, phone, address, cap, city, affiliation_start_date, affiliation_end_date,
-                 affiliation_status, note, head, cons_cert, created_at, updated_at):
+                 affiliation_status, note, head, cons_cert, updated_at):
         self.slaughterhouse = slaughterhouse
         self.email = email
         self.phone = phone
@@ -42,7 +43,7 @@ class Slaughterhouse(db.Model):
         self.note = note
         self.head = head
         self.cons_cert = cons_cert
-        self.created_at = created_at
+        self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):

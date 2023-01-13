@@ -1,0 +1,68 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <div class="row no-gutters justify-content-center">
+        <h5 class="card-title">
+            <a class="btn btn-update" type="button" href="{{ url_for('admin_view') }}" title="Annulla">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/trash-fill.svg') }}" alt="" />
+            </a>
+            Aggiorna/modifica i tuoi dati.
+        </h5>
+        <div class="col-md-5">
+            <form enctype="multipart/form-data" method="POST">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.username.label }}
+                    {{ form.username(class="form-control") }}
+                    {% if form.username.errors %}
+                        {% for error in form.username.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="form-group">
+                    {{ form.name.label }}
+                    {{ form.name(class="form-control") }}
+                    {% if form.name.errors %}
+                        {% for error in form.name.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="form-group">
+                    {{ form.last_name.label }}
+                    {{ form.last_name(class="form-control") }}
+                    {% if form.last_name.errors %}
+                        {% for error in form.last_name.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control") }}
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <hr>
+                <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
+                    <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
+                         alt=""/>
+                </button>
+                <br>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

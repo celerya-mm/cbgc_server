@@ -250,6 +250,11 @@ input,
     margin-bottom: 30px;
 }
 
+.text-danger {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+}
+
 .title {
     color: #ffffff;
     font-size: 0.8rem;

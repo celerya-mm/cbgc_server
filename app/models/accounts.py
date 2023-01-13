@@ -14,6 +14,7 @@ class Administrator(db.Model):
     email = db.Column(db.String(80), index=False, unique=True, nullable=False)
 
     auth_token = db.relationship('AuthToken', backref='administrator')
+    event = db.relationship('EventDB', backref='administrator')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -21,13 +22,13 @@ class Administrator(db.Model):
     def __repr(self):
         return '<Administrator {}>'.format(self.username)
 
-    def __init__(self, username, password, name, last_name, email, created_at, updated_at):
+    def __init__(self, username, password, name, last_name, email, updated_at):
         self.username = username
         self.password = password
         self.email = email
         self.name = name
         self.last_name = last_name
-        self.created_at = created_at
+        self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):
@@ -53,10 +54,10 @@ class User(db.Model):
     last_name = db.Column(db.String(25), index=False, unique=False, nullable=False)
     email = db.Column(db.String(80), index=False, unique=True, nullable=False)
 
-    farmer = db.relationship('Farmer', backref='farmer')
-    buyer = db.relationship('Buyer', backref='buyer')
-    # slaughterhouse = db.relationship('Slaughterhouse', backref='slaughterhouse')
+    farmer = db.relationship('Farmer', backref='user')
+    buyer = db.relationship('Buyer', backref='user')
     auth_token = db.relationship('AuthToken', backref='user')
+    event = db.relationship('EventDB', backref='user')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -64,13 +65,13 @@ class User(db.Model):
     def __repr(self):
         return '<User {}>'.format(self.username)
 
-    def __init__(self, username, password, name, last_name, email, created_at, updated_at):
+    def __init__(self, username, password, name, last_name, email, updated_at):
         self.username = username
         self.password = password
         self.name = name
         self.last_name = last_name
         self.email = email
-        self.created_at = created_at
+        self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):

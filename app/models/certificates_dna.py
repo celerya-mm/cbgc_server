@@ -17,20 +17,22 @@ class CertificateDna(db.Model):
     head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False)
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
 
+    event = db.relationship('EventDB', backref='cert_dna')
+
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr(self):
         return '<DnaCertificate {}>'.format(self.dna_cert_nr)
 
-    def __init__(self, dna_cert_nr, dna_cert_date, dna_cert_year, note, head_id, farmer_id, created_at, updated_at):
+    def __init__(self, dna_cert_nr, dna_cert_date, dna_cert_year, note, head_id, farmer_id, updated_at):
         self.dna_cert_nr = dna_cert_nr
         self.dna_cert_date = dna_cert_date
         self.dna_cert_year = dna_cert_year
         self.note = note
         self.head_id = head_id
         self.farmer_id = farmer_id
-        self.created_at = created_at
+        self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):

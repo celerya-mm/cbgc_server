@@ -1,3 +1,5 @@
+import hashlib
+
 from password_strength import PasswordPolicy
 
 # definisco la policy per le password
@@ -13,13 +15,12 @@ def psw_verify(password):
     verify_password = PSW_POLICY.test(password)
     if len(verify_password) > 0:
         data = {
-            '01_status': 'failed',
-            '02_message': f'The password is too weak: {verify_password}.',
-            'length': '8 characters minimum',
-            'uppercase': '1 uppercase character minimum',
-            'numbers': '1 digit minimum',
-            'special_characters': '1 special character minimum',
-            'contains_UserName': 'Not contain username'
+            "01_status": "failed",
+            "02_message": f"The password is too weak",
+            "length": "8 characters minimum",
+            "uppercase": "1 uppercase character minimum",
+            "numbers": "1 digit minimum",
+            "special_characters": "1 special character minimum"
         }
         return data
     else:
@@ -45,13 +46,18 @@ def psw_contain_usr(password, username):
     elif user_1 in psw or user_2 in psw:
         if len(password) - len(username) <= 2:
             data = {
-                '01_status': 'failed',
-                '02_message': f'The password is too similar to the username. Please chose another password.',
-                'username': username,
-                'password': password
+                "01_status": "failed",
+                "02_message": "The password is too similar to the username. Please chose another password.",
+                "username": username,
+                "password": password
             }
             return data
         else:
             return False
     else:
         return False
+
+
+def psw_hash(_psw):
+    return hashlib.sha256(str(_psw).encode('utf-8')).hexdigest()
+

@@ -7,7 +7,7 @@ class Head(db.Model):
     __tablename__ = 'heads'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    headset = db.Column(db.String(), index=False, unique=True, nullable=False)
+    headset = db.Column(db.String(15), index=False, unique=True, nullable=False)
     bird_date = db.Column(db.DateTime, index=False, nullable=False)
     castration_date = db.Column(db.DateTime, index=False, nullable=True)
     castration_compliance = db.Column(db.Boolean, index=False, nullable=True)  # True if days (castration-bird) < 240
@@ -22,6 +22,7 @@ class Head(db.Model):
 
     dna_cert = db.relationship('CertificateDna', backref='head')
     cons_cert = db.relationship('CertificateCons', backref='head')
+    event = db.relationship('EventDB', backref='head')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -30,7 +31,7 @@ class Head(db.Model):
         return '<Head {}>'.format(self.headset)
 
     def __init__(self, headset, bird_date, castration_date, castration_compliance, slaughter_date, sale_date, sale_year,
-                 note, farmer_id, buyer_id, dna_cert, cons_cert, created_at, updated_at):
+                 note, farmer_id, buyer_id, dna_cert, cons_cert, updated_at):
         self.headset = headset
         self.bird_date = bird_date
         self.castration_date = castration_date
@@ -43,7 +44,7 @@ class Head(db.Model):
         self.buyer_id = buyer_id
         self.dna_cert = dna_cert
         self.cons_cert = cons_cert
-        self.created_at = created_at
+        self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):

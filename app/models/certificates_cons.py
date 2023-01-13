@@ -21,6 +21,8 @@ class CertificateCons(db.Model):
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
     slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id'), nullable=True)
 
+    event = db.relationship('EventDB', backref='cert_cons')
+
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
@@ -28,7 +30,7 @@ class CertificateCons(db.Model):
         return '<CertificateCons {}>'.format(self.headset)
 
     def __init__(self, certificate_nr, certificate_date, certificate_year, cockade_id, sale_type, sale_quantity, note,
-                 head_id, farmer_id, buyer_id, created_at, updated_at):
+                 head_id, farmer_id, buyer_id, updated_at):
         self.certificate_nr = certificate_nr
         self.certificate_date = certificate_date
         self.certificate_year = certificate_year
@@ -40,8 +42,8 @@ class CertificateCons(db.Model):
         self.head_id = head_id
         self.farmer_id = farmer_id
         self.buyer_id = buyer_id
-        self.buyer_id = created_at
-        self.buyer_id = updated_at
+        self.created_at = datetime.now()
+        self.updated_at = updated_at
 
     def to_dict(self):
         if self.certificate_date:

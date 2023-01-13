@@ -26,8 +26,7 @@ def __save_auth_token(admin_id, user_id, token):
         admin_id=admin_id,
         user_id=user_id,
         token=token,
-        expires_at=EXPIRATION,
-        created_at=DATETIME
+        expires_at=EXPIRATION
     )
     db.session.add(auth_token)
     db.session.commit()
@@ -39,5 +38,5 @@ def is_valid_email(_email):
         v = validate_email(_email)
         print(v)
         return v["email"]
-    except EmailNotValidError as e:
+    except EmailNotValidError:
         return False

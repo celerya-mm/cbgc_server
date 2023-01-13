@@ -14,12 +14,12 @@ class AuthToken(db.Model):
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     expires_at = db.Column(db.DateTime, index=False, nullable=False)
 
-    def __init__(self, token, expires_at, admin_id, user_id, created_at):
+    def __init__(self, token, expires_at, admin_id, user_id):
         self.token = token
         self.expires_at = expires_at
         self.admin_id = admin_id
         self.user_id = user_id
-        self.created_at = created_at
+        self.created_at = datetime.now()
 
     def to_dict(self):
         return {

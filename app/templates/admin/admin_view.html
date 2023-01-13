@@ -4,10 +4,19 @@
 <form enctype="multipart/form-data" method="POST">
     <div class="container text-center mt-3">
         <h5 class="card-title">Ciao "{{admin.name}}"
-            <a class="btn btn-update" type="button" title="Modifica" href="{{ url_for('admin_update', admin=admin) }}">
-                <img class="icon-simple"src="{{ url_for('static', filename='icons/pencil-fill.svg') }}" alt="" />
-            </a>
+
         </h5>
+        <a class="btn btn-update" type="button" title="Modifica utente" href="{{ url_for('admin_update') }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill.svg') }}" alt=""/>
+        </a>
+        <a class="btn btn-update" type="button" title="Cambia password utente"
+           href="{{ url_for('admin_update_password') }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint.svg') }}" alt=""/>
+        </a>
+        <a class="btn btn-update" type="button" title="Visualizza storia modifiche al record"
+           href="{{ url_for('admin_view_history') }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/history.svg') }}" alt=""/>
+        </a>
     </div>
 
     <div class="container text-center mt-3">
@@ -15,28 +24,28 @@
             <div class="col-md-3 order-first">
                 <div class="form-group">
                     <h6> Username </h6>
-                    <p style="font-weight: bold">{{ admin.username }}</p>
+                    <p style="font-weight: bold; color: black">{{ admin.username }}</p>
                 </div>
                 <hr>
             </div>
             <div class="col-md-3 order-second">
                 <div class="form-group">
                     <h6> email </h6>
-                    <p style="font-weight: bold">{{ admin.email }}</p>
+                    <p style="font-weight: bold; color: black">{{ admin.email }}</p>
                 </div>
                 <hr>
             </div>
             <div class="col-md-3 order-third">
                 <div class="form-group">
                     <h6> Name </h6>
-                    <p style="font-weight: bold">{{ admin.name }}</p>
+                    <p style="font-weight: bold; color: black">{{ admin.name }}</p>
                 </div>
                 <hr>
             </div>
             <div class="col-md-3 order-fourth">
                 <div class="form-group">
                     <h6> Last Name </h6>
-                    <p style="font-weight: bold">{{ admin.last_name }}</p>
+                    <p style="font-weight: bold; color: black">{{ admin.last_name }}</p>
                 </div>
                 <hr>
             </div>
@@ -114,6 +123,7 @@
             }
         });
     });
+
 
 
 

@@ -4,7 +4,7 @@ from flask import request, jsonify, current_app as app
 
 from app.models.buyers import Buyer
 from app.models.tokens import AuthToken
-from app.utility.functions import validate_token_user
+from app.utility.functions import token_user_validate
 
 
 @app.route('/api/buyers/', methods=['GET'])
@@ -15,11 +15,12 @@ def get_buyers():
     if not token:
         return jsonify({"message": "Please log in."}), 401
     else:
-        if validate_token_user(token):
-            farmers_list = Buyer.query.all()
-            return jsonify([farmer.to_dict() for farmer in farmers_list]), 200
-        else:
+        authenticated = AuthToken.query.filter(AuthToken.token == token).first()
+        if authenticated in ["", None] or authenticated.expires_at < datetime.now():
             return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
+        else:
+            buyer_list = Buyer.query.all()
+            return jsonify([buyer.to_dict() for buyer in buyer_list]), 200
 
 
 @app.route('/api/buyer/<int:buyer_id>', methods=['GET'])

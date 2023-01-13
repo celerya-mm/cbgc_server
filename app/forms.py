@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, validators
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
 class FormLogin(FlaskForm):
@@ -21,7 +21,7 @@ class FormAccountSignup(FlaskForm):
     ])
     name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     last_name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    email = EmailField('email', validators=[DataRequired("Campo obbligatorio!")])
+    email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email()])
 
     submit = SubmitField("SIGNUP")
 
@@ -31,126 +31,29 @@ class AccountUpdateForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     last_name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    email = EmailField('email', validators=[DataRequired("Campo obbligatorio!")])
+    email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email()])
 
     submit = SubmitField("MODIFICA")
 
 
-class SignUpForm(FlaskForm):
-    """Form di SgnUp"""
-    username = StringField(
-        'Username',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=3)
-        ]
-    )
-    email = EmailField(
-        'e-mail',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-        ]
-    )
-    password1 = PasswordField(
-        'Password1',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=8)
-        ]
-    )
-    password2 = PasswordField(
-        'Password2',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=8),
-            validators.EqualTo('password1', message='le password non corrispondono')
-        ]
-    )
-    first_name = StringField(
-        'First Name',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=3)
-        ]
-    )
-    last_name = StringField(
-        'Last Name',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=3)
-        ]
-    )
-    pubkey = StringField(
-        'Public Key',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=782, max=800)
-        ]
-    )
-    timezone = SelectField(
-        'Time Zone',
-        default='Europe/Rome',
-        choices=("Europe/Rome"),
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=8, max=40)
-        ]
-    )
-    vat_id = StringField(
-        'Vat number',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=11, max=13)
-        ]
-    )
-    pec_email = EmailField(
-        'Pec',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-        ]
-    )
-    sdi_code = StringField(
-        'SDI code',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=6, max=7)
-        ]
-    )
-    submit = SubmitField("SIGNUP")
-
-
-class insertMailForm(FlaskForm):
+class InsertMailForm(FlaskForm):
     """Form d'invio mail per cambio password"""
-    email = EmailField(
-        'Current e-mail',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-        ]
-    )
+    email = EmailField('Current e-mail', validators=[DataRequired("Campo obbligatorio!"), Email()])
     submit = SubmitField("SEND EMAIL")
 
 
-class pswChangeForm(FlaskForm):
-    old_password = PasswordField(
-        'Old_Password',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=8)
-        ]
-    )
-    password1 = PasswordField(
-        'Password1',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=8)
-        ]
-    )
-    password2 = PasswordField(
-        'Password2',
-        validators=[
-            DataRequired("Campo obbligatorio!"),
-            Length(min=8),
-            validators.EqualTo('password1', message='le password non corrispondono')
-        ]
-    )
-    submit = SubmitField("SEND NEW PASSWORD")
+class PswChangeForm(FlaskForm):
+    old_password = PasswordField('Current Password', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
+    new_password_1 = PasswordField('New Password', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
+    new_password_2 = PasswordField('Password Confirm', validators=[
+        DataRequired("Campo obbligatorio!"), Length(min=8),
+        EqualTo('new_password_1', message='Both password fields must be equal!')
+    ])
+    submit = SubmitField("SEND_NEW_PASSWORD")
+
+    def validate_password(self):
+        if self.new_password_1.data != self.new_password_2.data:
+            raise validators.ValidationError('Passwords do not match')
+
+
+

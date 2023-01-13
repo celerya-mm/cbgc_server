@@ -40,7 +40,6 @@ def user_signup():
                         name=name,
                         last_name=last_name,
                         email=email,
-                        created_at=datetime.now(),
                         updated_at=datetime.now()
                     )
                     db.session.add(new_user)
@@ -155,8 +154,8 @@ def get_users_list():
         if authenticated in ["", None] or authenticated.expires_at < datetime.now():
             return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
         else:
-            admins_list = User.query.all()
-            return jsonify([admin.to_dict() for admin in admins_list]), 200
+            users_list = User.query.all()
+            return jsonify([user.to_dict() for user in users_list]), 200
 
 
 @app.route('/api/user/<int:user_id>', methods=['GET'])
@@ -173,14 +172,6 @@ def get_user(user_id):
         else:
             user = User.query.filter_by(id=user_id).first()
             if user:
-                return jsonify(
-                    id=user.id,
-                    username=user.username,
-                    name=user.name,
-                    last_name=user.last_name,
-                    email=user.email,
-                    created_at=datetime.strftime(user.created_at, "%Y-%m-%d %H:%M:%S"),
-                    updated_at=datetime.strftime(user.updated_at, "%Y-%m-%d %H:%M:%S")
-                ), 200
+                return jsonify(user.to_dict()), 200
             else:
                 return jsonify(error=f'User not found with id: {user_id}'), 404

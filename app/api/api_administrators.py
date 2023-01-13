@@ -1,4 +1,3 @@
-import hashlib
 from datetime import datetime
 
 from flask import request, jsonify, make_response, current_app as app
@@ -6,7 +5,7 @@ from flask import request, jsonify, make_response, current_app as app
 from app.app import db
 from app.models.accounts import Administrator
 from app.models.tokens import AuthToken
-from app.utility import psw_function as pswf
+from app.utility.psw_function import psw_contain_usr, psw_verify, psw_hash
 from app.utility.functions_accounts import is_valid_email, __save_auth_token, __generate_auth_token
 
 
@@ -20,11 +19,11 @@ def administrator_signup():
     last_name = data_received['last_name']
     email = data_received['email']
 
-    verify_password = pswf.psw_verify(password)
+    verify_password = psw_verify(password)
     if verify_password is not False:
         return make_response(jsonify(verify_password), 400)
 
-    contain_usr = pswf.psw_contain_usr(password, username)
+    contain_usr = psw_contain_usr(password, username)
     if contain_usr is not False:
         return make_response(jsonify(contain_usr), 400)
 
@@ -36,11 +35,10 @@ def administrator_signup():
                 if existing_user is None:
                     new_admin = Administrator(
                         username=username,
-                        password=hashlib.sha256(str(password).encode('utf-8')).hexdigest(),
+                        password=psw_hash(str(password)),
                         name=name,
                         last_name=last_name,
                         email=email,
-                        created_at=datetime.now(),
                         updated_at=datetime.now()
                     )
                     db.session.add(new_admin)
@@ -98,7 +96,7 @@ def authenticate_administrator():
 
     authenticated = Administrator.query.filter(
         Administrator.username == username,
-        Administrator.password == hashlib.sha256(str(password).encode('utf-8')).hexdigest()
+        Administrator.password == psw_hash(str(password))
     ).first()
     try:
         if authenticated not in [None, ""]:
@@ -171,14 +169,6 @@ def get_admin(admin_id):
         else:
             admin = Administrator.query.filter_by(id=admin_id).first()
             if admin:
-                return jsonify(
-                    id=admin.id,
-                    username=admin.username,
-                    name=admin.name,
-                    last_name=admin.last_name,
-                    email=admin.email,
-                    created_at=datetime.strftime(admin.created_at, "%Y-%m-%d %H:%M:%S"),
-                    updated_at=datetime.strftime(admin.updated_at, "%Y-%m-%d %H:%M:%S")
-                ), 200
+                return jsonify(admin.to_dict()), 200
             else:
                 return jsonify(error=f'User Administrator not found with id: {admin_id}'), 404
