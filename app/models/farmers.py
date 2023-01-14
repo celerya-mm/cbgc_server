@@ -39,10 +39,10 @@ class Farmer(db.Model):
     def __repr(self):
         return '<Farmer {}>'.format(self.farmer_name)
 
-    def __init__(self, farmer_name, email, phone, address, cap, city, stable_code, stable_type,
-                 stable_productive_orientation, stable_breeding_methods, affiliation_start_date,
-                 affiliation_end_date, affiliation_status, note, head, dna_cert, cons_cert, event,
-                 updated_at):
+    def __init__(self, farmer_name, email, phone=None, address=None, cap=None, city=None, stable_code=None,
+                 stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
+                 affiliation_start_date=None, affiliation_end_date=None, affiliation_status=None, note=None, head=[],
+                 dna_cert=[], cons_cert=[], event=[], updated_at=None):
         self.farmer_name = farmer_name
         self.email = email
         self.phone = phone

@@ -2,7 +2,7 @@
 
 {% block content %}
 <form enctype="multipart/form-data" method="POST">
-    <div class="container text-center mt-3">
+    <div class="container text-center mt-2">
         <h5 class="card-title">
             <a class="btn btn-update" type="button" title="Crea nuovo utente Amministratore"
                href="{{ url_for('admin_create') }}">
@@ -23,39 +23,35 @@
         </a>
     </div>
 
-    <div class="container text-center mt-3">
+    <div class="container text-center mt-2">
         <div class="row no-gutters justify-content-center">
             <div class="col-md-3 order-first">
                 <div class="form-group">
                     <h6> Username </h6>
                     <p style="font-weight: bold; color: #5B5A5B">{{ admin.username }}</p>
                 </div>
-                <hr>
             </div>
             <div class="col-md-3 order-second">
                 <div class="form-group">
                     <h6> email </h6>
                     <p style="font-weight: bold; color: #5B5A5B">{{ admin.email }}</p>
                 </div>
-                <hr>
             </div>
             <div class="col-md-3 order-third">
                 <div class="form-group">
                     <h6> Name </h6>
                     <p style="font-weight: bold; color: #5B5A5B">{{ admin.name }}</p>
                 </div>
-                <hr>
             </div>
             <div class="col-md-3 order-fourth">
                 <div class="form-group">
                     <h6> Last Name </h6>
                     <p style="font-weight: bold; color: #5B5A5B">{{ admin.last_name }}</p>
                 </div>
-                <hr>
             </div>
         </div>
     </div>
-    <div class="container text-center mt-3 mx-auto" style="margin: 0px;">
+    <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
         <div class="row no-gutters justify-content-center">
             <div class="col-md-14">
                 <h2 class="card-title" style="padding: 20px;">Elenco Amministratori:</h2>
@@ -66,10 +62,10 @@
                             <th class="title" id="h1" data-defaultsort="asc">ID</th>
                             <th class="title" id="h2">Username</th>
                             <th class="title" id="h3">email</th>
-                            <th class="title" id="h4">Name</th>
-                            <th class="title" id="h5">Last Name</th>
-                            <th class="title" id="h6">Create at</th>
-                            <th class="title" id="h7">Update at</th>
+                            <th class="title" id="h4">Nome</th>
+                            <th class="title" id="h5">Cognome</th>
+                            <th class="title" id="h6">Telefono</th>
+                            <th class="title" id="h7">Modificato</th>
                             <th class="title" id="h8"> </th>
                             <th class="title" id="h9"> </th>
                         </tr>
@@ -93,7 +89,7 @@
                                 {{ row.name|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.created_at|e }}
+                                {{ row.phone|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.updated_at|e }}

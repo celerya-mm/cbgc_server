@@ -26,7 +26,7 @@ def administrator_signup():
 
         valid_email = is_valid_email(data_received["email"])
         if valid_email:
-            if username not in [None, ""] and  password not in [None, ""] and \
+            if username not in [None, ""] and password not in [None, ""] and \
                     data_received["email"] not in [None, ""]:
                 try:
                     existing_user = Administrator.query.filter(Administrator.username == username).first()

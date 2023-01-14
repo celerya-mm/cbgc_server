@@ -1,5 +1,15 @@
+from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, validators
+from wtforms import \
+    PasswordField, \
+    StringField, \
+    SubmitField, \
+    EmailField, \
+    SelectField, \
+    validators, \
+    DateField, \
+    BooleanField
+
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
@@ -22,6 +32,7 @@ class FormAccountSignup(FlaskForm):
     name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     last_name = StringField('Last Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email()])
+    phone = StringField('Telefono', validators=[Length(min=7)])
 
     submit = SubmitField("SIGNUP")
 
@@ -33,11 +44,35 @@ class FormAccountSignup(FlaskForm):
 class FormAccountUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    last_name = StringField('Last Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
+    name = StringField('Nome', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
+    last_name = StringField('Cognome', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email()])
+    phone = StringField('Telefono', validators=[Length(min=7)])
 
     submit = SubmitField("MODIFICA")
+
+
+class FormFarmerCreate(FlaskForm):
+    """Form dati signup account Administrator."""
+    farmer_name = StringField('Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
+    email = EmailField('Email', validators=[DataRequired("Campo obbligatorio!"), Email()])
+    phone = StringField('Telefono', validators=[DataRequired("Campo obbligatorio!"), Length(min=7)])
+
+    affiliation_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
+    affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="NO")
+
+    stable_code = StringField('Codice Stalla')
+    stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"], default="Allevamento")
+    stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
+        "Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Carne")
+    stable_breeding_methods = SelectField("modalità Allevamento", choices=[
+        "Estensivo", "Intensivo", "Transumante", "Brado"], default="Estensivo")
+
+    address = StringField('Indirizzo', validators=[DataRequired("Campo obbligatorio!"), Length(min=5)])
+    cap = StringField('CAP', validators=[DataRequired("Campo obbligatorio!"), Length(min=5, max=5)])
+    city = StringField('Città', validators=[DataRequired("Campo obbligatorio!"), Length(min=5)])
+
+    submit = SubmitField("CREATE")
 
 
 class FormInsertMail(FlaskForm):

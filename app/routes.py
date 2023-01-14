@@ -5,8 +5,13 @@ from urllib import parse
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 
 from .app import db
-from .forms import FormAccountUpdate, FormAccountSignup, FormLogin, FormPswChange
+from .forms import FormAccountUpdate, \
+    FormAccountSignup, \
+    FormLogin, \
+    FormPswChange, \
+    FormFarmerCreate
 from .models.accounts import Administrator, User
+from .models.farmers import Farmer
 from .utility import functions as fnz
 from .utility.functions import event_create
 from .utility.functions_accounts import is_valid_email
@@ -96,6 +101,7 @@ def admin_create():
                     name=form_data["name"],
                     last_name=form_data["last_name"],
                     email=form_data["email"],
+                    phone=form_data["phone"],
                     password=psw_hash(form_data["new_password_1"]),
                     updated_at=datetime.now()
                 )
@@ -145,6 +151,7 @@ def admin_update(data):
                 administrator.name = form_data["name"]
                 administrator.last_name = form_data["last_name"]
                 administrator.email = form_data["email"]
+                administrator.phone = form_data["phone"]
                 administrator.updated_at = datetime.now()
 
                 # print("DATA:", json.dumps(administrator.to_dict(), indent=2))
@@ -173,7 +180,7 @@ def admin_update(data):
         else:
             form = FormAccountUpdate()
             # recupero i dati e li converto in dict
-            data = parse.unquote(data).replace("'", '"')
+            data = parse.unquote(data).replace("'", '"').replace(str(None), "0")
             data = json.loads(data)
             print("DATA_PASS:", json.dumps(data, indent=2))
             session["id_admin"] = data["id"]
@@ -181,6 +188,8 @@ def admin_update(data):
             form.email.data = data["email"]
             form.name.data = data["name"]
             form.last_name.data = data["last_name"]
+            form.email.data = data["email"]
+            form.phone.data = data["phone"]
             print(form.username.data)
             return render_template("admin/admin_update.html", form=form)
     else:
@@ -328,6 +337,7 @@ def user_create():
                     name=form_data["name"],
                     last_name=form_data["last_name"],
                     email=form_data["email"],
+                    phone=form_data["phone"],
                     password=psw_hash(form_data["new_password_1"]),
                     updated_at=datetime.now()
                 )
@@ -375,6 +385,7 @@ def user_update(data):
                 user.name = form_data["name"]
                 user.last_name = form_data["last_name"]
                 user.email = form_data["email"]
+                user.phone = form_data["phone"]
                 user.updated_at = datetime.now()
 
                 print("DATA:", json.dumps(user.to_dict(), indent=2))
@@ -404,14 +415,15 @@ def user_update(data):
         else:
             form = FormAccountUpdate()
             # recupero i dati e li converto in dict
-            data = parse.unquote(data).replace("'", '"')
+            data = parse.unquote(data).replace("'", '"').replace(str(None), "0")
             data = json.loads(data)
             print("DATA_PASS:", json.dumps(data, indent=2))
             session["id_user"] = data["id"]
             form.username.data = data["username"]
-            form.email.data = data["email"]
             form.name.data = data["name"]
             form.last_name.data = data["last_name"]
+            form.email.data = data["email"]
+            form.phone.data = data["phone"]
             print(form.username.data)
             return render_template("user/user_update.html", form=form)
     else:
@@ -441,6 +453,73 @@ def user_view_history(data):
         history_list = user.event
         history_list = [history.to_dict() for history in history_list]
         return render_template("user/user_view_history.html", user=_user, history_list=history_list)
+    else:
+        flash("Devi eseguire la login.")
+        return redirect(url_for('logout'))
+
+
+@app.route("/farmer_view/", methods=["GET", "POST"])
+def farmer_view():
+    """Visualizzo informazioni Allevatori."""
+    if "token_login" in session:
+        if fnz.token_admin_validate(session["token_login"]):
+            pass
+        else:
+            return redirect(url_for('login'))
+        # Estraggo la lista degli allevatori
+        farmer_list = Farmer.query.all()
+        _farmer_list = [farmer.to_dict() for farmer in farmer_list]
+        return render_template("farmer/farmer_view.html", farmer_list=_farmer_list)
+    else:
+        flash("Devi eseguire la login.")
+        return redirect(url_for('logout'))
+
+
+@app.route("/farmer_create/", methods=["GET", "POST"])
+def farmer_create():
+    """Creazione Allevatore Consorzio."""
+    if "token_login" in session:
+        if fnz.token_admin_validate(session["token_login"]):
+            pass
+        else:
+            return redirect(url_for('logout'))
+
+        form = FormFarmerCreate()
+        if form.validate_on_submit():
+            form_data = json.loads(json.dumps(request.form))
+            print("FORM_DATA", json.dumps(form_data, indent=2))
+            if form_data["affiliation_status"] == "NO":
+                form_data["affiliation_status"] = False
+            else:
+                form_data["affiliation_status"] = True
+
+            new_farmer = Farmer(
+                farmer_name=form_data["farmer_name"],
+                email=form_data["email"],
+                phone=form_data["phone"],
+
+                affiliation_start_date=form_data["affiliation_date"],
+                affiliation_status=form_data["affiliation_status"],
+
+                address=form_data["address"],
+                cap=form_data["cap"],
+                city=form_data["city"],
+
+                stable_code=form_data["stable_code"],
+                stable_type=form_data["stable_type"],
+                stable_productive_orientation=form_data["stable_productive_orientation"],
+                stable_breeding_methods=form_data["stable_breeding_methods"],
+
+                updated_at=datetime.now()
+            )
+
+            db.session.add(new_farmer)
+            db.session.commit()
+            flash("Allevatore creato correttamente.")
+            return redirect(url_for('farmer_view'))
+
+        else:
+            return render_template("farmer/farmer_create.html", form=form)
     else:
         flash("Devi eseguire la login.")
         return redirect(url_for('logout'))

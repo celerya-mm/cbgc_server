@@ -68,11 +68,11 @@
                     <a class="nav-item nav-link {% if request.path == '/farmer_view/' %} active {% endif %}"
                        title="Users" href="{{ url_for('farmer_view') }}">
                         {% if request.path == '/farmer_view/' %}
-                            <img src="{{ url_for('static', filename='icons/agricolture-active.svg') }}" alt="">
+                            <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
                         {% else %}
-                            <img src="{{ url_for('static', filename='icons/agricolture.svg') }}" alt="">
+                            <img src="{{ url_for('static', filename='icons/agriculture.svg') }}" alt="">
                         {% endif %}
-                        Utenti
+                        Allevatori
                     </a>
                     <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
                         <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">

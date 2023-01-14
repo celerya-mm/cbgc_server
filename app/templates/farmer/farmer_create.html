@@ -1,0 +1,135 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+    <div class="row no-gutters justify-content-center">
+        <h5 class="card-title">
+            <a class="btn btn-update" type="button" href="{{ url_for('farmer_view') }}" title="Annulla">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
+            </a>
+            Crea un nuovo Allevatore del Consorzio:
+        </h5>
+        <div class="col-md-12">
+            <form enctype="multipart/form-data" method="POST">
+                {{ form.csrf_token }}
+                <div class="row no-gutters justify-content-center">
+                    <div class="col-md-4 order-first">
+                        <br>
+                        <div class="form-group">
+                            {{ form.farmer_name.label }}
+                            {{ form.farmer_name(class="form-control") }}
+                            {% if form.farmer_name.errors %}
+                                {% for error in form.farmer_name.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.email.label }}
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.phone.label }}
+                            {{ form.phone(class="form-control") }}
+                            {% if form.phone.errors %}
+                                {% for error in form.phone.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.address.label }}
+                            {{ form.address(class="form-control") }}
+                            {% if form.address.errors %}
+                                {% for error in form.address.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 order-second">
+                        <br>
+                        <div class="form-group">
+                            {{ form.cap.label }}
+                            {{ form.cap(class="form-control") }}
+                            {% if form.cap.errors %}
+                                {% for error in form.cap.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.city.label }}
+                            {{ form.city(class="form-control") }}
+                            {% if form.city.errors %}
+                                {% for error in form.city.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.affiliation_date.label }}
+                            {{ form.affiliation_date(class="form-control") }}
+                            {% if form.city.errors %}
+                                {% for error in form.city.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.affiliation_status.label }}
+                            {{ form.affiliation_status(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="col-md-4 order-third">
+                        <br>
+                        <div class="form-group">
+                            {{ form.stable_code.label }}
+                            {{ form.stable_code(class="form-control") }}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.stable_type.label }}
+                            {{ form.stable_type(class="form-control") }}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.stable_productive_orientation.label }}
+                            {{ form.stable_productive_orientation(class="form-control") }}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.stable_breeding_methods.label }}
+                            {{ form.stable_breeding_methods(class="form-control") }}
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
+                    <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
+                         alt=""/>
+                </button>
+                <br>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
