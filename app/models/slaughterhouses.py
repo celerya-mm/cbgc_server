@@ -8,16 +8,19 @@ class Slaughterhouse(db.Model):
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     slaughterhouse = db.Column(db.String(100), index=False, unique=True, nullable=False)
+    slaughterhouse_code = db.Column(db.String(20), index=False, unique=True, nullable=True)
+
     email = db.Column(db.String(80), index=False, unique=False, nullable=True)
     phone = db.Column(db.String(80), index=False, unique=False, nullable=True)
+    address = db.Column(db.String(255), index=False, unique=False, nullable=True)
+    cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
+    city = db.Column(db.String(55), index=False, unique=False, nullable=True)
+
     # user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
     affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
     affiliation_status = db.Column(db.Boolean, index=True, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
-    address = db.Column(db.String(255), index=False, unique=False, nullable=True)
-    cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
-    city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 
     head = db.relationship('Head', backref='slaughterhouse')
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse')
@@ -29,18 +32,23 @@ class Slaughterhouse(db.Model):
     def __repr(self):
         return '<Slaughterhouse {}>'.format(self.farmer_name)
 
-    def __init__(self, slaughterhouse, email, phone, address, cap, city, affiliation_start_date, affiliation_end_date,
-                 affiliation_status, note, head, cons_cert, updated_at):
+    def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city, affiliation_start_date,
+                 affiliation_end_date, affiliation_status, note, head, cons_cert, updated_at):
         self.slaughterhouse = slaughterhouse
+        self.slaughterhouse_code = slaughterhouse_code
+
         self.email = email
         self.phone = phone
         self.address = address
         self.cap = cap
         self.city = city
+
         self.affiliation_start_date = affiliation_start_date
         self.affiliation_end_date = affiliation_end_date
         self.affiliation_status = affiliation_status
+
         self.note = note
+
         self.head = head
         self.cons_cert = cons_cert
         self.created_at = datetime.now()
@@ -54,6 +62,7 @@ class Slaughterhouse(db.Model):
         return {
             'id': self.id,
             'slaughterhouse': self.slaughterhouse,
+            'slaughterhouse_code': self.slaughterhouse_code,
             'email': self.email,
             'phone': self.phone,
             'address': self.address,

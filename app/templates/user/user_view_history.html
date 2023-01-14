@@ -1,0 +1,118 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="POST">
+    <div class="container text-center mt-3">
+        <h5 class="card-title">
+            <a class="btn btn-update" type="button" title="Torna indietro"
+               href="{{ url_for('user_view') }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
+            </a>
+            Elenco eventi modifica record per l'utente: "{{user.username}}"
+        </h5>
+        <a class="btn btn-update" type="button" title="Modifica utente" href="{{ url_for('user_update', data=user) }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+        </a>
+    </div>
+
+    <div class="container text-center mt-3">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-md-3 order-first">
+                <div class="form-group">
+                    <h6> Username </h6>
+                    <p style="font-weight: bold; color: black">{{ user.username }}</p>
+                </div>
+                <hr>
+            </div>
+            <div class="col-md-3 order-second">
+                <div class="form-group">
+                    <h6> email </h6>
+                    <p style="font-weight: bold; color: black">{{ user.email }}</p>
+                </div>
+                <hr>
+            </div>
+            <div class="col-md-3 order-third">
+                <div class="form-group">
+                    <h6> Name </h6>
+                    <p style="font-weight: bold; color: black">{{ user.name }}</p>
+                </div>
+                <hr>
+            </div>
+            <div class="col-md-3 order-fourth">
+                <div class="form-group">
+                    <h6> Last Name </h6>
+                    <p style="font-weight: bold; color: black">{{ user.last_name }}</p>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </div>
+    <div class="container text-center mt-3 mx-auto" style="margin: 0px;">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-md-14">
+                <h2 class="card-title" style="padding: 20px;">Elenco modifiche al record:</h2>
+                <div>
+                    <table id="data" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="h1" data-defaultsort="desc">ID</th>
+                            <th class="title" id="h2">Modifica</th>
+                            <th class="title" id="h3">Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in history_list %}
+                        <tr style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.id|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.event|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.created_at|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#data').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            },
+            columns: [
+              {searchable: false}
+              {orderable: false},
+              null
+              ],
+        });
+    });
+
+
+
+
+
+
+</script>
+{% endblock %}

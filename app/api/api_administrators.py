@@ -13,75 +13,82 @@ from app.utility.functions_accounts import is_valid_email, __save_auth_token, __
 def administrator_signup():
     """API creazione utente amministratore."""
     data_received = request.get_json()
-    username = data_received['username']
-    password = data_received['password']
-    name = data_received['name']
-    last_name = data_received['last_name']
-    email = data_received['email']
+    username = data_received['username'].replace(" ", "")
+    password = data_received['password'].replace(" ", "")
+    try:
+        verify_password = psw_verify(password)
+        if verify_password is not False:
+            return make_response(jsonify(verify_password), 400)
 
-    verify_password = psw_verify(password)
-    if verify_password is not False:
-        return make_response(jsonify(verify_password), 400)
+        contain_usr = psw_contain_usr(password, username)
+        if contain_usr is not False:
+            return make_response(jsonify(contain_usr), 400)
 
-    contain_usr = psw_contain_usr(password, username)
-    if contain_usr is not False:
-        return make_response(jsonify(contain_usr), 400)
+        valid_email = is_valid_email(data_received["email"])
+        if valid_email:
+            if username not in [None, ""] and  password not in [None, ""] and \
+                    data_received["email"] not in [None, ""]:
+                try:
+                    existing_user = Administrator.query.filter(Administrator.username == username).first()
+                    if existing_user is None:
+                        new_admin = Administrator(
+                            username=username,
+                            password=psw_hash(str(data_received['password'])),
+                            name=data_received['name'],
+                            last_name=data_received["last_name"],
+                            phone=data_received['phone'],
+                            email=data_received["email"],
+                            updated_at=datetime.now()
+                        )
+                        db.session.add(new_admin)
+                        db.session.commit()
+                        print('NEW admin ID: {}'.format(new_admin.id))
 
-    valid_email = is_valid_email(email)
-    if valid_email:
-        if username not in [None, ""] and password not in [None, ""] and email not in [None, ""]:
-            try:
-                existing_user = Administrator.query.filter(Administrator.username == username).first()
-                if existing_user is None:
-                    new_admin = Administrator(
-                        username=username,
-                        password=psw_hash(str(password)),
-                        name=name,
-                        last_name=last_name,
-                        email=email,
-                        updated_at=datetime.now()
-                    )
-                    db.session.add(new_admin)
-                    db.session.commit()
-                    print('NEW admin ID: {}'.format(new_admin.id))
-                    token = __generate_auth_token()
-                    save = __save_auth_token(new_admin.id, "", token)
-                    print('Generated auth token successfully.')
-                    data = {
-                        '01_status': 'success',
-                        'token': token,
-                        'expiration': save.expires_at,
-                        'id': new_admin.id,
-                        'username': new_admin.username,
-                        'email': new_admin.email
-                    }
-                    response = make_response(jsonify(data), 201)
-                else:
+                        token = __generate_auth_token()
+                        save = __save_auth_token(new_admin.id, "", token)
+                        print('Generated auth token successfully.')
+
+                        data = {
+                            '01_status': 'success',
+                            'token': token,
+                            'expiration': save.expires_at,
+                            'id': new_admin.id,
+                            'username': new_admin.username,
+                            'phone': new_admin.phone,
+                            'email': new_admin.email
+                        }
+                        response = make_response(jsonify(data), 201)
+                    else:
+                        data = {
+                            '01_status': 'failed',
+                            '02_message': 'Administrator {} already exists.'.format(username)
+                        }
+                        response = make_response(jsonify(data), 401)
+                except Exception as error:
                     data = {
                         '01_status': 'failed',
-                        '02_message': 'Administrator {} already exists.'.format(username)
+                        '02_message': 'Administrator registration failed: {}.'.format(error)
                     }
-                    response = make_response(jsonify(data), 401)
-            except Exception as error:
+                    response = make_response(jsonify(data), 500)
+            else:
                 data = {
                     '01_status': 'failed',
-                    '02_message': 'Administrator registration failed: {}.'.format(error)
+                    '02_message': 'Username, Password and email are required.',
+                    'username': data_received['username'],
+                    'email': data_received["email"]
                 }
-                response = make_response(jsonify(data), 500)
+                response = make_response(jsonify(data), 400)
         else:
             data = {
                 '01_status': 'failed',
-                '02_message': 'Username, Password and email are required.',
-                'username': username,
-                'password': '*******',
-                'email': email
+                '02_message': 'The email passed is not a valid email.',
+                'email': data_received["email"]
             }
             response = make_response(jsonify(data), 400)
-    else:
+    except Exception as error:
         data = {
             '01_status': 'failed',
-            '02_message': 'The email passed is not a valid email.',
-            'email': email
+            '02_message': 'An error occurred: {}.'.format(error)
         }
         response = make_response(jsonify(data), 400)
     return response
@@ -91,52 +98,48 @@ def administrator_signup():
 def authenticate_administrator():
     """API login utente amministratore."""
     data_received = request.get_json()
-    username = data_received["username"]
-    password = data_received["password"]
+    username = data_received['username'].replace(" ", "")
+    password = data_received['password'].replace(" ", "")
 
-    authenticated = Administrator.query.filter(
+    _admin = Administrator.query.filter(
         Administrator.username == username,
         Administrator.password == psw_hash(str(password))
     ).first()
-    try:
-        if authenticated not in [None, ""]:
-            record = len(authenticated.auth_token) - 1
-            if authenticated.auth_token[record].expires_at > datetime.now():
-                token = authenticated.auth_token[record].token
-                data = {
-                    '01_status': 'success',
-                    'token': token,
-                    'expiration': authenticated.auth_token[record].expires_at,
-                    'id': authenticated.id,
-                    'username': authenticated.username,
-                    'email': authenticated.email
-                }
-                response = make_response(jsonify(data), 201)
-            else:
-                token = __generate_auth_token()
-                save = __save_auth_token(authenticated.id, "", token)
-                data = {
-                    '01_status': 'success',
-                    'token': token,
-                    'expiration': save.expires_at,
-                    'id': authenticated.id,
-                    'username': authenticated.username,
-                    'email': authenticated.email
-                }
-                response = make_response(jsonify(data), 201)
-        else:
+
+    if _admin not in [None, ""]:
+        record = len(_admin.auth_token) - 1
+        if record > 0 and _admin.auth_token[record].expires_at > datetime.now():
+            token = _admin.auth_token[record].token
             data = {
-                '01_status': 'failed',
-                '02_message': f"Login failed, there's no administrator registered with this username e password.",
-                'username': username
+                '01_status': 'success',
+                'token': token,
+                'expiration': _admin.auth_token[record].expires_at,
+                'id': _admin.id,
+                'username': _admin.username,
+                'phone': _admin.phone,
+                'email': _admin.email
             }
-            response = make_response(jsonify(data), 500)
-    except Exception as error:
+            response = make_response(jsonify(data), 201)
+        else:
+            token = __generate_auth_token()
+            save = __save_auth_token(_admin.id, "", token)
+            data = {
+                '01_status': 'success',
+                'token': token,
+                'expiration': save.expires_at,
+                'id': _admin.id,
+                'username': _admin.username,
+                'phone': _admin.phone,
+                'email': _admin.email
+            }
+            response = make_response(jsonify(data), 201)
+    else:
         data = {
             '01_status': 'failed',
-            '02_message': 'An error occurred: {}.'.format(error)
+            '02_message': f"Login failed, there's no administrator registered with this username e password.",
+            'username': username
         }
-        response = make_response(jsonify(data), 400)
+        response = make_response(jsonify(data), 500)
     return response
 
 

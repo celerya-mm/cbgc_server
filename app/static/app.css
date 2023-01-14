@@ -51,6 +51,17 @@ body {
     padding: 2px;
 }
 
+.icon-table,
+.btn-table {
+    background-color: transparent;
+    width: 18px;
+    height: 18px;
+    margin: 2px;
+    background-position: center;
+    align-items: center;
+    vertical-align: middle;
+}
+
 .btn-update:hover {
     background-color: #f6f6f6;
     border-color: transparent;
@@ -73,6 +84,7 @@ body {
     margin: auto;
 }
 
+
 .content-container {
     max-width: 1028px;
     margin-top: 10px;
@@ -90,11 +102,11 @@ body {
 }
 
 .dataTables_length {
-    text-align: center;
+    text-align: left;
 }
 
 .dataTables_info {
-    text-align: center;
+    text-align: left;
 }
 
 .delete {
@@ -129,6 +141,8 @@ body {
 .icon-disable {
     fill: #DEDEDE;
 }
+
+
 
 img {
     color: #ffffff;
@@ -167,7 +181,7 @@ input,
 }
 
 .navbar-container {
-    max-width: 950px;
+    max-width: 1080px;
     font-size: 0.875rem;
     padding: 0px 0px 0px 10px;
 }
@@ -177,6 +191,11 @@ input,
     font-family: 'Jost', sans-serif;
     font-size: 1.2rem;
 }
+
+.navbar-toggler{
+    border:  4px solid #fffff;
+}
+
 
 .nav-link:hover {
     color: #F6D11B;
@@ -263,7 +282,7 @@ input,
 
 @media (min-width: 768px) {
     .pagination-block {
-        margin-left: 30px;
+        margin-left: 15px;
     }
 
     .nav-link {

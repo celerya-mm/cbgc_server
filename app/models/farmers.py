@@ -10,14 +10,23 @@ class Farmer(db.Model):
     farmer_name = db.Column(db.String(100), index=False, unique=True, nullable=False)
     email = db.Column(db.String(80), index=False, unique=False, nullable=True)
     phone = db.Column(db.String(80), index=False, unique=False, nullable=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
     affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
     affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
     affiliation_status = db.Column(db.Boolean, index=True, nullable=True)
-    note = db.Column(db.String(255), index=False, unique=False, nullable=True)
+
     address = db.Column(db.String(255), index=False, unique=False, nullable=True)
     cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
     city = db.Column(db.String(55), index=False, unique=False, nullable=True)
+
+    stable_code = db.Column(db.String(20), index=False, unique=False, nullable=True)
+    stable_type = db.Column(db.String(25), index=False, unique=False, nullable=True)
+    stable_productive_orientation = db.Column(db.String(25), index=False, unique=False, nullable=True)
+    stable_breeding_methods = db.Column(db.String(25), index=False, unique=False, nullable=True)
+
+    note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     head = db.relationship('Head', backref='farmer')
     dna_cert = db.relationship('CertificateDna', backref='farmer')
@@ -30,21 +39,33 @@ class Farmer(db.Model):
     def __repr(self):
         return '<Farmer {}>'.format(self.farmer_name)
 
-    def __init__(self, farmer_name, email, phone, address, cap, city, affiliation_start_date, affiliation_end_date,
-                 affiliation_status, note, head, dna_cert, cons_cert, updated_at):
+    def __init__(self, farmer_name, email, phone, address, cap, city, stable_code, stable_type,
+                 stable_productive_orientation, stable_breeding_methods, affiliation_start_date,
+                 affiliation_end_date, affiliation_status, note, head, dna_cert, cons_cert, event,
+                 updated_at):
         self.farmer_name = farmer_name
         self.email = email
         self.phone = phone
         self.address = address
         self.cap = cap
         self.city = city
+
         self.affiliation_start_date = affiliation_start_date
         self.affiliation_end_date = affiliation_end_date
         self.affiliation_status = affiliation_status
+
+        self.stable_code = stable_code
+        self.stable_type = stable_type
+        self.stable_productive_orientation = stable_productive_orientation
+        self.stable_breeding_methods = stable_breeding_methods
+
         self.note = note
+
         self.head = head
         self.dna_cert = dna_cert
         self.cons_cert = cons_cert
+        self.event = event
+
         self.created_at = datetime.now()
         self.updated_at = updated_at
 
@@ -61,9 +82,16 @@ class Farmer(db.Model):
             'address': self.address,
             'cap': self.cap,
             'city': self.city,
-            'affiliation_start_date': self.affiliation_start_date,
+
+            'stable_code': self.stable_code,
+            'stable_type': self.stable_type,
             'affiliation_end_date': self.affiliation_end_date,
             'affiliation_status': self.affiliation_status,
+
+            'affiliation_start_date': self.affiliation_start_date,
+            'stable_productive_orientation': self.stable_productive_orientation,
+            'stable_breeding_methods': self.stable_breeding_methods,
+
             'note': self.note,
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
             'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),

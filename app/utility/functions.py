@@ -1,12 +1,8 @@
-import base64
 import json
 from datetime import datetime
-from psycopg2.extras import Json
 
 import requests
-import sqlalchemy
-from flask import jsonify, flash, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import flash
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 

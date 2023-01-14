@@ -2,63 +2,14 @@
 
 {% block content %}
 <form enctype="multipart/form-data" method="POST">
-    <div class="container text-center mt-3">
-        <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Crea nuovo utente Amministratore"
-               href="{{ url_for('admin_create') }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
-            </a>
-            Ciao "{{admin.name}}"
-        </h5>
-        <a class="btn-update" type="button" title="Modifica utente" href="{{ url_for('admin_update', data=admin) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
-        </a>
-        <a class="btn-update" type="button" title="Cambia password utente"
-           href="{{ url_for('admin_update_password') }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_grey.svg') }}" alt=""/>
-        </a>
-        <a class="btn-update" type="button" title="Visualizza storia modifiche al record"
-           href="{{ url_for('admin_view_history', data=admin) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/history_grey.svg') }}" alt=""/>
-        </a>
-    </div>
-
-    <div class="container text-center mt-3">
-        <div class="row no-gutters justify-content-center">
-            <div class="col-md-3 order-first">
-                <div class="form-group">
-                    <h6> Username </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.username }}</p>
-                </div>
-                <hr>
-            </div>
-            <div class="col-md-3 order-second">
-                <div class="form-group">
-                    <h6> email </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.email }}</p>
-                </div>
-                <hr>
-            </div>
-            <div class="col-md-3 order-third">
-                <div class="form-group">
-                    <h6> Name </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.name }}</p>
-                </div>
-                <hr>
-            </div>
-            <div class="col-md-3 order-fourth">
-                <div class="form-group">
-                    <h6> Last Name </h6>
-                    <p style="font-weight: bold; color: #5B5A5B">{{ admin.last_name }}</p>
-                </div>
-                <hr>
-            </div>
-        </div>
-    </div>
     <div class="container text-center mt-3 mx-auto" style="margin: 0px;">
         <div class="row no-gutters justify-content-center">
             <div class="col-md-14">
-                <h2 class="card-title" style="padding: 20px;">Elenco Amministratori:</h2>
+                <h2 class="card-title" style="padding: 20px;">
+                    <a class="btn btn-update" type="button" title="Crea nuovo Utente" href="{{ url_for('user_create') }}">
+                        <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
+                    </a>
+                    Elenco Utenti:</h2>
                 <div>
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
@@ -75,7 +26,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for row in admin_list %}
+                        {% for row in user_list %}
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.id|e }}
@@ -100,14 +51,14 @@
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Modifica utente"
-                                   href="{{ url_for('admin_update', data=row) }}">
+                                   href="{{ url_for('user_update', data=row) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Visualizza utente"
-                                   href="{{ url_for('admin_view_history', data=row) }}">
+                                   href="{{ url_for('user_view_history', data=row) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>

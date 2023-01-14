@@ -37,6 +37,6 @@ def is_valid_email(_email):
     try:
         v = validate_email(_email)
         print(v)
-        return v["email"]
+        return True
     except EmailNotValidError:
         return False

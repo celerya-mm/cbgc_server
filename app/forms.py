@@ -14,35 +14,39 @@ class FormLogin(FlaskForm):
 class FormAccountSignup(FlaskForm):
     """Form dati signup account Administrator."""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    password1 = PasswordField('Password1', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
-    password2 = PasswordField('Password2', validators=[
+    new_password_1 = PasswordField('New Password', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
+    new_password_2 = PasswordField('Password Confirm', validators=[
         DataRequired("Campo obbligatorio!"),  Length(min=8),
-        validators.EqualTo('password1', message='Le password non corrispondono!')
+        EqualTo('new_password_1', message='Both password fields must be equal!')
     ])
     name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    last_name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
+    last_name = StringField('Last Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email()])
 
     submit = SubmitField("SIGNUP")
 
+    def validate_password(self):
+        if self.new_password_1.data != self.new_password_2.data:
+            raise validators.ValidationError('Passwords do not match')
 
-class AccountUpdateForm(FlaskForm):
+
+class FormAccountUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
-    last_name = StringField('First Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
+    last_name = StringField('Last Name', validators=[DataRequired("Campo obbligatorio!"), Length(min=3)])
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email()])
 
     submit = SubmitField("MODIFICA")
 
 
-class InsertMailForm(FlaskForm):
+class FormInsertMail(FlaskForm):
     """Form d'invio mail per cambio password"""
     email = EmailField('Current e-mail', validators=[DataRequired("Campo obbligatorio!"), Email()])
     submit = SubmitField("SEND EMAIL")
 
 
-class PswChangeForm(FlaskForm):
+class FormPswChange(FlaskForm):
     old_password = PasswordField('Current Password', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
     new_password_1 = PasswordField('New Password', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
     new_password_2 = PasswordField('Password Confirm', validators=[
@@ -54,6 +58,3 @@ class PswChangeForm(FlaskForm):
     def validate_password(self):
         if self.new_password_1.data != self.new_password_2.data:
             raise validators.ValidationError('Passwords do not match')
-
-
-
