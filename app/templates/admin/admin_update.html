@@ -7,7 +7,7 @@
             <a class="btn btn-update" type="button" href="{{ url_for('admin_view') }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
-            Aggiorna/modifica i tuoi dati.
+            Modifica l'AMMINISTRATORE:
         </h5>
         <div class="col-md-5">
             <form enctype="multipart/form-data" method="POST">
@@ -21,6 +21,7 @@
                             <br>
                         {% endfor %}
                     {% endif %}
+                    <p class="comment">Lo username non deve contenere spazi.</p>
                 </div>
                 <br>
                 <div class="form-group">
@@ -61,6 +62,17 @@
                     {{ form.phone(class="form-control") }}
                     {% if form.phone.errors %}
                         {% for error in form.phone.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.note.label }}
+                    {{ form.note(class="form-control") }}
+                    {% if form.note.errors %}
+                        {% for error in form.note.errors %}
                             <span class="text-danger">{{ error }}</span>
                             <br>
                         {% endfor %}

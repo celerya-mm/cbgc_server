@@ -30,11 +30,11 @@ class Head(db.Model):
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
-    def __repr(self):
-        return '<Head {}>'.format(self.headset)
+    def __repr__(self):
+        return '<Head: {}>'.format(self.headset)
 
-    def __init__(self, headset, bird_date, castration_date, castration_compliance, slaughter_date, sale_date, sale_year,
-                 note, farmer_id, buyer_id, dna_cert, cons_cert, updated_at):
+    def __init__(self, headset, bird_date, castration_date=None, castration_compliance=None, slaughter_date=None, sale_date=None, sale_year=None,
+                 note=None, farmer_id=None, buyer_id=None, dna_cert=None, cons_cert=None, updated_at=datetime.now()):
         self.headset = headset
         self.bird_date = bird_date
         self.castration_date = castration_date

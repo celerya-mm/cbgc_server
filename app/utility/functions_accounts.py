@@ -1,5 +1,6 @@
 import random
 import string
+from uuid import uuid4
 from datetime import datetime, timedelta
 
 from email_validator import validate_email, EmailNotValidError
@@ -9,8 +10,10 @@ from app.models.tokens import AuthToken
 
 
 def __generate_auth_token():
-    """Genero random token."""
-    return ''.join([random.choice(string.ascii_letters + string.digits) for _n in range(64)])
+    # """Genero random token."""
+    # return ''.join([random.choice(string.ascii_letters + string.digits) for _n in range(64)])
+    """Genero token UUID4."""
+    return str(uuid4())
 
 
 def __save_auth_token(admin_id, user_id, token):
@@ -19,17 +22,20 @@ def __save_auth_token(admin_id, user_id, token):
         admin_id = None
     if user_id in [""]:
         user_id = None
-    DATETIME = datetime.now()
+
     EXPIRATION = datetime.now() + timedelta(days=1)
     EXPIRATION = EXPIRATION.replace(hour=0, minute=0, second=0, microsecond=0)
+
     auth_token = AuthToken(
         admin_id=admin_id,
         user_id=user_id,
         token=token,
         expires_at=EXPIRATION
     )
+
     db.session.add(auth_token)
     db.session.commit()
+
     return auth_token
 
 

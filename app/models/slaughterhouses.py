@@ -29,11 +29,11 @@ class Slaughterhouse(db.Model):
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
-    def __repr(self):
-        return '<Slaughterhouse {}>'.format(self.farmer_name)
+    def __repr__(self):
+        return '<Slaughterhouse: {}>'.format(self.farmer_name)
 
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city, affiliation_start_date,
-                 affiliation_end_date, affiliation_status, note, head, cons_cert, updated_at):
+                 affiliation_end_date, affiliation_status, note, head, cons_cert, updated_at=datetime.now()):
         self.slaughterhouse = slaughterhouse
         self.slaughterhouse_code = slaughterhouse_code
 

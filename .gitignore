@@ -114,6 +114,7 @@ env.bak/
 venv.bak/
 migrations
 migrations/
+to_do.md
 
 # Spyder project settings
 .spyderproject

@@ -74,6 +74,15 @@
                         {% endif %}
                         Allevatori
                     </a>
+                    <a class="nav-item nav-link {% if request.path == '/buyer_view/' %} active {% endif %}"
+                       title="Users" href="{{ url_for('buyer_view') }}">
+                        {% if request.path == '/farmer_view/' %}
+                            <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
+                        {% endif %}
+                        Allevatori
+                    </a>
                     <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
                         <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">
                         LogOut

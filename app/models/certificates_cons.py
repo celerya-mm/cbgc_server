@@ -16,24 +16,32 @@ class CertificateCons(db.Model):
 
     sale_type = db.Column(db.String(50), index=False, unique=True, nullable=True)
     sale_quantity = db.Column(db.Float, index=False, nullable=True)
+    sale_rest = db.Column(db.Float, index=False, nullable=True)
 
-    note = db.Column(db.String(255), index=False, unique=False, nullable=True)
+    invoice_nr = db.Column(db.String(20), index=False, unique=False, nullable=True)
+    invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+    invoice_type = db.Column(db.String(20), index=False, unique=False, nullable=True)
+    invoice_status = db.Column(db.String(20), index=False, unique=False, nullable=True)
 
     head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False)
     buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id'), nullable=True)
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
     slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id'), nullable=True)
 
-    event = db.relationship('EventDB', backref='cert_cons')
+    events = db.relationship('EventDB', backref='cert_cons')
+
+    note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
-    def __repr(self):
-        return '<CertificateCons {}>'.format(self.headset)
+    def __repr__(self):
+        return '<CONS Certificate: {}>'.format(self.headset)
 
-    def __init__(self, certificate_nr, certificate_date, certificate_year, cockade_id, sale_type, sale_quantity, note,
-                 head_id, farmer_id, buyer_id, slaughterhouse_id, updated_at):
+    def __init__(self, certificate_nr, certificate_date, certificate_year, cockade_id, sale_type, sale_quantity,
+                 sale_rest=None, head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
+                 certificate_pdf=None, invoice_nr=None, invoice_date=None, invoice_type=None, invoice_status=None,
+                 note=None,  updated_at=datetime.now()):
         self.certificate_nr = certificate_nr
         self.certificate_date = certificate_date
         self.certificate_year = certificate_year
@@ -41,16 +49,21 @@ class CertificateCons(db.Model):
         self.cockade_id = cockade_id
 
         self.sale_type = sale_type
-        self.sale_type = sale_type
         self.sale_quantity = sale_quantity
-
-        self.note = note
+        self.sale_rest = sale_rest
 
         self.head_id = head_id
         self.farmer_id = farmer_id
         self.buyer_id = buyer_id
         self.slaughterhouse_id = slaughterhouse_id
 
+        self.certificate_pdf = certificate_pdf
+        self.invoice_nr = invoice_nr
+        self.invoice_date = invoice_date
+        self.invoice_type = invoice_type
+        self.invoice_status = invoice_status
+
+        self.note = note
         self.created_at = datetime.now()
         self.updated_at = updated_at
 
@@ -67,14 +80,19 @@ class CertificateCons(db.Model):
 
             'sale_type': self.sale_type,
             'sale_quantity': self.sale_quantity,
+            'sale_rest': self.sale_rest,
 
-            'note': self.note,
+            'invoice_nr': self.invoice_nr,
+            'invoice_date': self.invoice_date,
+            'invoice_type': self.invoice_type,
+            'invoice_status': self.invoice_status,
 
             'head_id': self.head_id,
             'farmer_id': self.farmer_id,
             'buyer_id': self.buyer_id,
             'slaughterhouse_id': self.slaughterhouse_id,
 
+            'note': self.note,
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
             'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

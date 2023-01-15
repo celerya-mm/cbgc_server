@@ -7,14 +7,17 @@ class AuthToken(db.Model):
     __tablename__ = 'auth_tokens'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    token = db.Column(db.String(64), nullable=False, unique=True)
+    token = db.Column(db.String(36), nullable=False, unique=True)
     admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id'), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     expires_at = db.Column(db.DateTime, index=False, nullable=False)
 
-    def __init__(self, token, expires_at, admin_id, user_id):
+    def __repr__(self):
+        return '<AuthToken: {}>'.format(self.token)
+
+    def __init__(self, token, expires_at, admin_id=None, user_id=None):
         self.token = token
         self.expires_at = expires_at
         self.admin_id = admin_id

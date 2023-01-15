@@ -8,6 +8,7 @@ from app.models.accounts import User
 from app.models.tokens import AuthToken
 from app.utility import psw_function as pswf
 from app.utility.functions_accounts import is_valid_email, __save_auth_token, __generate_auth_token
+from app.utility.psw_function import psw_hash
 
 
 @app.route('/api/user_signup/', methods=['POST'])
@@ -35,54 +36,57 @@ def user_signup():
                 if existing_user is None:
                     new_user = User(
                         username=username,
-                        password=hashlib.sha256(str(password).encode('utf-8')).hexdigest(),
+                        password=psw_hash(str(data_received['password'])),
                         name=data_received['name'],
-                        last_name=data_received['last_name'],
+                        last_name=data_received["last_name"],
                         phone=data_received['phone'],
-                        email=data_received['email'],
-                        updated_at=datetime.now()
+                        email=data_received["email"],
+                        note=data_received["note"]
                     )
                     db.session.add(new_user)
                     db.session.commit()
                     print('NEW user ID: {}'.format(new_user.id))
-                    token = __generate_auth_token()
-                    save = __save_auth_token("", new_user.id, token)
-                    print('Generated auth token successfully.')
+
                     data = {
-                        '01_status': 'success',
-                        'token': token,
-                        'expiration': save.expires_at,
-                        'id': new_user.id,
-                        'username': new_user.username,
-                        'phone': new_user.phone,
-                        'email': new_user.email
+                        'status': 'success',
+                        'data': {
+                            'id': new_user.id,
+                            'username': new_user.username,
+                            'phone': new_user.phone,
+                            'email': new_user.email,
+                            'note': new_user.note
+                        }
                     }
                     response = make_response(jsonify(data), 201)
                 else:
                     data = {
-                        '01_status': 'failed',
-                        '02_message': 'User {} already exists.'.format(username)
+                        'status': 'failed',
+                        'message': 'User {} already exists.'.format(username)
                     }
                     response = make_response(jsonify(data), 401)
             else:
                 data = {
-                    '01_status': 'failed',
-                    '02_message': 'Username, Password and email are required.',
-                    'username': username,
-                    'email': data_received['email']
+                    'status': 'failed',
+                    'message': 'Username, Password and email are required.',
+                    'data': {
+                        'username': username,
+                        'email': data_received['email']
+                    }
                 }
                 response = make_response(jsonify(data), 400)
         else:
             data = {
-                '01_status': 'failed',
-                '02_message': 'The email passed is not a valid email.',
-                'email': data_received['email']
+                'status': 'failed',
+                'message': 'The email passed is not a valid email.',
+                'data': {
+                    'email': data_received['email']}
+
             }
             response = make_response(jsonify(data), 400)
     except Exception as error:
         data = {
-            '01_status': 'failed',
-            '02_message': 'An error occurred: {}.'.format(error)
+            'status': 'failed',
+            'message': 'An error occurred: {}.'.format(error)
         }
         response = make_response(jsonify(data), 400)
     return response
@@ -102,41 +106,43 @@ def authenticate_user():
 
     try:
         if _user not in [None, ""]:
-            record = len(_user.auth_token) - 1
-            if record > 0 and _user.auth_token[record].expires_at > datetime.now():
-                token = _user.auth_token[record].token
+            record = len(_user.auth_tokens) - 1
+            if record > 0 and _user.auth_tokens[record].expires_at > datetime.now():
+                token = _user.auth_tokens[record].token
                 data = {
-                    '01_status': 'success',
-                    'token': token,
-                    'expiration': _user.auth_token[record].expires_at,
-                    'id': _user.id,
-                    'username': _user.username,
-                    'email': _user.email
+                    'status': 'success',
+                    'data': {
+                        'token': token,
+                        'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
+                        'user_id': _user.id
+                    }
                 }
                 response = make_response(jsonify(data), 201)
             else:
                 token = __generate_auth_token()
                 save = __save_auth_token("", _user.id, token)
                 data = {
-                    '01_status': 'success',
-                    'token': token,
-                    'expiration': save.expires_at,
-                    'id': _user.id,
-                    'username': _user.username,
-                    'email': _user.email
+                    'status': 'success',
+                    'data': {
+                        'token': token,
+                        'expiration': datetime.strftime(save.expires_at, "%Y-%m-%d %H:%M:%S"),
+                        'user_id': _user.id
+                    }
                 }
                 response = make_response(jsonify(data), 201)
         else:
             data = {
-                '01_status': 'failed',
-                '02_message': f"Login failed, there's no user registered with this username e password.",
-                "user": username
+                'status': 'failed',
+                'message': f"Login failed, there's no user registered with this username e password.",
+                'data': {
+                    "user": username
+                }
             }
             response = make_response(jsonify(data), 500)
     except Exception as error:
         data = {
-            '01_status': 'failed',
-            '02_message': 'An error occurred: {}.'.format(error)
+            'status': 'failed',
+            'message': 'An error occurred: {}.'.format(error)
         }
         response = make_response(jsonify(data), 400)
     return response

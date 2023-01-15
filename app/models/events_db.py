@@ -24,9 +24,10 @@ class EventDB(db.Model):
     def __repr__(self):
         return '<Event: {}>'.format(self.event)
 
-    def __init__(self, event, admin_id, user_id, farmer_id, buyer_id, slaughterhouse_id, head_id, cert_cons_id,
-                 cert_dna_id):
+    def __init__(self, event, admin_id=None, user_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
+                 head_id=None, cert_cons_id=None, cert_dna_id=None):
         self.event = event
+
         self.admin_id = admin_id
         self.user_id = user_id
         self.farmer_id = farmer_id
@@ -35,12 +36,14 @@ class EventDB(db.Model):
         self.head_id = head_id
         self.cert_cons_id = cert_cons_id
         self.cert_dna_id = cert_dna_id
+
         self.created_at = datetime.now()
 
     def to_dict(self):
         return {
             'id': self.id,
             'event': self.event,
+
             'admin_id': self.admin_id,
             'user_id': self.user_id,
             'farmer_id': self.farmer_id,
@@ -49,5 +52,6 @@ class EventDB(db.Model):
             'head_id': self.head_id,
             'cert_cons_id': self.cert_cons_id,
             'cert_dna_id': self.cert_dna_id,
+
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
         }

@@ -4,7 +4,6 @@ from flask import request, jsonify, current_app as app
 
 from app.models.buyers import Buyer
 from app.models.tokens import AuthToken
-from app.utility.functions import token_user_validate
 
 
 @app.route('/api/buyers/', methods=['GET'])

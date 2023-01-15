@@ -89,6 +89,12 @@ checkbox {
     height: 24px;
 }
 
+.comment {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.6rem;
+    color: #ED6666;
+}
+
 .content-container {
     max-width: 1028px;
     margin-top: 10px;
