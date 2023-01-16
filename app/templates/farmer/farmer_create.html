@@ -121,6 +121,17 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    {{ form.note_certificate.label }}
+                    {{ form.note_certificate(class="form-control") }}
+                    {% if form.note_certificate.errors %}
+                        {% for error in form.note_certificate.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                    <p class="comment">Queste note compariranno nella stampa del certificato. Usarle con cautela.</p>
+                </div>
+                <div class="form-group">
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}

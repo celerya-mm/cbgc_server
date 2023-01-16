@@ -50,9 +50,9 @@
                     <a class="nav-item nav-link {% if request.path == '/admin_view/' %} active {% endif %}"
                        title="Account" href="{{ url_for('admin_view') }}">
                         {% if request.path == '/admin_view/' %}
-                            <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
+                            <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
                         {% else %}
-                            <img src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
+                            <img src="{{ url_for('static', filename='icons/admin.svg') }}" alt="">
                         {% endif %}
                         Amministratori
                     </a>
@@ -75,13 +75,13 @@
                         Allevatori
                     </a>
                     <a class="nav-item nav-link {% if request.path == '/buyer_view/' %} active {% endif %}"
-                       title="Users" href="{{ url_for('buyer_view') }}">
-                        {% if request.path == '/farmer_view/' %}
+                       title="Users" href="{{ url_for('farmer_view') }}">
+                        {% if request.path == '/buyer_view/' %}
                             <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
                         {% else %}
                             <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
                         {% endif %}
-                        Allevatori
+                        Acquirenti
                     </a>
                     <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
                         <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">

@@ -5,17 +5,12 @@ from flask import current_app as app, flash, redirect, render_template, session,
 from sqlalchemy.exc import IntegrityError
 
 from .app import db
-from .forms import \
-    FormAccountUpdate, \
-    FormAccountSignup, \
-    FormLogin, \
-    FormPswChange, \
-    FormFarmer
+from .forms import (FormAccountUpdate, FormAccountSignup, FormLogin, FormPswChange, FormFarmer, FormBuyer)
 from .models.accounts import Administrator, User
+from .models.buyers import Buyer
 from .models.farmers import Farmer
 from .utility.functions import admin_log_in, event_create, token_admin_validate, url_to_json
-from .utility.functions_accounts import is_valid_email
-from .utility.psw_function import psw_contain_usr, psw_verify, psw_hash
+from .utility.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -165,7 +160,7 @@ def admin_update(data):
                 "Previous_data": previous_data
             }
             if event_create(_event, admin_id=_id):
-                return redirect(url_for('admin_view'))
+                return redirect(url_for('admin_view_history', data=administrator.to_dict()))
             else:
                 flash("ERRORE creazione evento. Ma il record è stato modificato correttamente.")
                 return redirect(url_for('admin_view'))
@@ -372,7 +367,6 @@ def user_update(data):
             user = User.query.get(_id)
             previous_data = user.to_dict()
             # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-
             user.username = form_data["username"].replace(" ", "")
             user.name = form_data["name"].strip()
             user.last_name = form_data["last_name"].strip()
@@ -386,7 +380,7 @@ def user_update(data):
             # print("NEW_DATA:", json.dumps(user.to_dict(), indent=2))
             try:
                 db.session.commit()
-                flash("AMMINISTRATORE aggiornato correttamente.")
+                flash("UTENTE aggiornato correttamente.")
             except IntegrityError as err:
                 db.session.rollback()
                 flash(f"ERRORE: {str(err.orig)}")
@@ -399,7 +393,7 @@ def user_update(data):
             }
             # print("EVENT:", json.dumps(_event, indent=2))
             if event_create(_event, user_id=_id):
-                return redirect(url_for('user_view'))
+                return redirect(url_for('user_view_history', data=user.to_dict()))
             else:
                 flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
                 return redirect(url_for('user_view'))
@@ -490,11 +484,12 @@ def farmer_create():
 
             email=form_data["email"].strip(),
             phone=form_data["phone"].strip(),
+
             address=form_data["address"].strip(),
             cap=form_data["cap"].strip(),
             city=form_data["city"].strip(),
 
-            affiliation_start_date=form_data["affiliation_date"],
+            affiliation_start_date=form_data["affiliation_start_date"],
             affiliation_status=form_data["affiliation_status"],
 
             stable_code=form_data["stable_code"],
@@ -502,6 +497,7 @@ def farmer_create():
             stable_productive_orientation=form_data["stable_productive_orientation"],
             stable_breeding_methods=form_data["stable_breeding_methods"],
 
+            note_certificate=form_data["note_certificate"],
             note=form_data["note"]
         )
         try:
@@ -519,107 +515,101 @@ def farmer_create():
 
 @app.route("/farmer_update/<data>", methods=["GET", "POST"])
 def farmer_update(data):
-    """Aggiorna dati Utente."""
+    """Aggiorna dati Allevatore."""
     # Verifico autenticazione
     if not token_admin_validate():
         return redirect(url_for('logout'))
 
     form = FormFarmer()
     if form.validate_on_submit():
+        # recupero i dati e li converto in dict
         form_data = json.loads(json.dumps(request.form))
-        print("FORM_DATA_PASS:", json.dumps(form_data, indent=2))
-        _id = session["id_user"]
+        # print("FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+
+        _id = session["id_farmer"]
         # print("USER_ID:", _id)
-        valid_email = is_valid_email(form_data["email"])
-        if valid_email:
-            farmer = User.query.get(_id)
-            previous_data = farmer.to_dict()
-            print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+        farmer = Farmer.query.get(_id)
+        previous_data = farmer.to_dict()
+        # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-            farmer.farmer_name = form_data["farmer_name"].strip()
+        farmer.farmer_name = form_data["farmer_name"].strip()
 
-            farmer.email = form_data["email"].strip()
-            farmer.phone = form_data["phone"].strip()
-            farmer.address = form_data["address"].strip()
-            farmer.cap = form_data["cap"].strip()
-            farmer.city = form_data["city"].strip()
+        farmer.email = form_data["email"].strip()
+        farmer.phone = form_data["phone"].strip()
 
-            farmer.affiliation_date = form_data["affiliation_date"]
-            farmer.affiliation_status = form_data["affiliation_status"]
+        farmer.address = form_data["address"].strip()
+        farmer.cap = form_data["cap"].strip()
+        farmer.city = form_data["city"].strip()
 
-            farmer.stable_code = form_data["stable_code"].strip()
-            farmer.stable_type = form_data["stable_type"].strip()
-            farmer.stable_productive_orientation = form_data["stable_productive_orientation"].strip()
-            farmer.stable_breeding_methods = form_data["stable_breeding_methods"].strip()
+        if form_data["affiliation_start_date"]:
+            farmer.affiliation_start_date = form_data["affiliation_start_date"]
 
-            if form_data["note"] is None:
-                farmer.note = "Null"
-            else:
-                farmer.note = form_data["note"].strip()
+        farmer.stable_code = form_data["stable_code"].strip()
+        farmer.stable_type = form_data["stable_type"].strip()
+        farmer.stable_productive_orientation = form_data["stable_productive_orientation"].strip()
+        farmer.stable_breeding_methods = form_data["stable_breeding_methods"].strip()
 
-            print("NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
+        if form_data["note_certificate"]:
+            farmer.note_certificate = form_data["note_certificate"].strip()
+        if form_data["note"]:
+            farmer.note = form_data["note"].strip()
 
-            try:
-                db.session.commit()
-                flash("ALLEVATORE aggiornato correttamente.")
-            except IntegrityError as err:
-                db.session.rollback()
-                flash(f"ERRORE: {str(err.orig)}")
-                return render_template("user/user_update.html", form=form)
+        print("NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
 
-            _event = {
-                "username": session["username"],
-                "Modification": f"Update Farmer whit id: {_id}",
-                "Previous_data": previous_data
-            }
-            # print("EVENT:", json.dumps(_event, indent=2))
-            if event_create(_event, user_id=_id):
-                return redirect(url_for('user_view'))
-            else:
-                flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-                return redirect(url_for('farmer_view'))
-        else:
-            form.farmer_name.data = form_data["farmer_name"]
-            form.email.data = form_data["email"]
-            form.phone.data = form_data["phone"]
-            form.address.data = form_data["address"]
-            form.cap.data = form_data["cap"]
-            form.city.data = form_data["city"]
-            form.affiliation_start_date.data = form_data["affiliation_start_date"]
-            form.affiliation_end_date.data = form_data["affiliation_end_date"]
-            form.affiliation_status.data = form_data["affiliation_status"]
-            form.stable_code.data = form_data["stable_code"]
-            form.stable_type.data = form_data["stable_type"]
-            form.stable_productive_orientation.data = form_data["stable_productive_orientation"]
-            form.stable_breeding_methods.data = form_data["stable_breeding_methods"]
-            form.note.data = form_data["note"]
-
-            flash("ERRORE: la email inserita non è valida.")
+        try:
+            db.session.commit()
+            flash("ALLEVATORE aggiornato correttamente.")
+        except IntegrityError as err:
+            db.session.rollback()
+            flash(f"ERRORE: {str(err.orig)}")
             return render_template("farmer/farmer_update.html", form=form)
+
+        _event = {
+            "username": session["username"],
+            "Modification": f"Update Farmer whit id: {_id}",
+            "Previous_data": previous_data
+        }
+        # print("EVENT:", json.dumps(_event, indent=2))
+        if event_create(_event, farmer_id=_id):
+            return redirect(url_for('farmer_view_history', data=farmer.to_dict()))
+        else:
+            flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+            return redirect(url_for('farmer_view'))
     else:
         # recupero i dati e li converto in dict
         data = url_to_json(data)
-        print("DATA_PASS:", json.dumps(data, indent=2))
+        # print("DATA_PASS:", json.dumps(data, indent=2))
 
         session["id_farmer"] = data["id"]
 
         form.farmer_name.data = data["farmer_name"]
         form.email.data = data["email"]
         form.phone.data = data["phone"]
+
         form.address.data = data["address"]
         form.cap.data = data["cap"]
         form.city.data = data["city"]
-        form.affiliation_start_date.data = data["affiliation_start_date"]
-        form.affiliation_end_date.data = data["affiliation_end_date"]
-        form.affiliation_status.data = data["affiliation_status"]
+
+        if data["affiliation_start_date"]:
+            form.affiliation_start_date.data = datetime.strptime(data["affiliation_start_date"], '%Y-%m-%d')
+
         form.stable_code.data = data["stable_code"]
         form.stable_type.data = data["stable_type"]
+
         form.stable_productive_orientation.data = data["stable_productive_orientation"]
         form.stable_breeding_methods.data = data["stable_breeding_methods"]
+
+        if data["note_certificate"]:
+            form.note_certificate.data = data["note_certificate"]
+
         form.note.data = data["note"]
 
-        print("FORM_DATA", form.farmer_name.data)
-        return render_template("farmer/farmer_update.html", form=form)
+        status = data["affiliation_status"]
+        if data["affiliation_end_date"]:
+            end_date = data["affiliation_end_date"]
+        else:
+            end_date = "vuoto"
+        return render_template("farmer/farmer_update.html", form=form, status=status, end_date=end_date)
 
 
 @app.route("/farmer_view_history/<data>", methods=["GET", "POST"])
@@ -645,3 +635,159 @@ def farmer_view_history(data):
     history_list = user.events
     history_list = [history.to_dict() for history in history_list]
     return render_template("farmer/farmer_view_history.html", form=_farmer, history_list=history_list)
+
+
+@app.route("/buyer_create/", methods=["GET", "POST"])
+def buyer_create():
+    """Creazione Allevatore Consorzio."""
+    # Verifico autenticazione
+    if not token_admin_validate():
+        return redirect(url_for('logout'))
+
+    form = FormBuyer()
+    if form.validate_on_submit():
+        form_data = json.loads(json.dumps(request.form))
+        print("FORM_DATA", json.dumps(form_data, indent=2))
+        if form_data["affiliation_status"] == "NO":
+            form_data["affiliation_status"] = False
+        else:
+            form_data["affiliation_status"] = True
+
+        user = User.query.get(form_data["user_id"])
+        user_id = user.id
+
+        new_farmer = Buyer(
+            buyer_name=form_data["buyer_name"].strip(),
+            buyer_type=form_data["buyer_type"].strip(),
+
+            email=form_data["email"].strip(),
+            phone=form_data["phone"].strip(),
+
+            address=form_data["address"].strip(),
+            cap=form_data["cap"].strip(),
+            city=form_data["city"].strip(),
+
+            affiliation_start_date=form_data["affiliation_date"],
+            affiliation_status=form_data["affiliation_status"],
+
+            user_id=user_id,
+
+            note_certificate=form_data["note_certificate"],
+            note=form_data["note"]
+        )
+        try:
+            db.session.add(new_farmer)
+            db.session.commit()
+            flash("ACQUIRENTE creato correttamente.")
+            return redirect(url_for('buyer_view'))
+        except IntegrityError as err:
+            db.session.rollback()
+            flash(f"ERRORE: {str(err.orig)}")
+            return render_template("buyer/buyer_create.html", form=form)
+    else:
+        return render_template("buyer/buyer_create.html", form=form)
+
+
+@app.route("/buyer_update/<data>", methods=["GET", "POST"])
+def buyer_update(data):
+    """Aggiorna dati Utente."""
+    # Verifico autenticazione
+    if not token_admin_validate():
+        return redirect(url_for('logout'))
+
+    form = FormFarmer()
+    if form.validate_on_submit():
+        form_data = json.loads(json.dumps(request.form))
+        print("FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+        _id = session["id_buyer"]
+        # print("USER_ID:", _id)
+        valid_email = is_valid_email(form_data["email"])
+        if valid_email:
+            buyer = Buyer.query.get(_id)
+            previous_data = buyer.to_dict()
+            print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+
+            buyer.farmer_name = form_data["farmer_name"].strip()
+
+            buyer.email = form_data["email"].strip()
+            buyer.phone = form_data["phone"].strip()
+            buyer.address = form_data["address"].strip()
+            buyer.cap = form_data["cap"].strip()
+            buyer.city = form_data["city"].strip()
+
+            buyer.affiliation_date = form_data["affiliation_date"]
+            buyer.affiliation_status = form_data["affiliation_status"]
+
+            buyer.stable_code = form_data["stable_code"].strip()
+            buyer.stable_type = form_data["stable_type"].strip()
+            buyer.stable_productive_orientation = form_data["stable_productive_orientation"].strip()
+            buyer.stable_breeding_methods = form_data["stable_breeding_methods"].strip()
+
+            if form_data["note"] is None:
+                buyer.note = "Null"
+            else:
+                buyer.note = form_data["note"].strip()
+
+            print("NEW_DATA:", json.dumps(buyer.to_dict(), indent=2))
+
+            try:
+                db.session.commit()
+                flash("ACQUIRENTE aggiornato correttamente.")
+            except IntegrityError as err:
+                db.session.rollback()
+                flash(f"ERRORE: {str(err.orig)}")
+                return render_template("buyer/buyer_update.html", form=form)
+
+            _event = {
+                "username": session["username"],
+                "Modification": f"Update Buyer whit id: {_id}",
+                "Previous_data": previous_data
+            }
+            # print("EVENT:", json.dumps(_event, indent=2))
+            if event_create(_event, user_id=_id):
+                return redirect(url_for('buyer_view'))
+            else:
+                flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+                return redirect(url_for('buyer_view'))
+        else:
+            form.farmer_name.data = form_data["farmer_name"]
+            form.email.data = form_data["email"]
+            form.phone.data = form_data["phone"]
+            form.address.data = form_data["address"]
+            form.cap.data = form_data["cap"]
+            form.city.data = form_data["city"]
+            form.affiliation_start_date.data = form_data["affiliation_start_date"]
+            form.affiliation_end_date.data = form_data["affiliation_end_date"]
+            form.affiliation_status.data = form_data["affiliation_status"]
+            form.stable_code.data = form_data["stable_code"]
+            form.stable_type.data = form_data["stable_type"]
+            form.stable_productive_orientation.data = form_data["stable_productive_orientation"]
+            form.stable_breeding_methods.data = form_data["stable_breeding_methods"]
+            form.note.data = form_data["note"]
+
+            flash("ERRORE: la email inserita non è valida.")
+            return render_template("buyer/buyer_update.html", form=form)
+    else:
+        # recupero i dati e li converto in dict
+        data = url_to_json(data)
+        print("DATA_PASS:", json.dumps(data, indent=2))
+
+        session["id_buyer"] = data["id"]
+
+        form.farmer_name.data = data["farmer_name"]
+        form.email.data = data["email"]
+        form.phone.data = data["phone"]
+        form.address.data = data["address"]
+        form.cap.data = data["cap"]
+        form.city.data = data["city"]
+        form.affiliation_start_date.data = data["affiliation_start_date"]
+        form.affiliation_end_date.data = data["affiliation_end_date"]
+        form.affiliation_status.data = data["affiliation_status"]
+        form.stable_code.data = data["stable_code"]
+        form.stable_type.data = data["stable_type"]
+        form.stable_productive_orientation.data = data["stable_productive_orientation"]
+        form.stable_breeding_methods.data = data["stable_breeding_methods"]
+        form.note.data = data["note"]
+
+        print("FORM_DATA", form.farmer_name.data)
+        return render_template("buyer/buyer_update.html", form=form)

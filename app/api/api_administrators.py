@@ -5,8 +5,8 @@ from flask import request, jsonify, make_response, current_app as app
 from app.app import db
 from app.models.accounts import Administrator
 from app.models.tokens import AuthToken
-from app.utility.psw_function import psw_contain_usr, psw_verify, psw_hash
-from app.utility.functions_accounts import is_valid_email, __save_auth_token, __generate_auth_token
+from app.utility.functions_accounts import (is_valid_email, __save_auth_token, __generate_auth_token, psw_contain_usr,
+                                            psw_verify, psw_hash)
 
 
 @app.route('/api/admin_signup/', methods=['POST'])
@@ -50,6 +50,7 @@ def administrator_signup():
                             'data': {
                                 'id': new_admin.id,
                                 'username': new_admin.username,
+                                'full_name': new_admin.full_name,
                                 'phone': new_admin.phone,
                                 'email': new_admin.email,
                                 'note': new_admin.note

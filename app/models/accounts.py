@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from sqlalchemy.sql import case
+
 from app.app import db
 
 
@@ -7,11 +10,12 @@ class Administrator(db.Model):
     __tablename__ = 'administrators'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(40), index=False, unique=True, nullable=False)
-    password = db.Column(db.String(64), index=False, unique=False, nullable=False)
+    username = db.Column(db.String(20), index=False, unique=True, nullable=False)
+    password = db.Column(db.String(64), index=False, unique=False, nullable=False)  # 64 char for hash code
 
-    name = db.Column(db.String(25), index=False, unique=False, nullable=True)
-    last_name = db.Column(db.String(25), index=False, unique=False, nullable=True)
+    name = db.Column(db.String(50), index=False, unique=False, nullable=True)
+    last_name = db.Column(db.String(50), index=False, unique=False, nullable=True)
+    full_name = db.Column(db.String(101), index=False, unique=False, nullable=True)
     email = db.Column(db.String(80), index=False, unique=True, nullable=True)
     phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
@@ -26,15 +30,35 @@ class Administrator(db.Model):
     def __repr__(self):
         return '<Administrator: {}>'.format(self.username)
 
-    def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, note=None,
-                 updated_at=datetime.now()):
+    def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
+                 events=None, note=None, updated_at=datetime.now()):
+
+        if name is not None and last_name is not None:
+            full_name = f"{name} {last_name}"
+        elif name is not None and last_name is None:
+            full_name = name
+        elif name is None and last_name is not None:
+            full_name = last_name
+        else:
+            full_name = None
+
         self.username = username
         self.password = password
 
         self.name = name
         self.last_name = last_name
+        self.full_name = full_name
+
         self.phone = phone
         self.email = email
+
+        if auth_tokens is None:
+            auth_tokens = []
+        self.auth_tokens = auth_tokens
+
+        if events is None:
+            events = []
+        self.events = events
 
         self.note = note
         self.created_at = datetime.now()
@@ -45,10 +69,12 @@ class Administrator(db.Model):
             'id': self.id,
             'username': self.username,
 
-            'name': self.name,
-            'last_name': self.last_name,
             'phone': self.phone,
             'email': self.email,
+
+            'name': self.name,
+            'last_name': self.last_name,
+            'full_name': self.full_name,
 
             'note': self.note,
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
@@ -62,14 +88,15 @@ class User(db.Model):
     # Columns
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), index=False, unique=True, nullable=False)
-    password = db.Column(db.String(64), index=False, unique=False, nullable=False)
+    password = db.Column(db.String(64), index=False, unique=False, nullable=False)  # 64 char for hash code
 
-    name = db.Column(db.String(25), index=False, unique=False, nullable=True)
-    last_name = db.Column(db.String(25), index=False, unique=False, nullable=True)
+    name = db.Column(db.String(50), index=False, unique=False, nullable=True)
+    last_name = db.Column(db.String(50), index=False, unique=False, nullable=True)
+    full_name = db.Column(db.String(101), index=False, unique=False, nullable=True)
+
     email = db.Column(db.String(80), index=False, unique=True, nullable=True)
     phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-    farmers = db.relationship('Farmer', backref='user')
     buyers = db.relationship('Buyer', backref='user')
     auth_tokens = db.relationship('AuthToken', backref='user')
     events = db.relationship('EventDB', backref='user')
@@ -83,14 +110,38 @@ class User(db.Model):
         return '<User: {}>'.format(self.username)
 
     def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, note=None,
-                 updated_at=datetime.now()):
+                 buyers=None, auth_tokens=None, events=None, updated_at=datetime.now()):
+
+        if name is not None and last_name is not None:
+            full_name = f"{name} {last_name}"
+        elif name is not None and last_name is None:
+            full_name = name
+        elif name is None and last_name is not None:
+            full_name = last_name
+        else:
+            full_name = None
+
         self.username = username
         self.password = password
 
         self.name = name
         self.last_name = last_name
+        self.full_name = full_name
+
         self.phone = phone
         self.email = email
+
+        if buyers is None:
+            buyers = []
+        self.buyers = buyers
+
+        if auth_tokens is None:
+            auth_tokens = []
+        self.auth_tokens = auth_tokens
+
+        if events is None:
+            events = []
+        self.events = events
 
         self.note = note
         self.created_at = datetime.now()
@@ -103,6 +154,8 @@ class User(db.Model):
 
             'name': self.name,
             'last_name': self.last_name,
+            'full_name': self.full_name,
+
             'phone': self.phone,
             'email': self.email,
 

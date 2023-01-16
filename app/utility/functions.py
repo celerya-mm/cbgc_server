@@ -113,15 +113,34 @@ def user_log_in(form):
         print(f"ERRORE_RISPOSTA_SERVER: {err}")
         return False
 
-# def farmers_list():
-#     """API - Estraggo la lista di tutti gli allevatori."""
-#     url = var.apiUrls["farmers_list"]
-#     payload = ""
-#     headers = {}
-#     response = requests.request("GET", url, headers=headers, data=payload)
-#     print("RESPONSE:", response.text)
-#     dati = json.loads(response.text)
-#     return response
-#
-#
-# _farmers_list = farmers_list()
+
+def address_mount(address, cap, city):
+    """Monta indirizzo completo."""
+    if address and cap and city:
+        full_address = f"{address} - {cap} - {city}"
+    elif address and cap:
+        full_address = f"{address} - {cap}"
+    elif address and city:
+        full_address = f"{address} - {city}"
+    elif cap and city:
+        full_address = f"{cap} - {city}"
+    elif address:
+        full_address = address
+    elif city:
+        full_address = city
+    elif cap:
+        full_address = cap
+    else:
+        full_address = None
+
+    return full_address
+
+
+def year_extract(date):
+    """Estrae l'anno da una data"""
+    if date:
+        print("TYPE_DATA", type(date))
+        year = datetime.strptime(date, "%Y-%m-%d")
+        return year.year
+    else:
+        return None

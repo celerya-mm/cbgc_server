@@ -1,6 +1,8 @@
 from datetime import datetime
+
+from sqlalchemy.dialects.postgresql import JSONB
+
 from app.app import db
-from sqlalchemy.dialects.postgresql import JSON
 
 
 class EventDB(db.Model):
@@ -8,7 +10,7 @@ class EventDB(db.Model):
     __tablename__ = 'events_db'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    event = db.Column(JSON, index=False, unique=False, nullable=False)
+    event = db.Column(JSONB, index=False, unique=False, nullable=False)
 
     admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id'), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)

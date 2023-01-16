@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from app.app import db
+from app.utility.functions import year_extract
 
 
 class CertificateDna(db.Model):
@@ -7,6 +9,7 @@ class CertificateDna(db.Model):
     __tablename__ = 'certificates_dna'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
     dna_cert_id = db.Column(db.String(20), index=False, unique=False, nullable=False)
     dna_cert_date = db.Column(db.DateTime, index=False, nullable=False)
     dna_cert_year = db.Column(db.Integer, index=False, nullable=False)
@@ -26,14 +29,24 @@ class CertificateDna(db.Model):
     def __repr__(self):
         return '<DNA Certificate: {}>'.format(self.dna_cert_nr)
 
-    def __init__(self, dna_cert_nr, dna_cert_date, dna_cert_year, head_id, farmer_id, note=None,
+    def __init__(self, dna_cert_nr, dna_cert_id, dna_cert_date, head_id, farmer_id, events=None, note=None,
                  updated_at=datetime.now()):
-        self.dna_cert_nr = dna_cert_nr
+
+        dna_cert_year = year_extract(dna_cert_date)
+        if not dna_cert_nr:
+            dna_cert_nr = f"{dna_cert_id}/{dna_cert_year}"
+
+        self.dna_cert_id = dna_cert_id
         self.dna_cert_date = dna_cert_date
         self.dna_cert_year = dna_cert_year
+        self.dna_cert_nr = dna_cert_nr
 
         self.head_id = head_id
         self.farmer_id = farmer_id
+
+        if events is None:
+            events = []
+        self.events = events
 
         self.note = note
         self.created_at = datetime.now()

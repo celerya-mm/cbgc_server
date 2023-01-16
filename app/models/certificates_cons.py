@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from app.app import db
+from app.utility.functions import year_extract
 
 
 class CertificateCons(db.Model):
@@ -7,12 +9,19 @@ class CertificateCons(db.Model):
     __tablename__ = 'certificates_cons'
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    certificate_nr = db.Column(db.String(20), index=False, unique=True, nullable=False)
+
+    certificate_id = db.Column(db.Integer, index=False, unique=False, nullable=False)
+    certificate_var = db.Column(db.String(10), index=False, unique=False, nullable=True)
     certificate_date = db.Column(db.DateTime, index=False, nullable=False)
     certificate_year = db.Column(db.Integer, index=False, nullable=False)
+
+    certificate_nr = db.Column(db.String(50), index=False, unique=True, nullable=False)
+
     certificate_pdf = db.Column(db.LargeBinary, index=False, nullable=True)
 
-    cockade_id = db.Column(db.String(20), index=False, unique=True, nullable=True)
+    cockade_id = db.Column(db.Integer, index=False, unique=False, nullable=False)
+    cockade_var = db.Column(db.String(10), index=False, unique=False, nullable=True)
+    cockade_nr = db.Column(db.String(20), index=False, unique=True, nullable=True)
 
     sale_type = db.Column(db.String(50), index=False, unique=True, nullable=True)
     sale_quantity = db.Column(db.Float, index=False, nullable=True)
@@ -20,7 +29,6 @@ class CertificateCons(db.Model):
 
     invoice_nr = db.Column(db.String(20), index=False, unique=False, nullable=True)
     invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
-    invoice_type = db.Column(db.String(20), index=False, unique=False, nullable=True)
     invoice_status = db.Column(db.String(20), index=False, unique=False, nullable=True)
 
     head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False)
@@ -30,6 +38,7 @@ class CertificateCons(db.Model):
 
     events = db.relationship('EventDB', backref='cert_cons')
 
+    note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -38,15 +47,36 @@ class CertificateCons(db.Model):
     def __repr__(self):
         return '<CONS Certificate: {}>'.format(self.headset)
 
-    def __init__(self, certificate_nr, certificate_date, certificate_year, cockade_id, sale_type, sale_quantity,
-                 sale_rest=None, head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
-                 certificate_pdf=None, invoice_nr=None, invoice_date=None, invoice_type=None, invoice_status=None,
-                 note=None,  updated_at=datetime.now()):
-        self.certificate_nr = certificate_nr
+    def __init__(self,
+                 certificate_var, certificate_date, certificate_id, certificate_pdf=None,
+                 cockade_var=None, cockade_id=None,
+                 sale_type=None, sale_quantity=None, sale_rest=None,
+                 head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
+                 invoice_nr=None, invoice_date=None, invoice_status=None,
+                 events=None, note_certificate=None, note=None, updated_at=datetime.now()):
+
+        certificate_year = year_extract(certificate_date)
+
+        if certificate_id and certificate_var and certificate_year:
+            certificate_nr = f"{certificate_id}{certificate_var}/{certificate_year}"
+        else:
+            certificate_nr = f"{certificate_id}/{certificate_year}"
+
+        if cockade_id and cockade_var and certificate_year:
+            cockade_nr = f"{cockade_id}{cockade_var}/{certificate_year}"
+        else:
+            cockade_nr = f"{cockade_id}/{certificate_year}"
+
+        self.certificate_id = certificate_id
+        self.certificate_var = certificate_var
         self.certificate_date = certificate_date
         self.certificate_year = certificate_year
 
+        self.certificate_nr = certificate_nr
+
         self.cockade_id = cockade_id
+        self.cockade_var = cockade_var
+        self.cockade_nr = cockade_nr
 
         self.sale_type = sale_type
         self.sale_quantity = sale_quantity
@@ -60,10 +90,15 @@ class CertificateCons(db.Model):
         self.certificate_pdf = certificate_pdf
         self.invoice_nr = invoice_nr
         self.invoice_date = invoice_date
-        self.invoice_type = invoice_type
         self.invoice_status = invoice_status
 
+        if events is None:
+            events = []
+        self.events = events
+
+        self.note_certificate = note_certificate
         self.note = note
+
         self.created_at = datetime.now()
         self.updated_at = updated_at
 
@@ -72,11 +107,16 @@ class CertificateCons(db.Model):
             self.certificate_date = datetime.strftime(self.certificate_date, "%Y-%m-%d")
         return {
             'id': self.id,
-            'certificate_nr': self.certificate_nr,
+            'certificate_id': self.certificate_id,
+            'certificate_var': self.certificate_var,
             'certificate_date': self.certificate_date,
             'certificate_year': self.certificate_year,
 
+            'certificate_nr': self.certificate_nr,
+
             'cockade_id': self.cockade_id,
+            'cockade_var': self.cockade_var,
+            'cockade_nr': self.cockade_nr,
 
             'sale_type': self.sale_type,
             'sale_quantity': self.sale_quantity,
@@ -84,7 +124,6 @@ class CertificateCons(db.Model):
 
             'invoice_nr': self.invoice_nr,
             'invoice_date': self.invoice_date,
-            'invoice_type': self.invoice_type,
             'invoice_status': self.invoice_status,
 
             'head_id': self.head_id,
@@ -92,7 +131,9 @@ class CertificateCons(db.Model):
             'buyer_id': self.buyer_id,
             'slaughterhouse_id': self.slaughterhouse_id,
 
+            'note_certificate': self.note_certificate,
             'note': self.note,
+
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
             'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

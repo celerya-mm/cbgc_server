@@ -6,9 +6,8 @@ from flask import request, jsonify, make_response, current_app as app
 from app.app import db
 from app.models.accounts import User
 from app.models.tokens import AuthToken
-from app.utility import psw_function as pswf
-from app.utility.functions_accounts import is_valid_email, __save_auth_token, __generate_auth_token
-from app.utility.psw_function import psw_hash
+from app.utility.functions_accounts import (is_valid_email, __save_auth_token, __generate_auth_token, psw_hash,
+                                            psw_verify, psw_contain_usr)
 
 
 @app.route('/api/user_signup/', methods=['POST'])
@@ -18,11 +17,11 @@ def user_signup():
     username = data_received['username'].replace(" ", "")
     password = data_received['password'].replace(" ", "")
     try:
-        verify_password = pswf.psw_verify(password)
+        verify_password = psw_verify(password)
         if verify_password is not False:
             return make_response(jsonify(verify_password), 400)
 
-        contain_usr = pswf.psw_contain_usr(password, username)
+        contain_usr = psw_contain_usr(password, username)
         if contain_usr is not False:
             return make_response(jsonify(contain_usr), 400)
 
@@ -52,6 +51,7 @@ def user_signup():
                         'data': {
                             'id': new_user.id,
                             'username': new_user.username,
+                            'full_name': new_user.full_name,
                             'phone': new_user.phone,
                             'email': new_user.email,
                             'note': new_user.note

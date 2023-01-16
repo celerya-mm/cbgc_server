@@ -1,5 +1,18 @@
 from datetime import datetime
+
 from app.app import db
+from app.utility.functions import year_extract
+
+
+def compliance(birth, castration):
+    """Verifica conformità castrazione (days>=240)."""
+    birth = datetime.strptime(birth, "%Y-%m-%d")
+    castration = datetime.strptime(castration, "%Y-%m-%d")
+    days = castration - birth
+    if days <= 240:
+        return True
+    else:
+        return False
 
 
 class Head(db.Model):
@@ -9,15 +22,16 @@ class Head(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     headset = db.Column(db.String(14), index=False, unique=True, nullable=False)
 
-    bird_date = db.Column(db.DateTime, index=False, nullable=False)
+    birth_date = db.Column(db.DateTime, index=False, nullable=False)
+    birth_year = db.Column(db.Integer, index=False, nullable=False)
+
     castration_date = db.Column(db.DateTime, index=False, nullable=True)
+    castration_year = db.Column(db.Integer, index=False, nullable=True)
     castration_compliance = db.Column(db.Boolean, index=False, nullable=True)  # True if days (castration-bird) < 240
 
     slaughter_date = db.Column(db.DateTime, index=False, nullable=True)
     sale_date = db.Column(db.DateTime, index=False, nullable=True)
     sale_year = db.Column(db.Integer, index=False, nullable=True)
-
-    note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=True)
     buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id'), nullable=True)
@@ -27,32 +41,58 @@ class Head(db.Model):
     cons_cert = db.relationship('CertificateCons', backref='head')
     event = db.relationship('EventDB', backref='head')
 
+    note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
+    note = db.Column(db.String(255), index=False, unique=False, nullable=True)
+
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
         return '<Head: {}>'.format(self.headset)
 
-    def __init__(self, headset, bird_date, castration_date=None, castration_compliance=None, slaughter_date=None, sale_date=None, sale_year=None,
-                 note=None, farmer_id=None, buyer_id=None, dna_cert=None, cons_cert=None, updated_at=datetime.now()):
+    def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None,
+                 sale_date=None, note_certificato=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
+                 dna_certs=None, cons_certs=None, events=None, note=None, updated_at=datetime.now()):
+
         self.headset = headset
-        self.bird_date = bird_date
+
+        self.birth_date = birth_date
+        self.birth_year = year_extract(birth_date)
+
         self.castration_date = castration_date
-        self.castration_compliance = castration_compliance
+        self.castration_year = year_extract(castration_date)
+        self.castration_compliance = compliance(birth_date, castration_date)
+
         self.slaughter_date = slaughter_date
+
         self.sale_date = sale_date
-        self.sale_year = sale_year
-        self.note = note
+        self.sale_year = year_extract(sale_date)
+
         self.farmer_id = farmer_id
         self.buyer_id = buyer_id
-        self.dna_cert = dna_cert
-        self.cons_cert = cons_cert
+        self.slaughterhouse_id = slaughterhouse_id
+
+        if dna_certs is None:
+            dna_certs = []
+        self.dna_certs = dna_certs
+
+        if cons_certs is None:
+            cons_certs = []
+        self.cons_certs = cons_certs
+
+        if events is None:
+            events = []
+        self.events = events
+
+        self.note_certificate = note_certificato
+        self.note = note
+
         self.created_at = datetime.now()
         self.updated_at = updated_at
 
     def to_dict(self):
-        if self.bird_date:
-            self.bird_date = datetime.strftime(self.bird_date, "%Y-%m-%d")
+        if self.birth_date:
+            self.birth_date = datetime.strftime(self.birth_date, "%Y-%m-%d")
         if self.castration_date:
             self.castration_date = datetime.strftime(self.castration_date, "%Y-%m-%d")
         if self.slaughter_date:
@@ -62,15 +102,25 @@ class Head(db.Model):
         return {
             'id': self.id,
             'headset': self.headset,
-            'bird_date': self.bird_date,
+
+            'birth_date': self.birth_date,
+            'birth_year': self.birth_year,
+
             'castration_date': self.castration_date,
+            'castration_year': self.castration_year,
             'castration_compliance': self.castration_compliance,
+
             'slaughter_date': self.slaughter_date,
             'sale_date': self.sale_date,
             'sale_year': self.sale_year,
-            'note': self.note,
+
             'farmer_id': self.farmer_id,
             'buyer_id': self.buyer_id,
+            'slaughterhouse_id': self.slaughterhouse_id,
+
+            'note_certificate': self.note_certificate,
+            'note': self.note,
+
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
             'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }
