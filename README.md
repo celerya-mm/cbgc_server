@@ -4,10 +4,10 @@ This repo contains the code illustrated in tutorial https://atifazad.com/tutoria
 
 
 ## Quick Setup
-If you want to execute the app without going through the steps illustracted in tutorial, do following...
+If you want to execute the app without going through the steps illustrated in tutorial, do following...
 
 1. Clone this repo.
-2. Create vitual environment.
+2. Create virtual environment.
 (https://atifazad.com/tutorials/how-to-setup-virtualenvwrapper-on-macos-catalina/)
 3. Copy `.env.example` to `.env` file.
 4. Create a PostgreSQL DB and add the required values in `.env` file.

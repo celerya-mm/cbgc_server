@@ -12,24 +12,24 @@
         <div class="col-md-12">
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
+                <br>
+                    <div class="form-group">
+                        {{ form.buyer_name.label }}
+                        {{ form.buyer_name(class="form-control") }}
+                        {% if form.buyer_name.errors %}
+                            {% for error in form.buyer_name.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                                <br>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                 <div class="row no-gutters justify-content-center">
 
                     <div class="col-md-4 order-first">
                         <br>
                         <div class="form-group">
-                            {{ form.buyer_name.label }}
-                            {{ form.buyer_name(class="form-control") }}
-                            {% if form.buyer_name.errors %}
-                                {% for error in form.buyer_name.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
                             {{ form.buyer_type.label }}
-                            {{ form.buyer_type(class="form-control") }}
+                            {{ form.buyer_type(class="form-control", style="text-align: center;") }}
                             {% if form.buyer_type.errors %}
                                 {% for error in form.buyer_type.errors %}
                                     <span class="text-danger">{{ error }}</span>
@@ -59,9 +59,10 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
+                        <br>
                         <div class="form-group">
                             {{ form.user_id.label }}
-                            {{ form.user_id(class="form-control") }}
+                            {{ form.user_id(class="form-control", style="text-align: center;") }}
                             {% if form.user_id.errors %}
                                 {% for error in form.user_id.errors %}
                                     <span class="text-danger">{{ error }}</span>
@@ -114,7 +115,7 @@
                         <br>
                         <div class="form-group">
                             {{ form.affiliation_status.label }}
-                            {{ form.affiliation_status(class="form-control") }}
+                            {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
                         </div>
                     </div>
                 </div>

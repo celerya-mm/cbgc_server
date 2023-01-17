@@ -15,10 +15,42 @@ from app.var_ambient import variables as var
 disable_warnings(InsecureRequestWarning)
 
 
-def url_to_json(_str):
+def url_to_json(_str, val_date=None):
     """Converte stringa passata da url in json."""
-    _str = literal_eval(_str)
-    # print("LEV:", json.dumps(_str, indent=2), "TYPE:", type(_str))
+    try:
+        _str = literal_eval(_str)
+    except ValueError:
+        _str = _str \
+            .replace("{'", '{"').replace("'}", '"}') \
+            .replace(": '", ': "').replace("':", '":') \
+            .replace(", '", ', "').replace("',", '",')
+
+        if val_date:
+            _list_field = []
+            for x in val_date:
+                _list_field.append(val_date[x])
+            print("LISTA_CAMPI_DATA:", _list_field)
+
+            for d in _list_field:
+                if f'"{d}": datetime.datetime' in _str:
+                    # print("SELECT:", f'"{d}": datetime.datetime')
+                    _split = _str.split(f'"{d}": datetime.datetime')[1]
+                    # print("STR_SPLIT:", _split)
+                    _split = str(_split.split(', "')[0])
+                    # print("STR_DATETIME:", _split)
+                    _replace = f"datetime.datetime{_split}"
+                    # print("REPLACE:", _replace)
+                    _split = _split.replace('(', "").replace(')', "").split(', ')
+                    # print("LIST_DATETIME:", _split)
+                    date = f"{_split[0]}-{_split[1]}-{_split[2]}"
+                    # print("DATETIME:", date)
+                    _str = _str.replace(_replace, f'"{date}"')
+                    # print("STR:", _str)
+
+        _str = literal_eval(_str)
+        # print("URL_WORK:", _str, "TYPE:", type(_str))
+
+    print("URL_TO_JSON:", json.dumps(_str, indent=2), "TYPE:", type(_str))
     return _str
 
 

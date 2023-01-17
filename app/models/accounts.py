@@ -1,8 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy.sql import case
-
 from app.app import db
+
+from .tokens import AuthToken  # noqa
+from .buyers import Buyer  # noqa
+from .events_db import EventDB  # noqa
 
 
 class Administrator(db.Model):
@@ -65,6 +67,7 @@ class Administrator(db.Model):
         self.updated_at = updated_at
 
     def to_dict(self):
+        """Esporta in un dict la classe."""
         return {
             'id': self.id,
             'username': self.username,
@@ -148,6 +151,7 @@ class User(db.Model):
         self.updated_at = updated_at
 
     def to_dict(self):
+        """Esporta in un dict la classe."""
         return {
             'id': self.id,
             'username': self.username,

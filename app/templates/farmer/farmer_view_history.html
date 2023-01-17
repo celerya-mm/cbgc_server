@@ -10,14 +10,32 @@
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
                      alt=""/>
             </a>
-            Dati all'ALLEVATORE:
+            Dati ALLEVATORE:
         </h5>
         <h5>
-            "{{form.farmer_name}}"
+            "{{form.farmer_name}}" - Stato Affiliazione
+            {% if form.affiliation_status == True %}
+                <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
+            {% else %}
+                <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
+            {% endif %}
         </h5>
+        <div class="form-group">
+            {% if form.affiliation_status != True and form.affiliation_status != "SI"%}
+                {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == None %}
+                    <span class="text-danger">
+                        ATTENZIONE: manca la data di cessazione affiliazione.
+                        Per inserirla esegui la procedura per il cambio dello stato affiliazione.</span>
+                {% endif %}
+            {% endif %}
+        </div>
         <a class="btn btn-update" type="button" title="Modifica utente"
            href="{{ url_for('farmer_update', data=form) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+        </a>
+        <a class="btn btn-update" type="button" title="Cambia Stato Affiliazione"
+           href="{{ url_for('farmer_affiliation_change', data=form) }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/change_affiliation.svg') }}" alt=""/>
         </a>
     </div>
 
@@ -59,6 +77,12 @@
                     </p>
                 </div>
                 <div class="form-group">
+                    <h6> Email </h6>
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.email }}
+                    </p>
+                </div>
+                <div class="form-group">
                     <h6> Data Affiliazione </h6>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                         {{ form.affiliation_start_date }}
@@ -69,14 +93,6 @@
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                         {{ form.affiliation_end_date }}
                     </p>
-                </div>
-                <div class="form-group">
-                    <h6> Stato Affiliazione </h6>
-                    {% if form.affiliation_status == True %}
-                    <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
-                    {% endif %}
                 </div>
             </div>
 
@@ -111,7 +127,7 @@
                 <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                     {{ form.note_certificate }}
                 </p>
-                <p class="comment">Queste note compariranno nella stampa del certificato. Usarle con cautela.</p>
+                <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
             </div>
             <div class="form-group">
                 <h6> Note </h6>
@@ -123,6 +139,7 @@
         </div>
     </div>
 </form>
+
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
     <div class="row no-gutters justify-content-center">
         <div class="col-md-12">

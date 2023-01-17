@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from app.app import db
-from app.utility.functions import year_extract
+from app.utilitys.functions import year_extract
 
 
 class CertificateCons(db.Model):
@@ -103,8 +103,17 @@ class CertificateCons(db.Model):
         self.updated_at = updated_at
 
     def to_dict(self):
-        if self.certificate_date:
+        """Esporta in un dict la classe."""
+        if self.certificate_date in ["", None] or isinstance(self.certificate_date, str):
+            pass
+        else:
             self.certificate_date = datetime.strftime(self.certificate_date, "%Y-%m-%d")
+
+        if self.invoice_date in ["", None] or isinstance(self.invoice_date, str):
+            pass
+        else:
+            self.invoice_date = datetime.strftime(self.invoice_date, "%Y-%m-%d")
+
         return {
             'id': self.id,
             'certificate_id': self.certificate_id,

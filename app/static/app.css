@@ -93,6 +93,8 @@ checkbox {
     font-family: 'Jost', sans-serif;
     font-size: 0.6rem;
     color: #ED6666;
+    padding: 0;
+    margin: 0;
 }
 
 .content-container {

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from app.app import db
-from app.utility.functions import year_extract
+from app.utilitys.functions import year_extract
 
 
 class CertificateDna(db.Model):
@@ -53,8 +53,12 @@ class CertificateDna(db.Model):
         self.updated_at = updated_at
 
     def to_dict(self):
-        if self.dna_cert_date:
+        """Esporta in un dict la classe."""
+        if self.dna_cert_date in ["", None] or isinstance(self.dna_cert_date, str):
+            pass
+        else:
             self.dna_cert_date = datetime.strftime(self.dna_cert_date, "%Y-%m-%d")
+
         return {
             'id': self.id,
             'dna_cert_nr': self.dna_cert_nr,
@@ -65,6 +69,7 @@ class CertificateDna(db.Model):
             'farmer_id': self.farmer_id,
 
             'note': self.note,
+
             'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
             'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

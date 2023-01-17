@@ -48,7 +48,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav ml-auto">
                     <a class="nav-item nav-link {% if request.path == '/admin_view/' %} active {% endif %}"
-                       title="Account" href="{{ url_for('admin_view') }}">
+                       title="Admin" href="{{ url_for('admin_view') }}">
                         {% if request.path == '/admin_view/' %}
                             <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
                         {% else %}
@@ -66,7 +66,7 @@
                         Utenti
                     </a>
                     <a class="nav-item nav-link {% if request.path == '/farmer_view/' %} active {% endif %}"
-                       title="Users" href="{{ url_for('farmer_view') }}">
+                       title="Allevatori" href="{{ url_for('farmer_view') }}">
                         {% if request.path == '/farmer_view/' %}
                             <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
                         {% else %}
@@ -75,7 +75,7 @@
                         Allevatori
                     </a>
                     <a class="nav-item nav-link {% if request.path == '/buyer_view/' %} active {% endif %}"
-                       title="Users" href="{{ url_for('farmer_view') }}">
+                       title="Acquirenti" href="{{ url_for('buyer_view') }}">
                         {% if request.path == '/buyer_view/' %}
                             <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
                         {% else %}
@@ -90,6 +90,16 @@
                 </div>
             </div>
         </nav>
+        <!-- Messaggio gestione errori std -->
+        <div class="container text-center mt-3 message">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p style="color: #ED6666">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
     </div>
 
     {% block content %}
@@ -114,22 +124,12 @@
     {% endblock %}
 </body>
 <footer class="footer">
-    <!-- Messaggio gestione errori std -->
-    <div class="container text-center mt-3 message">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <p style="color: #ED6666">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
     <br>
     <th class="footer-text"> Consorzio del Bue Grasso di Carrù - © Copyright 2017 - Tutti i diritti riservati – I marchi
         riportati in questo sito appartengono ai legittimi proprietari
     </th>
     <br>
-    <th class="footer-text"> Powerd by - © 2021 Celerya S.r.l.</th>
+    <th class="footer-text"> Powered by - © 2021 Celerya S.r.l.</th>
 </footer>
 
 </html>

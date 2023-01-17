@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from app.app import db
-from app.utility.functions import year_extract
+from app.utilitys.functions import year_extract
 
 
 def compliance(birth, castration):
@@ -91,14 +91,27 @@ class Head(db.Model):
         self.updated_at = updated_at
 
     def to_dict(self):
-        if self.birth_date:
+        """Esporta in un dict la classe."""
+        if self.birth_date in ["", None] or isinstance(self.birth_date, str):
+            pass
+        else:
             self.birth_date = datetime.strftime(self.birth_date, "%Y-%m-%d")
-        if self.castration_date:
+
+        if self.castration_date in ["", None] or isinstance(self.castration_date, str):
+            pass
+        else:
             self.castration_date = datetime.strftime(self.castration_date, "%Y-%m-%d")
-        if self.slaughter_date:
+
+        if self.slaughter_date in ["", None] or isinstance(self.slaughter_date, str):
+            pass
+        else:
             self.slaughter_date = datetime.strftime(self.slaughter_date, "%Y-%m-%d")
-        if self.sale_date:
+
+        if self.sale_date in ["", None] or isinstance(self.sale_date, str):
+            pass
+        else:
             self.sale_date = datetime.strftime(self.sale_date, "%Y-%m-%d")
+
         return {
             'id': self.id,
             'headset': self.headset,

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from app.app import db
-from app.utility.functions import address_mount
+from app.utilitys.functions import address_mount
 
 
 class Slaughterhouse(db.Model):
@@ -75,10 +75,17 @@ class Slaughterhouse(db.Model):
         self.updated_at = updated_at
 
     def to_dict(self):
-        if self.affiliation_start_date:
+        """Esporta in un dict la classe."""
+        if self.affiliation_start_date in ["", None] or isinstance(self.affiliation_start_date, str):
+            pass
+        else:
             self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
-        if self.affiliation_end_date:
+
+        if self.affiliation_end_date in ["", None] or isinstance(self.affiliation_end_date, str):
+            pass
+        else:
             self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
+
         return {
             'id': self.id,
             'slaughterhouse': self.slaughterhouse,
