@@ -115,6 +115,7 @@ venv.bak/
 migrations
 migrations/
 to_do.md
+Note.txt
 
 # Spyder project settings
 .spyderproject

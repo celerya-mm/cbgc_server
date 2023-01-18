@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, validators
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from wtforms import PasswordField, StringField, SubmitField, EmailField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from app.models.accounts import Administrator, User
 
@@ -29,13 +29,13 @@ class FormAdminSignup(FlaskForm):
         EqualTo('new_password_1',
                 message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
 
-    name = StringField('Nome', validators=[Length(min=3, max=25)])
-    last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
+    name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
+    last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
-    email = EmailField('email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)], default="+39 ")
+    email = EmailField('email', validators=[Email(), Length(max=80), Optional()])
+    phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-    note = StringField('Note', validators=[Length(max=255)])
+    note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("SIGNUP")
 
@@ -43,10 +43,11 @@ class FormAdminSignup(FlaskForm):
     def validate_password(self):
         """Valida la nuova password."""
         if self.new_password_1.data != self.new_password_2.data:
-            raise validators.ValidationError('Passwords do not match')
+            raise ValidationError('Passwords do not match')
 
     @staticmethod
     def validate_username(self, field):
+        """Valida nuovo username."""
         if field.data in list_admin():
             raise ValidationError("E' già presente un AMMINISTRATORE con lo stesso username.")
 
@@ -61,13 +62,13 @@ class FormUserSignup(FlaskForm):
         EqualTo('new_password_1',
                 message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
 
-    name = StringField('Nome', validators=[Length(min=3, max=25)])
-    last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
+    name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
+    last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
-    email = EmailField('email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)], default="+39 ")
+    email = EmailField('email', validators=[Email(), Length(max=80), Optional()])
+    phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-    note = StringField('Note', validators=[Length(max=255)])
+    note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("SIGNUP")
 
@@ -75,10 +76,11 @@ class FormUserSignup(FlaskForm):
     def validate_password(self):
         """Valida la nuova password."""
         if self.new_password_1.data != self.new_password_2.data:
-            raise validators.ValidationError('Passwords do not match')
+            raise ValidationError('Passwords do not match')
 
     @staticmethod
     def validate_username(self, field):
+        """Valida nuovo username."""
         if field.data in list_user():
             raise ValidationError("E' già presente un UTENTE con lo stesso username.")
 
@@ -87,12 +89,12 @@ class FormAccountUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
 
-    name = StringField('Nome', validators=[Length(min=3, max=25)])
-    last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
+    name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
+    last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
-    email = EmailField('email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)], default="+39 ")
+    email = EmailField('email', validators=[Email(), Length(max=80), Optional()])
+    phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-    note = StringField('Note', validators=[Length(max=255)])
+    note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("MODIFICA")

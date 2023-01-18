@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -15,7 +14,6 @@ from app.utilitys.functions import event_create, token_admin_validate, url_to_js
 @app.route("/farmer_view/", methods=["GET", "POST"])
 def farmer_view():
     """Visualizzo informazioni Allevatori."""
-    # Estraggo la lista degli allevatori
     _list = Farmer.query.all()
     _list = [r.to_dict() for r in _list]
     return render_template("farmer/farmer_view.html", form=_list)
@@ -28,7 +26,7 @@ def farmer_create():
     form = FormFarmerCreate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
-        # print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
+        print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
         if form_data["affiliation_status"] == "NO":
             form_data["affiliation_status"] = False
         else:
@@ -170,22 +168,13 @@ def farmer_update(data):
         form.stable_productive_orientation.data = data["stable_productive_orientation"]
         form.stable_breeding_methods.data = data["stable_breeding_methods"]
 
-        if "affiliation_start_date" in data.keys() and data["affiliation_start_date"] not in ["", None]:
-            form.affiliation_start_date.data = datetime.strptime(data["affiliation_start_date"], '%Y-%m-%d')
-
         if "note_certificate" in data.keys() and data["note_certificate"] not in ["", None]:
             form.note_certificate.data = data["note_certificate"]
 
         form.note.data = data["note"]
 
         status = data["affiliation_status"]
-
-        if data["affiliation_end_date"]:
-            end_date = data["affiliation_end_date"]
-        else:
-            end_date = "vuoto"
-
-        return render_template("farmer/farmer_update.html", form=form, status=status, end_date=end_date)
+        return render_template("farmer/farmer_update.html", form=form, status=status, id=data["id"])
 
 
 @token_admin_validate

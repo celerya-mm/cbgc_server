@@ -1,10 +1,9 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request, session
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db, secret
+from app.app import db
 from app.forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
 from app.forms.forms import FormAffiliationChange
 from app.models.accounts import User
@@ -36,9 +35,13 @@ def buyer_create():
         else:
             form_data["affiliation_status"] = True
 
-        user_search = form_data["user_id"]
-        user_search = user_search.split(" - ")[0]
-        user_find = User.query.filter_by(username=user_search).first()
+        if form_data["user_id"] not in ["", "-", None]:
+            user_search = form_data["user_id"]
+            user_search = user_search.split(" - ")[0]
+            user_id = User.query.filter_by(username=user_search).first()
+            user_id = user_id.id
+        else:
+            user_id = None
 
         # print("USER_ID:", user_find.id)
 
@@ -56,7 +59,7 @@ def buyer_create():
             affiliation_start_date=form_data["affiliation_start_date"],
             affiliation_status=form_data["affiliation_status"],
 
-            user_id=user_find.id,
+            user_id=user_id,
 
             note_certificate=form_data["note_certificate"],
             note=form_data["note"]
@@ -178,22 +181,13 @@ def buyer_update(data):
         form.cap.data = data["cap"]
         form.city.data = data["city"]
 
-        if "affiliation_start_date" in data.keys() and data["affiliation_start_date"] not in ["", None]:
-            form.affiliation_start_date.data = datetime.strptime(data["affiliation_start_date"], '%Y-%m-%d')
-
         if "note_certificate" in data.keys() and data["note_certificate"] not in ["", None]:
             form.note_certificate.data = data["note_certificate"]
 
         form.note.data = data["note"]
 
         status = data["affiliation_status"]
-
-        if "affiliation_end_date" in data.keys():
-            end_date = data["affiliation_end_date"]
-        else:
-            end_date = "vuoto"
-
-        return render_template("buyer/buyer_update.html", form=form, status=status, end_date=end_date)
+        return render_template("buyer/buyer_update.html", form=form, status=status, id=data["id"])
 
 
 @token_admin_validate
@@ -253,6 +247,8 @@ def buyer_affiliation_change(data):
         # print("BUYER_DATA_PASS_DICT:", json.dumps(data, indent=2))
 
         form.name.data = data["buyer_name"]
+        form.affiliation_start_date.data = data["affiliation_start_date"]
+        form.affiliation_end_date.data = data["affiliation_end_date"]
         session["buyer_name"] = data["buyer_name"]
 
-        return render_template("buyer/buyer_affiliation_change.html", form=form)
+        return render_template("buyer/buyer_affiliation_change.html", form=form, id=data["id"])

@@ -54,9 +54,7 @@ class CertificateDna(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.dna_cert_date in ["", None] or isinstance(self.dna_cert_date, str):
-            pass
-        else:
+        if self.dna_cert_date is not None and not isinstance(self.dna_cert_date, str):
             self.dna_cert_date = datetime.strftime(self.dna_cert_date, "%Y-%m-%d")
 
         return {

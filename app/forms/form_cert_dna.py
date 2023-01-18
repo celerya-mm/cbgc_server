@@ -2,10 +2,26 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
 from app.models.farmers import Farmer
 from app.models.heads import Head
+
+
+def list_head():
+    records = Head.query.all()
+    _list = [x.to_dict() for x in records]
+    _list = [d["headset"] for d in _list if "headset" in d]
+    _list.append("-")
+    return _list
+
+
+def list_farmer():
+    records = Farmer.query.all()
+    _list = [x.to_dict() for x in records]
+    _list = [d["farmer_name"] for d in _list if "farmer_name" in d]
+    _list.append("-")
+    return _list
 
 
 class FormCertDNA(FlaskForm):
@@ -16,25 +32,8 @@ class FormCertDNA(FlaskForm):
         validators=[DataRequired("Campo obbligatorio!"), Length(max=20)]
     )
 
-    invoice_nr = StringField('Fattura NR', validators=[Length(max=20)])
-    invoice_date = DateField('Fattura Data', format='%Y-%m-%d', default=datetime.now())
-    invoice_status = SelectField(
-        'Fattura Stato', validators=[DataRequired("Campo obbligatorio!")], choices=[
-            "Da Emettere", "Emessa", "Annullata", "Non Pagata", "Pagata"
-        ], default="Da Emettere"
-    )
-
-    farmers_list = []
-    farmers = Farmer.query.all()
-    for f in farmers:
-        farmers_list.append(f.farmer_name)
-    farmer_id = SelectField("Seleziona Allevatore", choices=farmers_list, default="")
-
-    head_list = []
-    heads = Head.query.all()
-    for h in heads:
-        head_list.append(h.headset)
-    head_id = SelectField("Seleziona Capo", choices=head_list, default="")
+    farmer_id = SelectField("Seleziona Allevatore", choices=list_farmer(), default="-")
+    head_id = SelectField("Seleziona Capo", choices=list_head(), default="-")
 
     note = StringField('Note', validators=[Length(max=255)])
 

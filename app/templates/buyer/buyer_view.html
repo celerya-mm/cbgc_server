@@ -31,6 +31,7 @@
                                 {{ row.id|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.affiliation_status }}
                                 {% if row.affiliation_status == True %}
                                     <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
                                 {% else %}

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
+from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 
 from app.models.buyers import Buyer
@@ -29,12 +29,12 @@ class FormBuyerCreate(FlaskForm):
 
     buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Macello", "Ristorante"], default="Ristorante")
 
-    email = EmailField('Email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=80)], default="+39 ")
+    email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
+    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
 
-    address = StringField('Indirizzo', validators=[Length(min=5, max=255)])
-    cap = StringField('CAP', validators=[Length(min=5, max=5)])
-    city = StringField('Città', validators=[Length(min=3, max=55)])
+    address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
+    cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
+    city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
 
     affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
     affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
@@ -43,8 +43,9 @@ class FormBuyerCreate(FlaskForm):
     users = User.query.all()
     for user in users:
         users_list.append(f"{user.username} - {user.full_name}")
+    users_list.append("-")
 
-    user_id = SelectField("Utente Servizio", choices=users_list, default="")
+    user_id = SelectField("Utente Servizio", choices=users_list, default="-", validators=[Optional()])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
@@ -53,7 +54,7 @@ class FormBuyerCreate(FlaskForm):
 
     @staticmethod
     def validate_buyer_name(self, field):
-        print("BUYER_NAME:", field)
+        """Valida Ragione Sociale."""
         if field.data.strip() in list_buyer():
             raise ValidationError("E' già presente un ACQUIRENTE con la stessa Ragione Sociale.")
 
@@ -71,8 +72,6 @@ class FormBuyerUpdate(FlaskForm):
     address = StringField('Indirizzo', validators=[Length(min=5, max=255)])
     cap = StringField('CAP', validators=[Length(min=5, max=5)])
     city = StringField('Città', validators=[Length(min=3, max=55)])
-
-    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])

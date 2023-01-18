@@ -104,14 +104,10 @@ class CertificateCons(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.certificate_date in ["", None] or isinstance(self.certificate_date, str):
-            pass
-        else:
+        if self.certificate_date is not None and not isinstance(self.certificate_date, str):
             self.certificate_date = datetime.strftime(self.certificate_date, "%Y-%m-%d")
 
-        if self.invoice_date in ["", None] or isinstance(self.invoice_date, str):
-            pass
-        else:
+        if self.invoice_date is not None and not isinstance(self.invoice_date, str):
             self.invoice_date = datetime.strftime(self.invoice_date, "%Y-%m-%d")
 
         return {

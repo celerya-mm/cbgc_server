@@ -17,6 +17,18 @@
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
+                    {{ form.affiliation_start_date.label }}
+                    {{ form.affiliation_start_date(class="form-control") }}
+                    {% if form.affiliation_start_date.errors %}
+                        {% for error in form.affiliation_start_date.errors %}
+                            <br>
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="form-group">
                     {{ form.affiliation_end_date.label }}
                     {{ form.affiliation_end_date(class="form-control") }}
                     {% if form.affiliation_end_date.errors %}
@@ -26,7 +38,6 @@
                             <br>
                         {% endfor %}
                     {% endif %}
-                    <p class="comment">La data di cessazione è richiesta in questo form.</p>
                 </div>
                 <br>
                 <div class="form-group justify-content-center">

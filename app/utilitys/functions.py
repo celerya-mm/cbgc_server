@@ -30,7 +30,7 @@ def url_to_json(_str, val_date=None):
             _list_field = []
             for x in val_date:
                 _list_field.append(val_date[x])
-            print("LISTA_CAMPI_DATA:", _list_field)
+            # print("LISTA_CAMPI_DATA:", _list_field)
 
             for d in _list_field:
                 if f'"{d}": datetime.datetime' in _str:
@@ -49,9 +49,8 @@ def url_to_json(_str, val_date=None):
                     # print("STR:", _str)
 
         _str = literal_eval(_str)
-        # print("URL_WORK:", _str, "TYPE:", type(_str))
-
-    print("URL_TO_JSON:", json.dumps(_str, indent=2), "TYPE:", type(_str))
+    # print("URL_WORK:", _str, "TYPE:", type(_str))
+    # print("URL_TO_JSON:", json.dumps(_str, indent=2), "TYPE:", type(_str))
     return _str
 
 

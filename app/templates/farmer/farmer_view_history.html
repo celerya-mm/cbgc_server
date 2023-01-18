@@ -10,10 +10,10 @@
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
                      alt=""/>
             </a>
-            Dati ALLEVATORE:
+            Dati ALLEVATORE  [ {{ form.id }} ]:
         </h5>
         <h5>
-            "{{form.farmer_name}}" - Stato Affiliazione
+            Stato Affiliazione
             {% if form.affiliation_status == True %}
                 <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
             {% else %}

@@ -7,7 +7,7 @@
             <a class="btn btn-update" type="button" href="{{ url_for('buyer_view') }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
-            Modifica ACQUIRENTE del Consorzio:
+            Modifica ACQUIRENTE [ {{ id }} ]:
         </h5>
         <div class="col-md-12">
             <form enctype="multipart/form-data" method="POST">
@@ -47,15 +47,6 @@
                 <div class="row no-gutters justify-content-center">
                     <div class="col-md-6 order-first">
                         <br>
-                        {{ form.buyer_type.label }}
-                        {{ form.buyer_type(class="form-control", style="text-align: center;") }}
-                        {% if form.buyer_type.errors %}
-                            {% for error in form.buyer_type.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
-                        {% endif %}
-                        <br>
                         <div class="form-group">
                             {{ form.address.label }}
                             {{ form.address(class="form-control") }}
@@ -91,6 +82,15 @@
                     </div>
                     <div class="col-md-6 order-second">
                         <br>
+                            {{ form.buyer_type.label }}
+                            {{ form.buyer_type(class="form-control", style="text-align: center;") }}
+                            {% if form.buyer_type.errors %}
+                                {% for error in form.buyer_type.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        <br>
                         <div class="form-group">
                             {{ form.email.label }}
                             {{ form.email(class="form-control") }}
@@ -107,17 +107,6 @@
                             {{ form.phone(class="form-control") }}
                             {% if form.phone.errors %}
                                 {% for error in form.phone.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.affiliation_start_date.label }}
-                            {{ form.affiliation_start_date(class="form-control") }}
-                            {% if form.affiliation_start_date.errors %}
-                                {% for error in form.affiliation_start_date.errors %}
                                     <span class="text-danger">{{ error }}</span>
                                     <br>
                                 {% endfor %}

@@ -80,14 +80,10 @@ class Buyer(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.affiliation_start_date in ["", None] or isinstance(self.affiliation_start_date, str):
-            pass
-        else:
+        if self.affiliation_start_date is not None and not isinstance(self.affiliation_start_date, str):
             self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
 
-        if self.affiliation_end_date in ["", None] or isinstance(self.affiliation_end_date, str):
-            pass
-        else:
+        if self.affiliation_end_date is not None and not isinstance(self.affiliation_end_date, str):
             self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
 
         return {

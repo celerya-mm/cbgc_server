@@ -9,9 +9,11 @@ from app.app import db
 from app.models.tokens import AuthToken
 
 
+def psw_hash(_psw):
+    return hashlib.sha256(str(_psw).encode('utf-8')).hexdigest()
+
+
 def __generate_auth_token():
-    # """Genero random token."""
-    # return ''.join([random.choice(string.ascii_letters + string.digits) for _n in range(64)])
     """Genero token UUID4."""
     return str(uuid4())
 
@@ -40,12 +42,7 @@ def __save_auth_token(admin_id, user_id, token):
 
 
 def is_valid_email(_email):
-    try:
-        v = validate_email(_email)
-        print(v)
-        return True
-    except EmailNotValidError:
-        return False
+    return bool(validate_email(_email))
 
 
 # definisco la policy per le password
@@ -102,7 +99,3 @@ def psw_contain_usr(password, username):
             return False
     else:
         return False
-
-
-def psw_hash(_psw):
-    return hashlib.sha256(str(_psw).encode('utf-8')).hexdigest()

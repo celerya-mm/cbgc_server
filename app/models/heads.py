@@ -1,7 +1,20 @@
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from app.app import db
 from app.utilitys.functions import year_extract
+
+
+def compliance_castration(birth, castration):
+    """Verifica conformità castrazione entro gli Otto mesi."""
+    if castration:
+        _max = datetime.strptime(birth, "%Y-%m-%d") + relativedelta(month=8)
+        print("BIRTH:", datetime.strptime(birth, "%Y-%m-%d"))
+        print("MAX:", _max)
+        print("CASTRATION:", datetime.strptime(castration, "%Y-%m-%d"))
+        return bool(_max > datetime.strptime(castration, "%Y-%m-%d"))
+    else:
+        return None
 
 
 class Head(db.Model):
@@ -40,7 +53,7 @@ class Head(db.Model):
         return '<Head: {}>'.format(self.headset)
 
     def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None,
-                 sale_date=None, note_certificato=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
+                 sale_date=None, note_certificate=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  dna_certs=None, cons_certs=None, events=None, note=None, updated_at=datetime.now()):
 
         self.headset = headset
@@ -50,7 +63,7 @@ class Head(db.Model):
 
         self.castration_date = castration_date
         self.castration_year = year_extract(castration_date)
-        self.castration_compliance = compliance(birth_date, castration_date)
+        self.castration_compliance = compliance_castration(birth_date, castration_date)
 
         self.slaughter_date = slaughter_date
 
@@ -73,7 +86,7 @@ class Head(db.Model):
             events = []
         self.events = events
 
-        self.note_certificate = note_certificato
+        self.note_certificate = note_certificate
         self.note = note
 
         self.created_at = datetime.now()
@@ -81,24 +94,16 @@ class Head(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.birth_date in ["", None] or isinstance(self.birth_date, str):
-            pass
-        else:
+        if self.birth_date is not None and not isinstance(self.birth_date, str):
             self.birth_date = datetime.strftime(self.birth_date, "%Y-%m-%d")
 
-        if self.castration_date in ["", None] or isinstance(self.castration_date, str):
-            pass
-        else:
+        if self.castration_date is not None and not isinstance(self.castration_date, str):
             self.castration_date = datetime.strftime(self.castration_date, "%Y-%m-%d")
 
-        if self.slaughter_date in ["", None] or isinstance(self.slaughter_date, str):
-            pass
-        else:
+        if self.slaughter_date is not None and not isinstance(self.slaughter_date, str):
             self.slaughter_date = datetime.strftime(self.slaughter_date, "%Y-%m-%d")
 
-        if self.sale_date in ["", None] or isinstance(self.sale_date, str):
-            pass
-        else:
+        if self.sale_date is not None and not isinstance(self.sale_date, str):
             self.sale_date = datetime.strftime(self.sale_date, "%Y-%m-%d")
 
         return {

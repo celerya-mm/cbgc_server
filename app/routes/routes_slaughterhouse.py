@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -30,6 +29,9 @@ def slaughterhouse_create():
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
         print("SLAUGHT_FORM_DATA", json.dumps(form_data, indent=2))
+        if form_data["affiliation_start_date"] is "":
+            form_data["affiliation_start_date"] = None
+
         if form_data["affiliation_status"] == "NO":
             form_data["affiliation_status"] = False
         else:
@@ -74,7 +76,7 @@ def slaughterhouse_view_history(data):
     print("SLAUGHT_DATA_PASS:", json.dumps(data, indent=2))
 
     # Estraggo l' ID dell'allevatore corrente
-    session["slaughterhouse"] = data["id"]
+    session["slaughterhouse_id"] = data["id"]
 
     # Interrogo il DB
     slaughterhouse = Slaughterhouse.query.filter_by(id=data["id"]).first()
@@ -160,22 +162,13 @@ def slaughterhouse_update(data):
         form.cap.data = data["cap"]
         form.city.data = data["city"]
 
-        if "affiliation_start_date" in data.keys() and data["affiliation_start_date"] not in ["", None]:
-            form.affiliation_start_date.data = datetime.strptime(data["affiliation_start_date"], '%Y-%m-%d')
-
         if "note_certificate" in data.keys() and data["note_certificate"] not in ["", None]:
             form.note_certificate.data = data["note_certificate"]
 
         form.note.data = data["note"]
 
         status = data["affiliation_status"]
-
-        if data["affiliation_end_date"]:
-            end_date = data["affiliation_end_date"]
-        else:
-            end_date = "vuoto"
-
-        return render_template("slaughterhouse/slaughterhouse_update.html", form=form, status=status, end_date=end_date)
+        return render_template("slaughterhouse/slaughterhouse_update.html", form=form, status=status, id=data["id"])
 
 
 @token_admin_validate
@@ -208,7 +201,8 @@ def slaughterhouse_affiliation_change(data):
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
-            return render_template("slaughterhouse/slaughterhouse_affiliation_change.html", form=slaughterhouse.to_dict())
+            return render_template(
+                "slaughterhouse/slaughterhouse_affiliation_change.html", form=slaughterhouse.to_dict())
 
         _event = {
             "username": session["username"],
@@ -223,18 +217,19 @@ def slaughterhouse_affiliation_change(data):
             return redirect(url_for('slaughterhouse_view'))
     else:
         # recupero i dati e li converto in dict
-        # print("FARM_DATA_FROM_HTML:", data, "TYPE:", type(data))
+        print("FARM_DATA_FROM_HTML:", data, "TYPE:", type(data))
 
         # data = data.to_dict()
         val_date = {
             1: "affiliation_start_date",
             2: "affiliation_end_date"
         }
-
         data = url_to_json(data, val_date)
         print("FARM_DATA_PASS_DICT:", json.dumps(data, indent=2))
 
         form.name.data = data["slaughterhouse"]
+        form.affiliation_start_date.data = data["affiliation_start_date"]
+        form.affiliation_end_date.data = data["affiliation_start_date"]
         session["slaughterhouse"] = data["slaughterhouse"]
-
-        return render_template("slaughterhouse/slaughterhouse_affiliation_change.html", form=form)
+        return render_template(
+            "slaughterhouse/slaughterhouse_affiliation_change.html", form=form, id=session["slaughterhouse_id"])
