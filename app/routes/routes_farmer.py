@@ -11,26 +11,20 @@ from app.models.farmers import Farmer
 from app.utilitys.functions import event_create, token_admin_validate, url_to_json
 
 
+@token_admin_validate
 @app.route("/farmer_view/", methods=["GET", "POST"])
 def farmer_view():
     """Visualizzo informazioni Allevatori."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Estraggo la lista degli allevatori
     farmer_list = Farmer.query.all()
     _farmer_list = [farmer.to_dict() for farmer in farmer_list]
     return render_template("farmer/farmer_view.html", farmer_list=_farmer_list)
 
 
+@token_admin_validate
 @app.route("/farmer_create/", methods=["GET", "POST"])
 def farmer_create():
     """Creazione Allevatore Consorzio."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormFarmerCreate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
@@ -74,13 +68,10 @@ def farmer_create():
         return render_template("farmer/farmer_create.html", form=form)
 
 
+@token_admin_validate
 @app.route("/farmer_view_history/<data>", methods=["GET", "POST"])
 def farmer_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Elaboro i dati ricevuti
     data = url_to_json(data)
     print("FARMER_DATA_PASS:", json.dumps(data, indent=2))
@@ -99,13 +90,10 @@ def farmer_view_history(data):
     return render_template("farmer/farmer_view_history.html", form=_farmer, history_list=history_list)
 
 
+@token_admin_validate
 @app.route("/farmer_update/<data>", methods=["GET", "POST"])
 def farmer_update(data):
     """Aggiorna dati Allevatore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormFarmerUpdate()
     if form.validate_on_submit():
         # recupero i dati e li converto in dict
@@ -200,13 +188,10 @@ def farmer_update(data):
         return render_template("farmer/farmer_update.html", form=form, status=status, end_date=end_date)
 
 
+@token_admin_validate
 @app.route("/farmer_affiliation_change/<data>", methods=["GET", "POST"])
 def farmer_affiliation_change(data):
     """Aggiorna dati Allevatore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormAffiliationChange()
     if form.validate_on_submit():
         # recupero i dati e li converto in dict

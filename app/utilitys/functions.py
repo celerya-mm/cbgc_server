@@ -1,9 +1,10 @@
 import json
 from ast import literal_eval
 from datetime import datetime
+from functools import wraps
 
 import requests
-from flask import flash, session
+from flask import flash, session, url_for, redirect
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -89,29 +90,32 @@ def token_user_validate(_token):
         return True
 
 
-def token_admin_validate():
-    """Eseguo la funzione solo."""
-    try:
-        token = session["token_login"]
-        if token:
+def token_admin_validate(func):
+    """Eseguo la funzione solo se presente token autenticazione valido."""
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        if "token_login" in session.keys() or session["token_login"]:
+            # controlla validità token
             authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
             if authenticated is None:
-                flash(f"There is no authenticated log in for your username. "
-                      f"Please log in again with an administrator account.")
-                return False
+                flash(f"There is no authenticated log-in with your username. "
+                      f"Please log-in again with an administrator account.")
+                return redirect(url_for('logout'))
             elif authenticated.expires_at < datetime.now():
-                flash("Your authenticated log in is expired. "
-                      "Please log in again with an administrator account.")
-                return False
+                flash("Your authenticated log-in is expired. "
+                      "Please log-in again with an administrator account.")
+                return redirect(url_for('logout'))
             elif authenticated.admin_id in ["", None]:
                 flash(f"Your account {authenticated.admin_id} does not allow this operation. "
-                      f"Please log in with an administrator account.")
-                return False
+                      f"Please log-in with an administrator account.")
+                return redirect(url_for('logout'))
             else:
-                return True
-    except Exception as err:
-        flash(f"Token autenticazione non presente, devi eseguire la Log-In. Errore: {err}")
-        return False
+                # esegue la funzione
+                return func(*args, **kwargs)
+        else:
+            flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
+            return redirect(url_for('logout'))
+    return wrap
 
 
 def admin_log_in(form):

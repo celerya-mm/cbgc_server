@@ -12,27 +12,20 @@ from app.models.buyers import Buyer
 from app.utilitys.functions import token_admin_validate, event_create, url_to_json
 
 
+@token_admin_validate
 @app.route("/buyer_view/", methods=["GET", "POST"])
 def buyer_view():
     """Visualizza informazioni Acquirenti."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Estraggo la lista degli allevatori
     buyer_list = Buyer.query.all()
     _buyer = [buyer.to_dict() for buyer in buyer_list]
-    print("SONO DENTRO")
     return render_template("buyer/buyer_view.html", form=_buyer)
 
 
+@token_admin_validate
 @app.route("/buyer_create/", methods=["GET", "POST"])
 def buyer_create():
     """Creazione Allevatore Consorzio."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormBuyerCreate()
     if form.validate_on_submit():
         print("SECRET:", secret)
@@ -81,13 +74,10 @@ def buyer_create():
         return render_template("buyer/buyer_create.html", form=form)
 
 
+@token_admin_validate
 @app.route("/buyer_view_history/<data>", methods=["GET", "POST"])
 def buyer_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Elaboro i dati ricevuti
     data = url_to_json(data)
     print("BUYER_VIEW_DATA_PASS:", json.dumps(data, indent=2))
@@ -117,13 +107,10 @@ def buyer_view_history(data):
     return render_template("buyer/buyer_view_history.html", form=_buyer, history_list=history_list)
 
 
+@token_admin_validate
 @app.route("/buyer_update/<data>", methods=["GET", "POST"])
 def buyer_update(data):
     """Aggiorna dati Allevatore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormBuyerUpdate()
     if form.validate_on_submit():
         # recupero i dati e li converto in dict
@@ -210,13 +197,10 @@ def buyer_update(data):
         return render_template("buyer/buyer_update.html", form=form, status=status, end_date=end_date)
 
 
+@token_admin_validate
 @app.route("/buyer_affiliation_change/<data>", methods=["GET", "POST"])
 def buyer_affiliation_change(data):
     """Aggiorna dati Allevatore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormAffiliationChange()
     if form.validate_on_submit():
         # recupero i dati e li converto in dict

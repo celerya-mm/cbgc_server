@@ -10,26 +10,20 @@ from app.utilitys.functions import event_create, token_admin_validate, url_to_js
 from app.utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
 
 
+@token_admin_validate
 @app.route("/user_view/", methods=["GET", "POST"])
 def user_view():
     """Visualizzo informazioni User."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Estraggo la lista degli utenti amministratori
     user_list = User.query.all()
     _user_list = [user.to_dict() for user in user_list]
     return render_template("user/user_view.html", user_list=_user_list)
 
 
+@token_admin_validate
 @app.route("/user_create/", methods=["GET", "POST"])
 def user_create():
     """Creazione Utente Consorzio."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormUserSignup()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
@@ -83,13 +77,10 @@ def user_create():
         return render_template("user/user_create.html", form=form)
 
 
+@token_admin_validate
 @app.route("/user_view_history/<data>", methods=["GET", "POST"])
 def user_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Elaboro i dati ricevuti
     data = url_to_json(data)
     print("USER_DATA_PASS:", json.dumps(data, indent=2))
@@ -108,13 +99,10 @@ def user_view_history(data):
     return render_template("user/user_view_history.html", form=_user, history_list=history_list)
 
 
+@token_admin_validate
 @app.route("/user_update/<data>", methods=["GET", "POST"])
 def user_update(data):
     """Aggiorna dati Utente."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormAccountUpdate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))

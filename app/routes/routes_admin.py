@@ -12,32 +12,30 @@ from app.utilitys.functions import event_create, token_admin_validate, url_to_js
 from app.utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
 
 
+@token_admin_validate
 @app.route("/admin_view/", methods=["GET", "POST"])
 def admin_view():
     """Visualizzo informazioni Utente Amministratore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
+    if "username" in session.keys():
+        # Estraggo l'utente amministratore corrente
+        admin = Administrator.query.filter_by(username=session["username"]).first()
+        _admin = admin.to_dict()
+        session["admin"] = _admin
+
+        # Estraggo la lista degli utenti amministratori
+        admin_list = Administrator.query.all()
+        _admin_list = [admin.to_dict() for admin in admin_list]
+
+        return render_template("admin/admin_view.html", admin=_admin, admin_list=_admin_list)
+    else:
+        flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
         return redirect(url_for('logout'))
 
-    # Estraggo l'utente amministratore corrente
-    admin = Administrator.query.filter_by(username=session["username"]).first()
-    _admin = admin.to_dict()
-    session["admin"] = _admin
 
-    # Estraggo la lista degli utenti amministratori
-    admin_list = Administrator.query.all()
-    _admin_list = [admin.to_dict() for admin in admin_list]
-
-    return render_template("admin/admin_view.html", admin=_admin, admin_list=_admin_list)
-
-
+@token_admin_validate
 @app.route("/admin_create/", methods=["GET", "POST"])
 def admin_create():
     """Creazione Utente Amministratore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormAdminSignup()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
@@ -91,13 +89,10 @@ def admin_create():
         return render_template("admin/admin_create.html", form=form)
 
 
+@token_admin_validate
 @app.route("/admin_view_history/<data>", methods=["GET", "POST"])
 def admin_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     # Elaboro i dati ricevuti
     data = url_to_json(data)
     print("DATA_PASS:", json.dumps(data, indent=2))
@@ -116,13 +111,10 @@ def admin_view_history(data):
     return render_template("admin/admin_view_history.html", form=_admin, history_list=history_list)
 
 
+@token_admin_validate
 @app.route("/admin_update/<data>", methods=["GET", "POST"])
 def admin_update(data):
     """Aggiorna Utente Amministratore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormAccountUpdate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
@@ -192,13 +184,10 @@ def admin_update(data):
         return render_template("admin/admin_update.html", form=form)
 
 
+@token_admin_validate
 @app.route("/admin_update_password/", methods=["GET", "POST"])
 def admin_update_password():
     """Aggiorna password Utente Amministratore."""
-    # Verifico autenticazione
-    if not token_admin_validate():
-        return redirect(url_for('logout'))
-
     form = FormPswChange()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
