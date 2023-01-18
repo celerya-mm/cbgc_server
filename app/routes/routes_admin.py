@@ -23,10 +23,10 @@ def admin_view():
         session["admin"] = _admin
 
         # Estraggo la lista degli utenti amministratori
-        admin_list = Administrator.query.all()
-        _admin_list = [admin.to_dict() for admin in admin_list]
+        _list = Administrator.query.all()
+        _list = [r.to_dict() for r in _list]
 
-        return render_template("admin/admin_view.html", admin=_admin, admin_list=_admin_list)
+        return render_template("admin/admin_view.html", admin=_admin, form=_list)
     else:
         flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
         return redirect(url_for('logout'))

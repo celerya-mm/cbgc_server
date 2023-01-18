@@ -15,7 +15,7 @@ class Slaughterhouse(db.Model):
     email = db.Column(db.String(80), index=False, unique=False, nullable=True)
     phone = db.Column(db.String(80), index=False, unique=False, nullable=True)
 
-    address = db.Column(db.String(255), index=False, unique=False, nullable=True)
+    address = db.Column(db.String(150), index=False, unique=False, nullable=True)
     cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
     city = db.Column(db.String(55), index=False, unique=False, nullable=True)
     full_address = db.Column(db.String(55), index=False, unique=False, nullable=True)
@@ -38,7 +38,7 @@ class Slaughterhouse(db.Model):
         return '<Slaughterhouse: {}>'.format(self.farmer_name)
 
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
-                 affiliation_start_date, affiliation_end_date, affiliation_status, note_certificate, note,
+                 affiliation_start_date, affiliation_status, note_certificate, note, affiliation_end_date=None,
                  head=None, cons_cert=None, event=None, updated_at=datetime.now()):
 
         self.slaughterhouse = slaughterhouse

@@ -4,16 +4,19 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError
 
-from app.models.accounts import User
+
 from app.models.buyers import Buyer
+from app.models.accounts import User
+
+# Importazioni necessarie per mantenere le relazioni valide
 from app.models.heads import Head  # noqa
 from app.models.certificates_cons import CertificateCons  # noqa
 from app.models.certificates_dna import CertificateDna  # noqa
 
 
 def list_buyer():
-    _buyers = Buyer.query.all()
-    _list = [x.to_dict() for x in _buyers]
+    records = Buyer.query.all()
+    _list = [x.to_dict() for x in records]
     _list = [d["buyer_name"] for d in _list if "buyer_name" in d]
     return _list
 
@@ -48,14 +51,15 @@ class FormBuyerCreate(FlaskForm):
 
     submit = SubmitField("CREATE")
 
-    def validate_buyer_name(self, field):  # noqa
+    @staticmethod
+    def validate_buyer_name(self, field):
         print("BUYER_NAME:", field)
         if field.data.strip() in list_buyer():
             raise ValidationError("E' già presente un ACQUIRENTE con la stessa Ragione Sociale.")
 
 
 class FormBuyerUpdate(FlaskForm):
-    """Form inserimento dati Acquirente."""
+    """Form modifica dati Acquirente."""
     buyer_name = StringField(
         'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
     )

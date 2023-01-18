@@ -14,7 +14,7 @@ def login():
         if token:
             session["token_login"] = token
             session["username"] = form.username.data
-            return redirect(url_for('buyer_view'))
+            return redirect(url_for('slaughterhouse_view'))
         else:
             flash("Invalid username or password. Please try again!", category="alert")
             return render_template("login.html", form=form)

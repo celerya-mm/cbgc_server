@@ -4,25 +4,24 @@ from flask import current_app as app, flash, redirect, render_template, session,
 from sqlalchemy.exc import IntegrityError
 
 from app.app import db
-from app.forms.form_account import FormAccountUpdate, FormUserSignup
-from app.models.accounts import User
+from app.models.heads import Head
+from app.forms.form_head import FormHeadCreate
 from app.utilitys.functions import event_create, token_admin_validate, url_to_json
-from app.utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
 
 
 @token_admin_validate
-@app.route("/user_view/", methods=["GET", "POST"])
-def user_view():
+@app.route("/head_view/", methods=["GET", "POST"])
+def head_view():
     """Visualizzo informazioni User."""
     # Estraggo la lista degli utenti amministratori
-    _list = User.query.all()
-    _list = [r.to_dict() for r in _list]
-    return render_template("user/user_view.html", form=_list)
+    user_list = User.query.all()
+    _user_list = [user.to_dict() for user in user_list]
+    return render_template("user/user_view.html", user_list=_user_list)
 
 
 @token_admin_validate
-@app.route("/user_create/", methods=["GET", "POST"])
-def user_create():
+@app.route("/head_create/", methods=["GET", "POST"])
+def head_create():
     """Creazione Utente Consorzio."""
     form = FormUserSignup()
     if form.validate_on_submit():
@@ -78,8 +77,8 @@ def user_create():
 
 
 @token_admin_validate
-@app.route("/user_view_history/<data>", methods=["GET", "POST"])
-def user_view_history(data):
+@app.route("/head_view_history/<data>", methods=["GET", "POST"])
+def head_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Elaboro i dati ricevuti
     data = url_to_json(data)
@@ -100,8 +99,8 @@ def user_view_history(data):
 
 
 @token_admin_validate
-@app.route("/user_update/<data>", methods=["GET", "POST"])
-def user_update(data):
+@app.route("/head_update/<data>", methods=["GET", "POST"])
+def head_update(data):
     """Aggiorna dati Utente."""
     form = FormAccountUpdate()
     if form.validate_on_submit():

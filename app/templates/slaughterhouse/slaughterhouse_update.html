@@ -4,10 +4,10 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('buyer_view') }}" title="Annulla">
+            <a class="btn btn-update" type="button" href="{{ url_for('slaughterhouse_view') }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
-            Modifica ACQUIRENTE del Consorzio:
+            Modifica MACELLO del Consorzio:
         </h5>
         <div class="col-md-12">
             <form enctype="multipart/form-data" method="POST">
@@ -29,16 +29,16 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <a class="btn btn-update" type="button" title="Modifica ACQUIRENTE"
-                   href="{{ url_for('buyer_affiliation_change', data=form.data) }}">
+                <a class="btn btn-update" type="button" title="Modifica Macello"
+                   href="{{ url_for('slaughterhouse_affiliation_change', data=form.data) }}">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/change_affiliation.svg') }}" alt=""/>
                 </a>
                 <br>
                 <div class="form-group">
-                    {{ form.buyer_name.label }}
-                    {{ form.buyer_name(class="form-control") }}
-                    {% if form.buyer_name.errors %}
-                        {% for error in form.buyer_name.errors %}
+                    {{ form.slaughterhouse.label }}
+                    {{ form.slaughterhouse(class="form-control") }}
+                    {% if form.slaughterhouse.errors %}
+                        {% for error in form.slaughterhouse.errors %}
                             <span class="text-danger">{{ error }}</span>
                             <br>
                         {% endfor %}
@@ -47,10 +47,10 @@
                 <div class="row no-gutters justify-content-center">
                     <div class="col-md-6 order-first">
                         <br>
-                        {{ form.buyer_type.label }}
-                        {{ form.buyer_type(class="form-control", style="text-align: center;") }}
-                        {% if form.buyer_type.errors %}
-                            {% for error in form.buyer_type.errors %}
+                        {{ form.slaughterhouse_code.label }}
+                        {{ form.slaughterhouse_code(class="form-control", style="text-align: center;") }}
+                        {% if form.slaughterhouse_code.errors %}
+                            {% for error in form.slaughterhouse_code.errors %}
                                 <span class="text-danger">{{ error }}</span>
                                 <br>
                             {% endfor %}

@@ -18,7 +18,7 @@ class Buyer(db.Model):
     address = db.Column(db.String(150), index=False, unique=False, nullable=True)
     cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
     city = db.Column(db.String(55), index=False, unique=False, nullable=True)
-    full_address = db.Column(db.String(55), index=False, unique=False, nullable=True)
+    full_address = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
     affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)

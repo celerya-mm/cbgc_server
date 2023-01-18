@@ -65,6 +65,15 @@
                         {% endif %}
                         Utenti
                     </a>
+                    <a class="nav-item nav-link {% if request.path == '/head_view/' %} active {% endif %}"
+                       title="Allevatori" href="{{ url_for('head_view') }}">
+                        {% if request.path == '/farmer_view/' %}
+                            <img src="{{ url_for('static', filename='icons/head-active.svg') }}" alt="">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='icons/head.svg') }}" alt="">
+                        {% endif %}
+                        Capi
+                    </a>
                     <a class="nav-item nav-link {% if request.path == '/farmer_view/' %} active {% endif %}"
                        title="Allevatori" href="{{ url_for('farmer_view') }}">
                         {% if request.path == '/farmer_view/' %}
@@ -82,6 +91,15 @@
                             <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
                         {% endif %}
                         Acquirenti
+                    </a>
+                    <a class="nav-item nav-link {% if request.path == '/slaughterhouse_view/' %} active {% endif %}"
+                       title="Acquirenti" href="{{ url_for('slaughterhouse_view') }}">
+                        {% if request.path == '/slaughterhouse_view/' %}
+                            <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
+                        {% endif %}
+                        Macelli
                     </a>
                     <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
                         <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">
@@ -129,7 +147,10 @@
         riportati in questo sito appartengono ai legittimi proprietari
     </th>
     <br>
-    <th class="footer-text"> Powered by - © 2021 Celerya S.r.l.</th>
+    <th class="footer-text">
+        Powered by - © 2021 Celerya S.r.l. |
+        <a href="https://celerya.com">celerya.com</a> | info@celerya.com
+    </th>
 </footer>
 
 </html>

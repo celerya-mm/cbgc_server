@@ -6,15 +6,15 @@ from app.models.accounts import Administrator, User
 
 
 def list_admin():
-    _admin = Administrator.query.all()
-    _list = [x.to_dict() for x in _admin]
+    records = Administrator.query.all()
+    _list = [x.to_dict() for x in records]
     _list = [d["username"] for d in _list if "username" in d]
     return _list
 
 
 def list_user():
-    _users = User.query.all()
-    _list = [x.to_dict() for x in _users]
+    records = User.query.all()
+    _list = [x.to_dict() for x in records]
     _list = [d["username"] for d in _list if "username" in d]
     return _list
 
@@ -39,18 +39,20 @@ class FormAdminSignup(FlaskForm):
 
     submit = SubmitField("SIGNUP")
 
+    @staticmethod
     def validate_password(self):
         """Valida la nuova password."""
         if self.new_password_1.data != self.new_password_2.data:
             raise validators.ValidationError('Passwords do not match')
 
-    def validate_username(self, field):  # noqa
+    @staticmethod
+    def validate_username(self, field):
         if field.data in list_admin():
             raise ValidationError("E' già presente un AMMINISTRATORE con lo stesso username.")
 
 
 class FormUserSignup(FlaskForm):
-    """Form dati signup account Administrator."""
+    """Form dati signup account Utente."""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
     new_password_1 = PasswordField('Nuova Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
@@ -69,12 +71,14 @@ class FormUserSignup(FlaskForm):
 
     submit = SubmitField("SIGNUP")
 
+    @staticmethod
     def validate_password(self):
         """Valida la nuova password."""
         if self.new_password_1.data != self.new_password_2.data:
             raise validators.ValidationError('Passwords do not match')
 
-    def validate_username(self, field):  # noqa
+    @staticmethod
+    def validate_username(self, field):
         if field.data in list_user():
             raise ValidationError("E' già presente un UTENTE con lo stesso username.")
 

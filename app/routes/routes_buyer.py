@@ -17,9 +17,9 @@ from app.utilitys.functions import token_admin_validate, event_create, url_to_js
 def buyer_view():
     """Visualizza informazioni Acquirenti."""
     # Estraggo la lista degli allevatori
-    buyer_list = Buyer.query.all()
-    _buyer = [buyer.to_dict() for buyer in buyer_list]
-    return render_template("buyer/buyer_view.html", form=_buyer)
+    _list = Buyer.query.all()
+    _list = [r.to_dict() for r in _list]
+    return render_template("buyer/buyer_view.html", form=_list)
 
 
 @token_admin_validate
@@ -28,9 +28,9 @@ def buyer_create():
     """Creazione Allevatore Consorzio."""
     form = FormBuyerCreate()
     if form.validate_on_submit():
-        print("SECRET:", secret)
+        # print("SECRET:", secret)
         form_data = json.loads(json.dumps(request.form))
-        print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
+        # print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
         if form_data["affiliation_status"] == "NO":
             form_data["affiliation_status"] = False
         else:
@@ -40,7 +40,7 @@ def buyer_create():
         user_search = user_search.split(" - ")[0]
         user_find = User.query.filter_by(username=user_search).first()
 
-        print("USER_ID:", user_find.id)
+        # print("USER_ID:", user_find.id)
 
         new_farmer = Buyer(
             buyer_name=form_data["buyer_name"].strip(),
@@ -80,7 +80,7 @@ def buyer_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Elaboro i dati ricevuti
     data = url_to_json(data)
-    print("BUYER_VIEW_DATA_PASS:", json.dumps(data, indent=2))
+    # print("BUYER_VIEW_DATA_PASS:", json.dumps(data, indent=2))
 
     # Estraggo l' ID dell'allevatore corrente
     session["id_buyer"] = data["id"]
@@ -98,8 +98,7 @@ def buyer_view_history(data):
     try:
         user = User.query.get(buyer.user_id)
         _buyer["user_full"] = f"ID = {buyer.user_id}; Username =  {user.username}; Nome Completo = {user.full_name}"
-
-        print("BUYER_VIEW_DATA:", json.dumps(_buyer, indent=2), "TYPE:", type(_buyer))
+        # print("BUYER_VIEW_DATA:", json.dumps(_buyer, indent=2), "TYPE:", type(_buyer))
     except Exception as err:
         print("ERRORE:", err)
         pass
@@ -121,7 +120,7 @@ def buyer_update(data):
         # print("USER_ID:", _id)
         buyer = Buyer.query.get(_id)
         previous_data = buyer.to_dict()
-        print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+        # print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
         buyer.buyer_name = form_data["buyer_name"].strip()
         buyer.buyer_type = form_data["buyer_type"].strip()
@@ -141,7 +140,7 @@ def buyer_update(data):
         if "note" in form_data.keys():
             buyer.note = form_data["note"].strip()
 
-        print("BUYER_NEW_DATA:", json.dumps(buyer.to_dict(), indent=2))
+        # print("BUYER_NEW_DATA:", json.dumps(buyer.to_dict(), indent=2))
 
         try:
             db.session.commit()
@@ -165,7 +164,7 @@ def buyer_update(data):
     else:
         # recupero i dati e li converto in dict
         data = url_to_json(data)
-        print("BUYER_UPDATE_DATA_PASS:", json.dumps(data, indent=2))
+        # print("BUYER_UPDATE_DATA_PASS:", json.dumps(data, indent=2))
 
         session["id_buyer"] = data["id"]
 
@@ -205,11 +204,11 @@ def buyer_affiliation_change(data):
     if form.validate_on_submit():
         # recupero i dati e li converto in dict
         form_data = json.loads(json.dumps(request.form))
-        print("BUYER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+        # print("BUYER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
         farmer = Buyer.query.filter_by(buyer_name=session["buyer_name"]).first()
         previous_data = farmer.to_dict()
-        print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+        # print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
         if form_data["affiliation_status"] in ["SI", True]:
             farmer.affiliation_status = True
@@ -219,7 +218,7 @@ def buyer_affiliation_change(data):
         farmer.affiliation_start_date = form_data["affiliation_start_date"]
         farmer.affiliation_end_date = form_data["affiliation_end_date"]
 
-        print("BUYER_NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
+        # print("BUYER_NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
 
         try:
             db.session.commit()
@@ -242,7 +241,7 @@ def buyer_affiliation_change(data):
             return redirect(url_for('farmer_view'))
     else:
         # recupero i dati e li converto in dict
-        print("BUYER_DATA_FROM_HTML:", data, "TYPE:", type(data))
+        # print("BUYER_DATA_FROM_HTML:", data, "TYPE:", type(data))
 
         # data = data.to_dict()
         val_date = {

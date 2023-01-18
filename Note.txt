@@ -1,0 +1,12 @@
+Numerazione Certificati Consorzio con ripristino numerazione dal 1 luglio di ogni anno
+
+Migrare modifiche:
+    flask db init (solo prima volta)
+    flask db migrate --message "First migration"
+    flask db upgrade
+Verifica DB:
+    flask db current
+    flask db stamp head
+
+Downgrade: flask db downgrade
+Storia: flask db history

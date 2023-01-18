@@ -4,57 +4,64 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('buyer_view') }}" title="Annulla">
+            <a class="btn btn-update" type="button" href="{{ url_for('slaughterhouse_view') }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
-            Modifica ACQUIRENTE del Consorzio:
+            Crea un nuovo MACELLO del Consorzio:
         </h5>
         <div class="col-md-12">
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
-                <div class="form-group">
-                    Stato Affiliazione
-                    {% if status == True %}
-                       <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {% if status != True %}
-                        {% if end_date == "vuoto" or end_date == None %}
-                            <span class="text-danger">
-                                ATTENZIONE: manca la data di cessazione affiliazione.
-                                Per inserirla esegui la procedura per il cambio dello stato affiliazione.</span>
-                        {% endif %}
-                    {% endif %}
-                </div>
-                <a class="btn btn-update" type="button" title="Modifica ACQUIRENTE"
-                   href="{{ url_for('buyer_affiliation_change', data=form.data) }}">
-                    <img class="icon-simple" src="{{ url_for('static', filename='icons/change_affiliation.svg') }}" alt=""/>
-                </a>
                 <br>
-                <div class="form-group">
-                    {{ form.buyer_name.label }}
-                    {{ form.buyer_name(class="form-control") }}
-                    {% if form.buyer_name.errors %}
-                        {% for error in form.buyer_name.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-6 order-first">
-                        <br>
-                        {{ form.buyer_type.label }}
-                        {{ form.buyer_type(class="form-control", style="text-align: center;") }}
-                        {% if form.buyer_type.errors %}
-                            {% for error in form.buyer_type.errors %}
+                    <div class="form-group">
+                        {{ form.slaughterhouse.label }}
+                        {{ form.slaughterhouse(class="form-control") }}
+                        {% if form.slaughterhouse.errors %}
+                            {% for error in form.slaughterhouse.errors %}
                                 <span class="text-danger">{{ error }}</span>
                                 <br>
                             {% endfor %}
                         {% endif %}
+                    </div>
+                <div class="row no-gutters justify-content-center">
+
+                    <div class="col-md-4 order-first">
+                        <br>
+                        <div class="form-group">
+                            {{ form.slaughterhouse_code.label }}
+                            {{ form.slaughterhouse_code(class="form-control", style="text-align: center;") }}
+                            {% if form.slaughterhouse_code.errors %}
+                                {% for error in form.slaughterhouse_code.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.email.label }}
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.phone.label }}
+                            {{ form.phone(class="form-control") }}
+                            {% if form.phone.errors %}
+                                {% for error in form.phone.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 order-second">
                         <br>
                         <div class="form-group">
                             {{ form.address.label }}
@@ -88,30 +95,6 @@
                                 {% endfor %}
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="col-md-6 order-second">
-                        <br>
-                        <div class="form-group">
-                            {{ form.email.label }}
-                            {{ form.email(class="form-control") }}
-                            {% if form.email.errors %}
-                                {% for error in form.email.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.phone.label }}
-                            {{ form.phone(class="form-control") }}
-                            {% if form.phone.errors %}
-                                {% for error in form.phone.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
                         <br>
                         <div class="form-group">
                             {{ form.affiliation_start_date.label }}
@@ -122,10 +105,21 @@
                                     <br>
                                 {% endfor %}
                             {% endif %}
+                            <p class="comment">Inserire data anche se non affiliato.</p>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.affiliation_status.label }}
+                            {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
+                            {% if form.affiliation_status.errors %}
+                                {% for error in form.affiliation_status.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                <br>
                 <div class="form-group">
                     {{ form.note_certificate.label }}
                     {{ form.note_certificate(class="form-control") }}
@@ -135,8 +129,8 @@
                             <br>
                         {% endfor %}
                     {% endif %}
+                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                 </div>
-                <br>
                 <div class="form-group">
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}

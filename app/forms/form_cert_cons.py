@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired, Length
 from app.models.buyers import Buyer
 from app.models.certificates_cons import CertificateCons
 from app.models.farmers import Farmer
-from app.models.heads import Head
+from app.models.heads import FormHead
 from app.models.slaughterhouses import Slaughterhouse
 
 
@@ -66,7 +66,7 @@ class FormCertCons(FlaskForm):
     buyer_id = SelectField("Seleziona Acquirente", choices=buyer_list, default="")
 
     head_list = []
-    heads = Head.query.all()
+    heads = FormHead.query.all()
     for h in heads:
         head_list.append(h.headset)
     head_id = SelectField("Seleziona Capo", choices=head_list, default="")

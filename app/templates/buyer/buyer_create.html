@@ -111,11 +111,23 @@
                         <div class="form-group">
                             {{ form.affiliation_start_date.label }}
                             {{ form.affiliation_start_date(class="form-control") }}
+                            {% if form.affiliation_start_date.errors %}
+                                {% for error in form.affiliation_start_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                         <br>
                         <div class="form-group">
                             {{ form.affiliation_status.label }}
                             {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
+                            {% if form.affiliation_status.errors %}
+                                {% for error in form.affiliation_status.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -128,7 +140,7 @@
                             <br>
                         {% endfor %}
                     {% endif %}
-                    <p class="comment">Queste note compariranno nella stampa del certificato. Usarle con cautela.</p>
+                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                 </div>
                 <div class="form-group">
                     {{ form.note.label }}

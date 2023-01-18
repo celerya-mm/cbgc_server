@@ -4,17 +4,6 @@ from app.app import db
 from app.utilitys.functions import year_extract
 
 
-def compliance(birth, castration):
-    """Verifica conformità castrazione (days>=240)."""
-    birth = datetime.strptime(birth, "%Y-%m-%d")
-    castration = datetime.strptime(castration, "%Y-%m-%d")
-    days = castration - birth
-    if days <= 240:
-        return True
-    else:
-        return False
-
-
 class Head(db.Model):
     # Table
     __tablename__ = 'heads'

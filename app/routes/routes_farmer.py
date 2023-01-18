@@ -16,9 +16,9 @@ from app.utilitys.functions import event_create, token_admin_validate, url_to_js
 def farmer_view():
     """Visualizzo informazioni Allevatori."""
     # Estraggo la lista degli allevatori
-    farmer_list = Farmer.query.all()
-    _farmer_list = [farmer.to_dict() for farmer in farmer_list]
-    return render_template("farmer/farmer_view.html", farmer_list=_farmer_list)
+    _list = Farmer.query.all()
+    _list = [r.to_dict() for r in _list]
+    return render_template("farmer/farmer_view.html", form=_list)
 
 
 @token_admin_validate
@@ -28,7 +28,7 @@ def farmer_create():
     form = FormFarmerCreate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
-        print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
+        # print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
         if form_data["affiliation_status"] == "NO":
             form_data["affiliation_status"] = False
         else:
@@ -74,7 +74,7 @@ def farmer_view_history(data):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Elaboro i dati ricevuti
     data = url_to_json(data)
-    print("FARMER_DATA_PASS:", json.dumps(data, indent=2))
+    # print("FARMER_DATA_PASS:", json.dumps(data, indent=2))
 
     # Estraggo l' ID dell'allevatore corrente
     session["id_farmer"] = data["id"]
@@ -128,7 +128,7 @@ def farmer_update(data):
         if form_data["note"]:
             farmer.note = form_data["note"].strip()
 
-        print("FARM_NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
+        # print("FARM_NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
 
         try:
             db.session.commit()
@@ -232,10 +232,6 @@ def farmer_affiliation_change(data):
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
             return redirect(url_for('farmer_view'))
     else:
-        # recupero i dati e li converto in dict
-        # print("FARM_DATA_FROM_HTML:", data, "TYPE:", type(data))
-
-        # data = data.to_dict()
         val_date = {
             1: "affiliation_start_date",
             2: "affiliation_end_date"

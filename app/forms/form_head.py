@@ -1,17 +1,22 @@
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError
 
-from app.models.farmers import Farmer
 from app.models.heads import Head
-from app.models.slaughterhouses import Slaughterhouse
+
+from app.models.buyers import Buyer  # noqa
+from app.models.farmers import Farmer  # noqa
+from app.models.slaughterhouses import Slaughterhouse  # noqa
+from app.models.certificates_cons import CertificateCons  # noqa
+from app.models.certificates_dna import CertificateDna  # noqa
 
 
 def list_head():
-    _heads = Head.query.all()
-    _list = [x.to_dict() for x in _heads]
+    records = Head.query.all()
+    _list = [x.to_dict() for x in records]
     _list = [d["headset"] for d in _list if "headset" in d]
     return _list
 
@@ -42,7 +47,19 @@ class FormHeadCreate(FlaskForm):
 
     submit = SubmitField("CREATE")
 
+    @staticmethod
     def validate_headset(self, field):  # noqa
         print("BUYER_NAME:", field)
         if field.data.strip() in list_head():
             raise ValidationError("E' già presente un ACQUIRENTE con la stessa Ragione Sociale.")
+
+    @staticmethod
+    def validate_castration_date(self, field):
+        """Verifica conformità castrazione (days>=240)."""
+        birth = datetime.strptime(self.birth_date, "%Y-%m-%d")
+        field = datetime.strptime(field, "%Y-%m-%d")
+        days = field - birth
+        if days > 240:
+            return True
+        else:
+            return False

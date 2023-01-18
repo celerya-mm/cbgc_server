@@ -6,11 +6,16 @@ from wtforms.validators import DataRequired, Email, Length, ValidationError
 
 from app.models.farmers import Farmer
 
+# Importazioni necessarie per mantenere le relazioni valide
+from app.models.heads import Head  # noqa
+from app.models.certificates_cons import CertificateCons  # noqa
+# from app.models.certificates_dna import CertificateDna  # noqa
+
 
 def list_farmer():
-    _farmers = Farmer.query.all()
-    farmer_list = [x.to_dict() for x in _farmers]
-    _list = [d["farmer_name"] for d in farmer_list if "farmer_name" in d]
+    records = Farmer.query.all()
+    _list = [x.to_dict() for x in records]
+    _list = [d["farmer_name"] for d in records if "farmer_name" in d]
     return _list
 
 
@@ -42,13 +47,14 @@ class FormFarmerCreate(FlaskForm):
 
     submit = SubmitField("CREATE")
 
-    def validate_farmer_name(self, field):  # noqa
+    @staticmethod
+    def validate_farmer_name(self, field):
         if field.data in list_farmer():
             raise ValidationError("E' già presente un ALLEVATORE con la stessa Ragione Sociale.")
 
 
 class FormFarmerUpdate(FlaskForm):
-    """Form inserimento dati Allevatore."""
+    """Form modifica dati Allevatore."""
     farmer_name = StringField('Ragione Sociale', validators=[
         DataRequired("Campo obbligatorio!"),
         Length(min=3, max=100)])
