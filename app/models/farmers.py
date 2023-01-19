@@ -3,7 +3,10 @@ from datetime import datetime
 from ..app import db
 
 # importazioni per relazioni "backref"
-# from .events_db import EventDB  # noqa
+from .events_db import EventDB  # noqa
+from .heads import Head  # noqa
+from .certificates_cons import CertificateCons  # noqa
+from .certificates_dna import CertificateDna  # noqa
 
 
 class Farmer(db.Model):
@@ -31,9 +34,9 @@ class Farmer(db.Model):
     stable_breeding_methods = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
     heads = db.relationship('Head', backref='farmer')
-    dna_certs = db.relationship('CertificateDna', backref='farmer')
-    cons_certs = db.relationship('CertificateCons', backref='farmer')
-    events = db.relationship('EventDB', backref='farmer')
+    dna_certs = db.relationship('CertificateDna', backref='farmers')
+    cons_certs = db.relationship('CertificateCons', backref='farmers')
+    events = db.relationship('EventDB', backref='farmers')
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -42,7 +45,13 @@ class Farmer(db.Model):
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<Farmer: {}>'.format(self.farmer_name)
+        return f'Farmer ID: {self.id}; Name: {self.farmer_name}; email: {self.email}; phone: {self.phone}; ' \
+               f'full_address: {self.full_address}'
+
+    def __str__(self):
+        """Riporta in string la classe."""
+        return f'Farmer ID: {self.id}; Name: {self.farmer_name}; email: {self.email}; phone: {self.phone}; ' \
+               f'full_address: {self.full_address}'
 
     def __init__(self, farmer_name, email, phone=None, address=None, cap=None, city=None, stable_code=None,
                  stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
@@ -71,11 +80,11 @@ class Farmer(db.Model):
         self.stable_productive_orientation = stable_productive_orientation
         self.stable_breeding_methods = stable_breeding_methods
 
-        self.heads = heads or []
-        self.dna_certs = dna_certs or []
-        self.cons_certs = cons_certs or []
+        self.heads = heads
+        self.dna_certs = dna_certs
+        self.cons_certs = cons_certs
 
-        self.events = events or []
+        self.events = events
 
         self.note_certificate = note_certificate
         self.note = note

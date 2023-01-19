@@ -8,6 +8,11 @@ from ..app import db
 # from .buyers import Buyer  # noqa
 # from .slaughterhouses import Slaughterhouse  # noqa
 
+# importazioni per relazioni "backref"
+from .events_db import EventDB  # noqa
+from .certificates_dna import CertificateDna  # noqa
+from .certificates_cons import CertificateCons  # noqa
+
 
 def castration_compliance(birth, castration):
     """Verifica conformità castrazione entro gli OTTO mesi."""
