@@ -1,7 +1,14 @@
 from datetime import datetime
 
-from app.app import db
-from app.utilitys.functions import year_extract
+from ..app import db
+
+# importazioni per relazioni "ForeignKey"
+# from .heads import Head  # noqa
+# from .farmers import Farmer  # noqa
+
+# importazioni per relazioni "backref"
+# from .events_db import EventDB  # noqa
+
 
 
 class CertificateDna(db.Model):
@@ -29,24 +36,20 @@ class CertificateDna(db.Model):
     def __repr__(self):
         return '<DNA Certificate: {}>'.format(self.dna_cert_nr)
 
-    def __init__(self, dna_cert_nr, dna_cert_id, dna_cert_date, head_id, farmer_id, events=None, note=None,
+    def __init__(self, dna_cert_id, dna_cert_date, head_id, farmer_id, dna_cert_nr=None, events=None, note=None,
                  updated_at=datetime.now()):
 
-        dna_cert_year = year_extract(dna_cert_date)
-        if not dna_cert_nr:
-            dna_cert_nr = f"{dna_cert_id}/{dna_cert_year}"
+        from ..utilitys.functions import year_extract
 
         self.dna_cert_id = dna_cert_id
         self.dna_cert_date = dna_cert_date
-        self.dna_cert_year = dna_cert_year
-        self.dna_cert_nr = dna_cert_nr
+        self.dna_cert_year = year_extract(dna_cert_date)
+        self.dna_cert_nr = dna_cert_nr or f"{dna_cert_id}/{self.dna_cert_year}"
 
         self.head_id = head_id
         self.farmer_id = farmer_id
 
-        if events is None:
-            events = []
-        self.events = events
+        self.events = events or []
 
         self.note = note
         self.created_at = datetime.now()
@@ -54,15 +57,13 @@ class CertificateDna(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.dna_cert_date in ["", None] or isinstance(self.dna_cert_date, str):
-            pass
-        else:
-            self.dna_cert_date = datetime.strftime(self.dna_cert_date, "%Y-%m-%d")
-
+        from ..utilitys.functions import date_to_str
         return {
             'id': self.id,
+            'dna_cert_id': self.dna_cert_id,
             'dna_cert_nr': self.dna_cert_nr,
-            'dna_cert_date':  self.dna_cert_date,
+
+            'dna_cert_date':  date_to_str(self.dna_cert_date),
             'dna_cert_year': self.dna_cert_year,
 
             'head_id': self.head_id,
@@ -70,6 +71,6 @@ class CertificateDna(db.Model):
 
             'note': self.note,
 
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

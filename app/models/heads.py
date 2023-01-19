@@ -1,7 +1,25 @@
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
-from app.app import db
-from app.utilitys.functions import year_extract
+from ..app import db
+
+# importazioni per relazioni "ForeignKey"
+# from .farmers import Farmer  # noqa
+# from .buyers import Buyer  # noqa
+# from .slaughterhouses import Slaughterhouse  # noqa
+
+
+def castration_compliance(birth, castration):
+    """Verifica conformità castrazione entro gli OTTO mesi."""
+    from ..utilitys.functions import str_to_date, date_to_str
+    if castration:
+        _max = str_to_date(birth) + relativedelta(month=8)
+        print("BIRTH:", date_to_str(birth))
+        print("MAX:", _max)
+        print("CASTRATION:", date_to_str(castration))
+        return bool(str_to_date(castration) <= _max)
+    else:
+        return None
 
 
 class Head(db.Model):
@@ -16,7 +34,9 @@ class Head(db.Model):
 
     castration_date = db.Column(db.DateTime, index=False, nullable=True)
     castration_year = db.Column(db.Integer, index=False, nullable=True)
-    castration_compliance = db.Column(db.Boolean, index=False, nullable=True)  # True if days (castration-bird) < 240
+
+    # True if (castration_date - castration_date) <= 8 month
+    castration_compliance = db.Column(db.Boolean, index=False, nullable=True)
 
     slaughter_date = db.Column(db.DateTime, index=False, nullable=True)
     sale_date = db.Column(db.DateTime, index=False, nullable=True)
@@ -28,7 +48,7 @@ class Head(db.Model):
 
     dna_cert = db.relationship('CertificateDna', backref='head')
     cons_cert = db.relationship('CertificateCons', backref='head')
-    event = db.relationship('EventDB', backref='head')
+    events = db.relationship('EventDB', backref='head')
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -40,40 +60,35 @@ class Head(db.Model):
         return '<Head: {}>'.format(self.headset)
 
     def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None,
-                 sale_date=None, note_certificato=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
+                 sale_date=None, note_certificate=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  dna_certs=None, cons_certs=None, events=None, note=None, updated_at=datetime.now()):
+
+        from ..utilitys.functions import year_extract, str_to_date
 
         self.headset = headset
 
-        self.birth_date = birth_date
+        self.birth_date = str_to_date(birth_date)
         self.birth_year = year_extract(birth_date)
 
-        self.castration_date = castration_date
+        self.castration_date = str_to_date(castration_date)
         self.castration_year = year_extract(castration_date)
-        self.castration_compliance = compliance(birth_date, castration_date)
+        self.castration_compliance = castration_compliance(birth_date, castration_date)
 
-        self.slaughter_date = slaughter_date
+        self.slaughter_date = str_to_date(slaughter_date)
 
-        self.sale_date = sale_date
+        self.sale_date = str_to_date(sale_date)
         self.sale_year = year_extract(sale_date)
 
         self.farmer_id = farmer_id
         self.buyer_id = buyer_id
         self.slaughterhouse_id = slaughterhouse_id
 
-        if dna_certs is None:
-            dna_certs = []
-        self.dna_certs = dna_certs
+        self.dna_certs = dna_certs or []
+        self.cons_certs = cons_certs or []
 
-        if cons_certs is None:
-            cons_certs = []
-        self.cons_certs = cons_certs
+        self.events = events or []
 
-        if events is None:
-            events = []
-        self.events = events
-
-        self.note_certificate = note_certificato
+        self.note_certificate = note_certificate
         self.note = note
 
         self.created_at = datetime.now()
@@ -81,39 +96,20 @@ class Head(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.birth_date in ["", None] or isinstance(self.birth_date, str):
-            pass
-        else:
-            self.birth_date = datetime.strftime(self.birth_date, "%Y-%m-%d")
-
-        if self.castration_date in ["", None] or isinstance(self.castration_date, str):
-            pass
-        else:
-            self.castration_date = datetime.strftime(self.castration_date, "%Y-%m-%d")
-
-        if self.slaughter_date in ["", None] or isinstance(self.slaughter_date, str):
-            pass
-        else:
-            self.slaughter_date = datetime.strftime(self.slaughter_date, "%Y-%m-%d")
-
-        if self.sale_date in ["", None] or isinstance(self.sale_date, str):
-            pass
-        else:
-            self.sale_date = datetime.strftime(self.sale_date, "%Y-%m-%d")
-
+        from ..utilitys.functions import date_to_str
         return {
             'id': self.id,
             'headset': self.headset,
 
-            'birth_date': self.birth_date,
+            'birth_date': date_to_str(self.birth_date),
             'birth_year': self.birth_year,
 
-            'castration_date': self.castration_date,
+            'castration_date': date_to_str(self.castration_date),
             'castration_year': self.castration_year,
             'castration_compliance': self.castration_compliance,
 
-            'slaughter_date': self.slaughter_date,
-            'sale_date': self.sale_date,
+            'slaughter_date': date_to_str(self.slaughter_date),
+            'sale_date': date_to_str(self.sale_date),
             'sale_year': self.sale_year,
 
             'farmer_id': self.farmer_id,
