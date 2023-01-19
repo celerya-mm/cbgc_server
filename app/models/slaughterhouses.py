@@ -2,10 +2,7 @@ from datetime import datetime
 
 from ..app import db
 
-# importazioni per relazioni "backref"
-from .events_db import EventDB  # noqa
-from .heads import Head  # noqa
-from .certificates_cons import CertificateCons  # noqa
+# importazioni per relazioni "ForeignKey"
 
 
 class Slaughterhouse(db.Model):

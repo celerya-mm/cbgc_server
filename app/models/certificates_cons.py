@@ -9,7 +9,7 @@ from ..app import db
 # from .slaughterhouses import Slaughterhouse  # noqa
 
 # importazioni per relazioni "backref"
-from .events_db import EventDB  # noqa
+# from .events_db import EventDB  # noqa
 
 
 def mount_code(_id, year, var=None):

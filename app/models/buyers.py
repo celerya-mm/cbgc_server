@@ -6,9 +6,9 @@ from ..app import db
 # from .accounts import User # noqa
 
 # importazioni per relazioni "backref"
-from .heads import Head  # noqa
-from .certificates_cons import CertificateCons  # noqa
-from .events_db import EventDB  # noqa
+# from .heads import Head  # noqa
+# from .certificates_cons import CertificateCons  # noqa
+# from .events_db import EventDB  # noqa
 
 
 class Buyer(db.Model):

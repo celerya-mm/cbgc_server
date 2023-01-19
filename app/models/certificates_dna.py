@@ -7,7 +7,8 @@ from ..app import db
 # from .farmers import Farmer  # noqa
 
 # importazioni per relazioni "backref"
-from .events_db import EventDB  # noqa
+# from .events_db import EventDB  # noqa
+
 
 
 class CertificateDna(db.Model):
