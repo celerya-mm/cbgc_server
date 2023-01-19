@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
-from app.models.accounts import Administrator, User
+from ..models.accounts import Administrator, User
 
 
 def list_admin():
@@ -46,7 +46,7 @@ class FormAdminSignup(FlaskForm):
             raise ValidationError('Passwords do not match')
 
     @staticmethod
-    def validate_username(self, field):
+    def validate_username(self, field):  # noqa
         """Valida nuovo username."""
         if field.data in list_admin():
             raise ValidationError("E' già presente un AMMINISTRATORE con lo stesso username.")
@@ -79,7 +79,7 @@ class FormUserSignup(FlaskForm):
             raise ValidationError('Passwords do not match')
 
     @staticmethod
-    def validate_username(self, field):
+    def validate_username(self, field):  # noqa
         """Valida nuovo username."""
         if field.data in list_user():
             raise ValidationError("E' già presente un UTENTE con lo stesso username.")

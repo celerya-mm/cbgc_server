@@ -29,10 +29,6 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <a class="btn btn-update" type="button" title="Modifica ALLEVATORE"
-                   href="{{ url_for('farmer_affiliation_change', data=form.data) }}">
-                    <img class="icon-simple" src="{{ url_for('static', filename='icons/change_affiliation.svg') }}" alt=""/>
-                </a>
                 <br>
                 <div class="form-group">
                     {{ form.farmer_name.label }}

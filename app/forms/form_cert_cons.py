@@ -4,11 +4,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FloatField
 from wtforms.validators import DataRequired, Length, Optional
 
-from app.models.buyers import Buyer
-from app.models.certificates_cons import CertificateCons
-from app.models.farmers import Farmer
-from app.models.heads import Head
-from app.models.slaughterhouses import Slaughterhouse
+from ..models.buyers import Buyer
+from ..models.certificates_cons import CertificateCons
+from ..models.farmers import Farmer
+from ..models.heads import Head
+from ..models.slaughterhouses import Slaughterhouse
 
 
 def list_head():

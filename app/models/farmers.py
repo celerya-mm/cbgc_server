@@ -1,7 +1,9 @@
 from datetime import datetime
 
-from app.app import db
-from app.utilitys.functions import address_mount
+from ..app import db
+
+# importazioni per relazioni "backref"
+# from .events_db import EventDB  # noqa
 
 
 class Farmer(db.Model):
@@ -48,6 +50,8 @@ class Farmer(db.Model):
                  heads=None, dna_certs=None, cons_certs=None, events=None, note_certificate=None, note=None,
                  updated_at=datetime.now()):
 
+        from ..utilitys.functions import address_mount, str_to_date
+
         self.farmer_name = farmer_name
 
         self.email = email
@@ -58,8 +62,8 @@ class Farmer(db.Model):
         self.city = city
         self.full_address = address_mount(address, cap, city)
 
-        self.affiliation_start_date = affiliation_start_date
-        self.affiliation_end_date = affiliation_end_date
+        self.affiliation_start_date = str_to_date(affiliation_start_date)
+        self.affiliation_end_date = str_to_date(affiliation_end_date)
         self.affiliation_status = affiliation_status
 
         self.stable_code = stable_code
@@ -67,21 +71,11 @@ class Farmer(db.Model):
         self.stable_productive_orientation = stable_productive_orientation
         self.stable_breeding_methods = stable_breeding_methods
 
-        if heads is None:
-            heads = []
-        self.heads = heads
+        self.heads = heads or []
+        self.dna_certs = dna_certs or []
+        self.cons_certs = cons_certs or []
 
-        if dna_certs is None:
-            dna_certs = []
-        self.dna_certs = dna_certs
-
-        if cons_certs is None:
-            cons_certs = []
-        self.cons_certs = cons_certs
-
-        if events is None:
-            events = []
-        self.events = events
+        self.events = events or []
 
         self.note_certificate = note_certificate
         self.note = note
@@ -91,11 +85,7 @@ class Farmer(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        if self.affiliation_start_date is not None and not isinstance(self.affiliation_start_date, str):
-            self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
-
-        if self.affiliation_end_date is not None and not isinstance(self.affiliation_end_date, str):
-            self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
+        from ..utilitys.functions import date_to_str
 
         return {
             'id': self.id,
@@ -109,18 +99,18 @@ class Farmer(db.Model):
             'city': self.city,
             'full_address': self.full_address,
 
-            'stable_code': self.stable_code,
-            'stable_type': self.stable_type,
-            'affiliation_end_date': self.affiliation_end_date,
+            'affiliation_start_date': date_to_str(self.affiliation_start_date),
+            'affiliation_end_date': date_to_str(self.affiliation_end_date),
             'affiliation_status': self.affiliation_status,
 
-            'affiliation_start_date': self.affiliation_start_date,
+            'stable_code': self.stable_code,
+            'stable_type': self.stable_type,
             'stable_productive_orientation': self.stable_productive_orientation,
             'stable_breeding_methods': self.stable_breeding_methods,
 
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

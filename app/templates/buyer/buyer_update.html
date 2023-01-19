@@ -29,10 +29,6 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <a class="btn btn-update" type="button" title="Modifica ACQUIRENTE"
-                   href="{{ url_for('buyer_affiliation_change', data=form.data) }}">
-                    <img class="icon-simple" src="{{ url_for('static', filename='icons/change_affiliation.svg') }}" alt=""/>
-                </a>
                 <br>
                 <div class="form-group">
                     {{ form.buyer_name.label }}

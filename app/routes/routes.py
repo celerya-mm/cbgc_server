@@ -1,7 +1,7 @@
 from flask import current_app as app, flash, redirect, render_template, session, url_for
 
-from app.forms.forms import FormLogin
-from app.utilitys.functions import admin_log_in
+from ..forms.forms import FormLogin
+from ..utilitys.functions import admin_log_in
 
 
 @app.route("/", methods=["GET", "POST"])

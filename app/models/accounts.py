@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from app.app import db
+from ..app import db
 
-from .tokens import AuthToken  # noqa
-from .buyers import Buyer  # noqa
-from .events_db import EventDB  # noqa
+# importazioni per relazioni "backref"
+# from .tokens import AuthToken  # noqa
+# from .buyers import Buyer  # noqa
+# from .events_db import EventDB  # noqa
 
 
 class Administrator(db.Model):
@@ -35,32 +36,21 @@ class Administrator(db.Model):
     def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
                  events=None, note=None, updated_at=datetime.now()):
 
-        if name is not None and last_name is not None:
-            full_name = f"{name} {last_name}"
-        elif name is not None and last_name is None:
-            full_name = name
-        elif name is None and last_name is not None:
-            full_name = last_name
-        else:
-            full_name = None
+        from ..utilitys.functions import mount_full_name
 
         self.username = username
         self.password = password
 
         self.name = name
         self.last_name = last_name
-        self.full_name = full_name
+        self.full_name = mount_full_name(name, last_name)
 
         self.phone = phone
         self.email = email
 
-        if auth_tokens is None:
-            auth_tokens = []
-        self.auth_tokens = auth_tokens
+        self.auth_tokens = auth_tokens or []
 
-        if events is None:
-            events = []
-        self.events = events
+        self.events = events or []
 
         self.note = note
         self.created_at = datetime.now()
@@ -115,36 +105,22 @@ class User(db.Model):
     def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, note=None,
                  buyers=None, auth_tokens=None, events=None, updated_at=datetime.now()):
 
-        if name is not None and last_name is not None:
-            full_name = f"{name} {last_name}"
-        elif name is not None and last_name is None:
-            full_name = name
-        elif name is None and last_name is not None:
-            full_name = last_name
-        else:
-            full_name = None
+        from ..utilitys.functions import mount_full_name
 
         self.username = username
         self.password = password
 
         self.name = name
         self.last_name = last_name
-        self.full_name = full_name
+        self.full_name = mount_full_name(name, last_name)
 
         self.phone = phone
         self.email = email
 
-        if buyers is None:
-            buyers = []
-        self.buyers = buyers
+        self.buyers = buyers or []
+        self.auth_tokens = auth_tokens or []
 
-        if auth_tokens is None:
-            auth_tokens = []
-        self.auth_tokens = auth_tokens
-
-        if events is None:
-            events = []
-        self.events = events
+        self.events = events or []
 
         self.note = note
         self.created_at = datetime.now()

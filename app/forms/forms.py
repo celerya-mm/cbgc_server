@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, DateField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
+from wtforms import PasswordField, StringField, SubmitField, EmailField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 
 
 class FormLogin(FlaskForm):
@@ -11,22 +9,6 @@ class FormLogin(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired("Campo obbligatorio!"), Length(min=8)])
 
     submit = SubmitField("LOGIN")
-
-
-class FormAffiliationChange(FlaskForm):
-    """Inserisce data cessazione affiliazione."""
-    name = StringField('Ragione Sociale')
-    affiliation_start_date = DateField(
-        'Inizio Affiliazione', format='%Y-%m-%d', validators=[Optional()])
-    affiliation_end_date = DateField(
-        'Cessazione Affiliazione', format='%Y-%m-%d', default=datetime.now(), validators=[Optional()])
-    affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
-    submit = SubmitField("CHANGE")
-
-    def validate_affiliation_status(self, field):
-        if field.data == "SI" and self.affiliation_end_date.data:
-            raise ValidationError('Attenzione se è presente una data di cessazione lo Stato Affiliazione '
-                                  'non può essere "SI".')
 
 
 class FormInsertMail(FlaskForm):

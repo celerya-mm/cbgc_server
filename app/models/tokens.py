@@ -1,5 +1,9 @@
 from datetime import datetime
-from app.app import db
+
+from ..app import db
+
+# importazioni per relazioni "ForeignKey"
+# from .accounts import Administrator, User  # noqa
 
 
 class AuthToken(db.Model):

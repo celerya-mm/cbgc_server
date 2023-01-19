@@ -1,18 +1,26 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db
+from ..app import db
 
-from app.models.heads import Head
-from app.models.farmers import Farmer
-from app.models.buyers import Buyer
-from app.models.slaughterhouses import Slaughterhouse
+from ..models.heads import Head
+from ..models.farmers import Farmer
+from ..models.buyers import Buyer
+from ..models.slaughterhouses import Slaughterhouse
 
-from app.forms.form_head import FormHeadCreate, FormHeadUpdate
-from app.utilitys.functions import event_create, token_admin_validate, url_to_json
+from ..forms.form_head import FormHeadCreate, FormHeadUpdate
+from ..utilitys.functions import event_create, token_admin_validate, url_to_json, str_to_date
+
+
+def not_empty(_v):
+    """Verifica se il dato passato è vuoto o da non considerare."""
+    if _v in ["", "-", None]:
+        return None
+    else:
+        _v = _v.strip()
+        return _v
 
 
 @token_admin_validate
@@ -32,38 +40,18 @@ def head_create():
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
         # print("HEAD_FORM_DATA", json.dumps(form_data, indent=2))
-        if form_data["birth_date"] is "":
-            form_data["birth_date"] = None
-
-        if form_data["castration_date"] is "":
-            form_data["castration_date"] = None
-
-        if form_data["slaughter_date"] is "":
-            form_data["slaughter_date"] = None
-
-        if form_data["sale_date"] is "":
-            form_data["sale_date"] = None
-
-        if form_data["farmer_id"] in ["", "-"]:
-            form_data["farmer_id"] = None
-
-        if form_data["buyer_id"] in ["", "-"]:
-            form_data["buyer_id"] = None
-
-        if form_data["slaughterhouse_id"] in ["", "-"]:
-            form_data["slaughterhouse_id"] = None
 
         new_head = Head(
             headset=form_data["headset"],
 
-            birth_date=form_data["birth_date"],
-            castration_date=form_data["castration_date"],
-            slaughter_date=form_data["slaughter_date"],
-            sale_date=form_data["sale_date"],
+            birth_date=not_empty(form_data["birth_date"]),
+            castration_date=not_empty(form_data["castration_date"]),
+            slaughter_date=not_empty(form_data["slaughter_date"]),
+            sale_date=not_empty(form_data["sale_date"]),
 
-            farmer_id=form_data["farmer_id"],
-            buyer_id=form_data["buyer_id"],
-            slaughterhouse_id=form_data["slaughterhouse_id"],
+            farmer_id=not_empty(form_data["farmer_id"]),
+            buyer_id=not_empty(form_data["buyer_id"]),
+            slaughterhouse_id=not_empty(form_data["slaughterhouse_id"]),
 
             note_certificate=form_data["note_certificate"],
             note=form_data["note"].strip(),
@@ -139,54 +127,31 @@ def head_update(data):
 
         head.headset = form_data["headset"]
 
-        if form_data["birth_date"] is "":
-            head.birth_date = None
-        else:
-            head.birth_date = form_data["birth_date"]
-
-        if form_data["castration_date"] is "":
-            head.castration_date = None
-        else:
-            head.castration_date = form_data["castration_date"]
-
-        if form_data["slaughter_date"] is "":
-            head.slaughter_date = None
-        else:
-            head.slaughter_date = form_data["slaughter_date"]
-
-        if form_data["sale_date"] is "":
-            head.sale_date = None
-        else:
-            head.sale_date = form_data["sale_date"]
+        head.birth_date = not_empty(form_data["birth_date"])
+        head.castration_date = not_empty(form_data["castration_date"])
+        head.slaughter_date = not_empty(form_data["slaughter_date"])
+        head.sale_date = not_empty(form_data["sale_date"])
 
         if form_data["farmer_id"] in ["", "-"]:
             head.farmer_id = None
         else:
-            farmer = Farmer.query.filter(Farmer.farmer_name == form_data["farmer_id"]).first()
+            farmer = Farmer.query.filter_by(farmer_name=form_data["farmer_id"]).first()
             head.farmer_id = farmer.id
 
         if form_data["buyer_id"] in ["", "-"]:
             head.buyer_id = None
         else:
-            buyer = Buyer.query.filter(Buyer.buyer_name == form_data["buyer_id"]).first()
+            buyer = Buyer.query.filter_by(buyer_name=form_data["buyer_id"]).first()
             head.buyer_id = buyer.id
 
         if form_data["slaughterhouse_id"] in ["", "-"]:
             head.slaughterhouse_id = None
         else:
-            slaughter = Slaughterhouse.query.filter(
-                Slaughterhouse.slaughterhouse == form_data["slaughterhouse_id"]).first()
+            slaughter = Slaughterhouse.query.filter_by(slaughterhouse=form_data["slaughterhouse_id"]).first()
             head.slaughterhouse_id = slaughter.id
 
-        if form_data["note_certificate"] is None:
-            head.note_certificate = "Null"
-        else:
-            head.note_certificate = form_data["note_certificate"].strip()
-
-        if form_data["note"] is None:
-            head.note = "Null"
-        else:
-            head.note = form_data["note"].strip()
+        head.note_certificate = not_empty(form_data["note_certificate"])
+        head.note = not_empty(form_data["note"])
 
         # print("HEAD_NEW_DATA:", json.dumps(head.to_dict(), indent=2))
         try:
@@ -223,17 +188,10 @@ def head_update(data):
 
         form.headset.data = data["headset"]
 
-        if data["birth_date"] is not None and isinstance(data["birth_date"], str):
-            form.birth_date.data = datetime.strptime(data["birth_date"], "%Y-%m-%d")
-
-        if data["castration_date"] is not None and isinstance(data["castration_date"], str):
-            form.castration_date.data = datetime.strptime(data["castration_date"], "%Y-%m-%d")
-
-        if data["slaughter_date"] is not None and isinstance(data["slaughter_date"], str):
-            form.slaughter_date.data = datetime.strptime(data["slaughter_date"], "%Y-%m-%d")
-
-        if data["sale_date"] is not None and isinstance(data["sale_date"], str):
-            form.sale_date.data = datetime.strptime(data["sale_date"], "%Y-%m-%d")
+        form.birth_date.data = str_to_date(data["birth_date"])
+        form.castration_date.data = str_to_date(data["castration_date"])
+        form.slaughter_date.data = str_to_date(data["slaughter_date"])
+        form.sale_date.data = str_to_date(data["sale_date"])
 
         if data["farmer_id"]:
             try:

@@ -4,8 +4,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
-from app.models.farmers import Farmer
-from app.models.heads import Head
+from ..models.farmers import Farmer
+from ..models.heads import Head
 
 
 def list_head():

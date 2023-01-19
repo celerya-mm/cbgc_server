@@ -8,10 +8,10 @@ from flask import flash, session, url_for, redirect
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-from app.app import db
-from app.models.events_db import EventDB
-from app.models.tokens import AuthToken
-from app.var_ambient import variables as var
+from ..app import db
+from ..models.events_db import EventDB
+from ..models.tokens import AuthToken
+from ..var_ambient import variables as var
 
 disable_warnings(InsecureRequestWarning)
 
@@ -47,8 +47,8 @@ def url_to_json(_str, val_date=None):
                     # print("DATETIME:", date)
                     _str = _str.replace(_replace, f'"{date}"')
                     # print("STR:", _str)
-
         _str = literal_eval(_str)
+
     # print("URL_WORK:", _str, "TYPE:", type(_str))
     # print("URL_TO_JSON:", json.dumps(_str, indent=2), "TYPE:", type(_str))
     return _str
@@ -171,6 +171,19 @@ def address_mount(address, cap, city):
     return full_address
 
 
+def mount_full_name(name, last_name):
+    """Monta il nome completo."""
+    if name is not None and last_name is not None:
+        full_name = f"{name} {last_name}"
+    elif name is not None and last_name is None:
+        full_name = name
+    elif name is None and last_name is not None:
+        full_name = last_name
+    else:
+        full_name = None
+    return full_name
+
+
 def year_extract(date):
     """Estrae l'anno da una data"""
     if date:
@@ -179,3 +192,27 @@ def year_extract(date):
         return year.year
     else:
         return None
+
+
+def str_to_date(_str, _form="%Y-%m-%d"):
+    """Converte una stringa in datetime."""
+    if _str is not None and isinstance(_str, str):
+        return datetime.strptime(_str, _form)
+    else:
+        return _str
+
+
+def date_to_str(_date, _form="%Y-%m-%d"):
+    """Converte datetime in stringa."""
+    if _date is not None and not isinstance(_date, str):
+        return datetime.strftime(_date, _form)
+    else:
+        return _date
+
+
+def affiliation_status(_stat):
+    """Cambia valori SI, NO in True, False."""
+    if _stat == "NO":
+        return False
+    else:
+        return True

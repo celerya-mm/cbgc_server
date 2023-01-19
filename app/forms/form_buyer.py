@@ -5,13 +5,12 @@ from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 
-from app.models.buyers import Buyer
-from app.models.accounts import User
+from ..models.buyers import Buyer
 
 # Importazioni necessarie per mantenere le relazioni valide
-from app.models.heads import Head  # noqa
-from app.models.certificates_cons import CertificateCons  # noqa
-from app.models.certificates_dna import CertificateDna  # noqa
+from ..models.heads import Head  # noqa
+from ..models.accounts import User  # noqa
+from ..models.certificates_cons import CertificateCons  # noqa
 
 
 def list_buyer():
@@ -39,21 +38,13 @@ class FormBuyerCreate(FlaskForm):
     affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
     affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
 
-    users_list = []
-    users = User.query.all()
-    for user in users:
-        users_list.append(f"{user.username} - {user.full_name}")
-    users_list.append("-")
-
-    user_id = SelectField("Utente Servizio", choices=users_list, default="-", validators=[Optional()])
-
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("CREATE")
 
     @staticmethod
-    def validate_buyer_name(self, field):
+    def validate_buyer_name(self, field):  # noqa
         """Valida Ragione Sociale."""
         if field.data.strip() in list_buyer():
             raise ValidationError("E' già presente un ACQUIRENTE con la stessa Ragione Sociale.")
@@ -73,7 +64,18 @@ class FormBuyerUpdate(FlaskForm):
     cap = StringField('CAP', validators=[Length(min=5, max=5)])
     city = StringField('Città', validators=[Length(min=3, max=55)])
 
+    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
+    affiliation_end_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
+    affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
+
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
-    submit = SubmitField("CREATE")
+    submit = SubmitField("SAVE")
+
+    @staticmethod
+    def validate_affiliation_status(self, field):
+        """Valida stato affiliazione in base alle date inserite."""
+        if field.data == "NO" and self.affiliation_end_date.data not in [None, ""]:
+            raise ValidationError("Attenzione lo Stato Affiliazione non può essere SI se è presente una data di "
+                                  "cessazione affiliazione.")

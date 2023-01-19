@@ -3,11 +3,10 @@ import json
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db
-from app.forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
-from app.forms.forms import FormAffiliationChange
-from app.models.farmers import Farmer
-from app.utilitys.functions import event_create, token_admin_validate, url_to_json
+from ..app import db
+from ..forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
+from ..models.farmers import Farmer
+from ..utilitys.functions import event_create, token_admin_validate, url_to_json, affiliation_status
 
 
 @token_admin_validate
@@ -26,12 +25,7 @@ def farmer_create():
     form = FormFarmerCreate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
-        print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
-        if form_data["affiliation_status"] == "NO":
-            form_data["affiliation_status"] = False
-        else:
-            form_data["affiliation_status"] = True
-
+        # print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
         new_farmer = Farmer(
             farmer_name=form_data["farmer_name"].strip(),
 
@@ -43,7 +37,7 @@ def farmer_create():
             city=form_data["city"].strip(),
 
             affiliation_start_date=form_data["affiliation_start_date"],
-            affiliation_status=form_data["affiliation_status"],
+            affiliation_status=affiliation_status(form_data["affiliation_status"]),
 
             stable_code=form_data["stable_code"],
             stable_type=form_data["stable_type"],
@@ -113,8 +107,9 @@ def farmer_update(data):
         farmer.cap = form_data["cap"].strip()
         farmer.city = form_data["city"].strip()
 
-        if form_data["affiliation_start_date"]:
-            farmer.affiliation_start_date = form_data["affiliation_start_date"]
+        farmer.affiliation_start_date = form_data["affiliation_start_date"]
+        farmer.affiliation_end_date = form_data["affiliation_end_date"]
+        farmer.affiliation_status = form_data["affiliation_status"]
 
         farmer.stable_code = form_data["stable_code"].strip()
         farmer.stable_type = form_data["stable_type"].strip()
@@ -168,6 +163,10 @@ def farmer_update(data):
         form.stable_productive_orientation.data = data["stable_productive_orientation"]
         form.stable_breeding_methods.data = data["stable_breeding_methods"]
 
+        form.affiliation_start_date.data = data["affiliation_start_date"]
+        form.affiliation_end_date.data = data["affiliation_end_date"]
+        form.affiliation_status.data = data["affiliation_status"]
+
         if "note_certificate" in data.keys() and data["note_certificate"] not in ["", None]:
             form.note_certificate.data = data["note_certificate"]
 
@@ -175,61 +174,3 @@ def farmer_update(data):
 
         status = data["affiliation_status"]
         return render_template("farmer/farmer_update.html", form=form, status=status, id=data["id"])
-
-
-@token_admin_validate
-@app.route("/farmer_affiliation_change/<data>", methods=["GET", "POST"])
-def farmer_affiliation_change(data):
-    """Aggiorna dati Allevatore."""
-    form = FormAffiliationChange()
-    if form.validate_on_submit():
-        # recupero i dati e li converto in dict
-        form_data = json.loads(json.dumps(request.form))
-        # print("FARM_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
-
-        farmer = Farmer.query.filter_by(farmer_name=session["farmer_name"]).first()
-        previous_data = farmer.to_dict()
-        # print("FARM_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-
-        if form_data["affiliation_status"] in ["SI", True]:
-            farmer.affiliation_status = True
-        else:
-            farmer.affiliation_status = False
-
-        farmer.affiliation_start_date = form_data["affiliation_start_date"]
-        farmer.affiliation_end_date = form_data["affiliation_end_date"]
-
-        print("FARM_NEW_DATA:", json.dumps(farmer.to_dict(), indent=2))
-
-        try:
-            db.session.commit()
-            flash("ALLEVATORE aggiornato correttamente.")
-        except IntegrityError as err:
-            db.session.rollback()
-            flash(f"ERRORE: {str(err.orig)}")
-            return render_template("farmer/farmer_affiliation_change.html", form=farmer.to_dict())
-
-        _event = {
-            "username": session["username"],
-            "Modification": f"Update Farmer whit id: {farmer.id}",
-            "Previous_data": previous_data
-        }
-        # print("EVENT:", json.dumps(_event, indent=2))
-        if event_create(_event, farmer_id=farmer.id):
-            return redirect(url_for('farmer_view_history', data=farmer.to_dict()))
-        else:
-            flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('farmer_view'))
-    else:
-        val_date = {
-            1: "affiliation_start_date",
-            2: "affiliation_end_date"
-        }
-
-        data = url_to_json(data, val_date)
-        # print("FARM_DATA_PASS_DICT:", json.dumps(data, indent=2))
-
-        form.name.data = data["farmer_name"]
-        session["farmer_name"] = data["farmer_name"]
-
-        return render_template("farmer/farmer_affiliation_change.html", form=form)

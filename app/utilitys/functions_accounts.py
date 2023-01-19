@@ -2,11 +2,11 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 import hashlib
 
-from email_validator import validate_email, EmailNotValidError
+from email_validator import validate_email
 from password_strength import PasswordPolicy
 
-from app.app import db
-from app.models.tokens import AuthToken
+from ..app import db
+from ..models.tokens import AuthToken
 
 
 def psw_hash(_psw):

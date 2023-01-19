@@ -2,7 +2,16 @@ from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import JSONB
 
-from app.app import db
+from ..app import db
+
+# importazioni per relazioni "ForeignKey"
+# from .accounts import Administrator, User   # noqa
+# from .farmers import Farmer  # noqa
+# from .buyers import Buyer  # noqa
+# from .slaughterhouses import Slaughterhouse  # noqa
+# from .heads import Head  # noqa
+# from .certificates_cons import CertificateCons  # noqa
+# from .certificates_dna import CertificateDna  # noqa
 
 
 class EventDB(db.Model):

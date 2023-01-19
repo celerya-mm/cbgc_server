@@ -3,11 +3,11 @@ import json
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db
-from app.forms.form_account import FormAccountUpdate, FormUserSignup
-from app.models.accounts import User
-from app.utilitys.functions import event_create, token_admin_validate, url_to_json
-from app.utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
+from ..app import db
+from ..forms.form_account import FormAccountUpdate, FormUserSignup
+from ..models.accounts import User
+from ..utilitys.functions import event_create, token_admin_validate, url_to_json
+from ..utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
 
 
 @token_admin_validate

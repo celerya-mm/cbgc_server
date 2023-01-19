@@ -4,12 +4,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from app.models.farmers import Farmer
+from ..models.farmers import Farmer
 
 # Importazioni necessarie per mantenere le relazioni valide
-from app.models.heads import Head  # noqa
-from app.models.certificates_cons import CertificateCons  # noqa
-# from app.models.certificates_dna import CertificateDna  # noqa
+from ..models.heads import Head  # noqa
+from ..models.certificates_cons import CertificateCons  # noqa
+from ..models.certificates_dna import CertificateDna  # noqa
 
 
 def list_farmer():
@@ -49,7 +49,7 @@ class FormFarmerCreate(FlaskForm):
     submit = SubmitField("CREATE")
 
     @staticmethod
-    def validate_farmer_name(self, field):
+    def validate_farmer_name(self, field):  # noqa
         if field.data in list_farmer():
             raise ValidationError("E' già presente un ALLEVATORE con la stessa Ragione Sociale.")
 
@@ -74,29 +74,18 @@ class FormFarmerUpdate(FlaskForm):
     stable_breeding_methods = SelectField("Modalità Allevamento", choices=[
         "-", "Estensivo", "Intensivo", "Transumante", "Brado"])
 
+    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
+    affiliation_end_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
+    affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
+
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
-    submit = SubmitField("CREATE")
+    submit = SubmitField("SAVE")
 
-    def to_dict(self):
-        return {
-            "farmer_name": self.farmer_name.data,
-
-            "email": self.email.data,
-            "phone": self.phone,
-
-            "address": self.address.data,
-            "cap": self.cap.data,
-            "city": self.city.data,
-
-            "affiliation_start_date": self.affiliation_start_date.data,
-
-            "stable_code": self.stable_code.data,
-            "stable_type": self.stable_type.data,
-            "stable_productive_orientation": self.stable_productive_orientation.data,
-            "stable_breeding_methods": self.stable_breeding_methods.data,
-
-            "note_certificate": self.note_certificate.data,
-            "note": self.note.data
-        }
+    @staticmethod
+    def validate_affiliation_status(self, field):
+        """Valida stato affiliazione in base alle date inserite."""
+        if field.data == "NO" and self.affiliation_end_date.data not in [None, ""]:
+            raise ValidationError("Attenzione lo Stato Affiliazione non può essere SI se è presente una data di "
+                                  "cessazione affiliazione.")
