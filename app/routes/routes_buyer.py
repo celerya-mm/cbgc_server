@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, url_for, request, session
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db, secret
+from app.app import db
 from app.forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
 from app.forms.forms import FormAffiliationChange
 from app.models.accounts import User

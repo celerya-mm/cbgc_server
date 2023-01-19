@@ -3,7 +3,7 @@ from datetime import datetime
 from ..app import db
 
 # importazioni per relazioni "backref"
-# from .events_db import EventDB  # noqa
+from .events_db import EventDB  # noqa
 
 
 class Farmer(db.Model):

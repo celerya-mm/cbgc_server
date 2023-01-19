@@ -46,7 +46,7 @@ class FormAdminSignup(FlaskForm):
             raise validators.ValidationError('Passwords do not match')
 
     @staticmethod
-    def validate_username(self, field):
+    def validate_username(self, field):  # noqa
         if field.data in list_admin():
             raise ValidationError("E' già presente un AMMINISTRATORE con lo stesso username.")
 
@@ -78,7 +78,7 @@ class FormUserSignup(FlaskForm):
             raise validators.ValidationError('Passwords do not match')
 
     @staticmethod
-    def validate_username(self, field):
+    def validate_username(self, field):  # noqa
         if field.data in list_user():
             raise ValidationError("E' già presente un UTENTE con lo stesso username.")
 

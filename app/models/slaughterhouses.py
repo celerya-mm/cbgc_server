@@ -2,8 +2,6 @@ from datetime import datetime
 
 from ..app import db
 
-# importazioni per relazioni "ForeignKey"
-
 
 class Slaughterhouse(db.Model):
     # Table

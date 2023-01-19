@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
+from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from ..models.farmers import Farmer
 
@@ -65,8 +65,6 @@ class FormFarmerUpdate(FlaskForm):
     address = StringField('Indirizzo', validators=[Length(min=5, max=255)])
     cap = StringField('CAP', validators=[Length(min=5, max=5)])
     city = StringField('Città', validators=[Length(min=3, max=55)])
-
-    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 
     stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25)])
     stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"], default="Allevamento")

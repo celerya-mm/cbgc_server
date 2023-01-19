@@ -2,7 +2,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 import hashlib
 
-from email_validator import validate_email
+from email_validator import validate_email, EmailNotValidError
 from password_strength import PasswordPolicy
 
 from ..app import db

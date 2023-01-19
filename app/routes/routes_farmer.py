@@ -232,12 +232,7 @@ def farmer_affiliation_change(data):
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
             return redirect(url_for('farmer_view'))
     else:
-        val_date = {
-            1: "affiliation_start_date",
-            2: "affiliation_end_date"
-        }
-
-        data = url_to_json(data, val_date)
+        data = url_to_json(data)
         # print("FARM_DATA_PASS_DICT:", json.dumps(data, indent=2))
 
         form.name.data = data["farmer_name"]

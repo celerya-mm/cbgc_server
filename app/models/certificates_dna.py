@@ -2,13 +2,9 @@ from datetime import datetime
 
 from ..app import db
 
-# importazioni per relazioni "ForeignKey"
-# from .heads import Head  # noqa
-# from .farmers import Farmer  # noqa
 
 # importazioni per relazioni "backref"
-# from .events_db import EventDB  # noqa
-
+from .events_db import EventDB  # noqa
 
 
 class CertificateDna(db.Model):

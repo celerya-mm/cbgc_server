@@ -42,7 +42,7 @@ class FormSlaughterhouseCreate(FlaskForm):
     submit = SubmitField("CREATE")
 
     @staticmethod
-    def validate_slaughterhouse(self, field):
+    def validate_slaughterhouse(self, field):  # noqa
         if field.data.strip() in list_slaughterhouse():
             raise ValidationError("E' già presente un MACELLO con la stessa Ragione Sociale.")
 
