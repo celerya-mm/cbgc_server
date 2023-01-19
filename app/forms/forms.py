@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField, validators, DateField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 
 
@@ -11,20 +13,31 @@ class FormLogin(FlaskForm):
     submit = SubmitField("LOGIN")
 
 
+class FormAffiliationChange(FlaskForm):
+    """Inserisce data cessazione affiliazione."""
+    name = StringField('Ragione Sociale')
+    affiliation_end_date = DateField('Cessazione Affiliazione', format='%Y-%m-%d', default=datetime.now())
+    affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
+    submit = SubmitField("CHANGE")
+
+    def validate_affiliation_status(self, field):
+        if field.data == "SI" and self.affiliation_end_date.data:
+            raise ValidationError('Attenzione se è presente una data di cessazione lo Stato Affiliazione '
+                                  'non può essere "SI".')
+
+
 class FormInsertMail(FlaskForm):
-    """Form d'invio mail per cambio password."""
+    """Form d'invio mail per cambio password"""
     email = EmailField('Current e-mail', validators=[DataRequired("Campo obbligatorio!"), Email()])
     submit = SubmitField("SEND EMAIL")
 
 
 class FormPswChange(FlaskForm):
-    """For per cambio password."""
     old_password = PasswordField('Current Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
 
     new_password_1 = PasswordField('Nuova Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
-
     new_password_2 = PasswordField('Conferma Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
         EqualTo('new_password_1',
@@ -33,6 +46,5 @@ class FormPswChange(FlaskForm):
     submit = SubmitField("SEND_NEW_PASSWORD")
 
     def validate_password(self):
-        """Valida se le due passwords corrispondono."""
         if self.new_password_1.data != self.new_password_2.data:
-            raise ValidationError('Passwords do not match')
+            raise validators.ValidationError('Passwords do not match')

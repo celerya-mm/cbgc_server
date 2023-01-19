@@ -25,7 +25,7 @@
                     </div>
                 <div class="row no-gutters justify-content-center">
 
-                    <div class="col-md-6 order-first">
+                    <div class="col-md-4 order-first">
                         <br>
                         <div class="form-group">
                             {{ form.buyer_type.label }}
@@ -73,7 +73,7 @@
                         <br>
                     </div>
 
-                    <div class="col-md-6 order-second">
+                    <div class="col-md-4 order-second">
                         <br>
                         <div class="form-group">
                             {{ form.address.label }}
@@ -133,7 +133,6 @@
                 </div>
                 <div class="form-group">
                     {{ form.note_certificate.label }}
-                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                     {{ form.note_certificate(class="form-control") }}
                     {% if form.note_certificate.errors %}
                         {% for error in form.note_certificate.errors %}
@@ -141,6 +140,7 @@
                             <br>
                         {% endfor %}
                     {% endif %}
+                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                 </div>
                 <div class="form-group">
                     {{ form.note.label }}

@@ -1,11 +1,7 @@
 from datetime import datetime
 
-from ..app import db
-
-# importazioni per relazioni "backref"
-from .events_db import EventDB  # noqa
-from .heads import Head  # noqa
-from .certificates_cons import CertificateCons  # noqa
+from app.app import db
+from app.utilitys.functions import address_mount
 
 
 class Slaughterhouse(db.Model):
@@ -33,7 +29,7 @@ class Slaughterhouse(db.Model):
 
     head = db.relationship('Head', backref='slaughterhouse')
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse')
-    events = db.relationship('EventDB', backref='slaughterhouse')
+    event = db.relationship('EventDB', backref='slaughterhouse')
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -43,9 +39,7 @@ class Slaughterhouse(db.Model):
 
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
                  affiliation_start_date, affiliation_status, note_certificate, note, affiliation_end_date=None,
-                 head=None, cons_cert=None, events=None, updated_at=datetime.now()):
-
-        from ..utilitys.functions import address_mount, str_to_date
+                 head=None, cons_cert=None, event=None, updated_at=datetime.now()):
 
         self.slaughterhouse = slaughterhouse
         self.slaughterhouse_code = slaughterhouse_code
@@ -58,13 +52,21 @@ class Slaughterhouse(db.Model):
         self.city = city
         self.full_address = address_mount(address, cap, city)
 
-        self.affiliation_start_date = str_to_date(affiliation_start_date)
-        self.affiliation_end_date = str_to_date(affiliation_end_date)
+        self.affiliation_start_date = affiliation_start_date
+        self.affiliation_end_date = affiliation_end_date
         self.affiliation_status = affiliation_status
 
-        self.head = head or []
-        self.cons_cert = cons_cert or []
-        self.events = events or []
+        if head is None:
+            head = []
+        self.head = head
+
+        if cons_cert is None:
+            cons_cert = []
+        self.cons_cert = cons_cert
+
+        if event is None:
+            event = []
+        self.event = event
 
         self.note_certificate = note_certificate
         self.note = note
@@ -74,7 +76,16 @@ class Slaughterhouse(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        if self.affiliation_start_date in ["", None] or isinstance(self.affiliation_start_date, str):
+            pass
+        else:
+            self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
+
+        if self.affiliation_end_date in ["", None] or isinstance(self.affiliation_end_date, str):
+            pass
+        else:
+            self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
+
         return {
             'id': self.id,
             'slaughterhouse': self.slaughterhouse,
@@ -88,13 +99,13 @@ class Slaughterhouse(db.Model):
             'city': self.city,
             'full_address': self.full_address,
 
-            'affiliation_start_date': date_to_str(self.affiliation_start_date),
-            'affiliation_end_date': date_to_str(self.affiliation_end_date),
+            'affiliation_start_date': self.affiliation_start_date,
+            'affiliation_end_date': self.affiliation_end_date,
             'affiliation_status': self.affiliation_status,
 
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

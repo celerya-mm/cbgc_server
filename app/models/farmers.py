@@ -1,12 +1,7 @@
 from datetime import datetime
 
-from ..app import db
-
-# importazioni per relazioni "backref"
-from .events_db import EventDB  # noqa
-from .heads import Head  # noqa
-from .certificates_cons import CertificateCons  # noqa
-from .certificates_dna import CertificateDna  # noqa
+from app.app import db
+from app.utilitys.functions import address_mount
 
 
 class Farmer(db.Model):
@@ -34,9 +29,9 @@ class Farmer(db.Model):
     stable_breeding_methods = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
     heads = db.relationship('Head', backref='farmer')
-    dna_certs = db.relationship('CertificateDna', backref='farmers')
-    cons_certs = db.relationship('CertificateCons', backref='farmers')
-    events = db.relationship('EventDB', backref='farmers')
+    dna_certs = db.relationship('CertificateDna', backref='farmer')
+    cons_certs = db.relationship('CertificateCons', backref='farmer')
+    events = db.relationship('EventDB', backref='farmer')
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -45,21 +40,13 @@ class Farmer(db.Model):
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return f'Farmer ID: {self.id}; Name: {self.farmer_name}; email: {self.email}; phone: {self.phone}; ' \
-               f'full_address: {self.full_address}'
-
-    def __str__(self):
-        """Riporta in string la classe."""
-        return f'Farmer ID: {self.id}; Name: {self.farmer_name}; email: {self.email}; phone: {self.phone}; ' \
-               f'full_address: {self.full_address}'
+        return '<Farmer: {}>'.format(self.farmer_name)
 
     def __init__(self, farmer_name, email, phone=None, address=None, cap=None, city=None, stable_code=None,
                  stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
                  affiliation_start_date=None, affiliation_end_date=None, affiliation_status=None,
                  heads=None, dna_certs=None, cons_certs=None, events=None, note_certificate=None, note=None,
                  updated_at=datetime.now()):
-
-        from ..utilitys.functions import address_mount, str_to_date
 
         self.farmer_name = farmer_name
 
@@ -71,8 +58,8 @@ class Farmer(db.Model):
         self.city = city
         self.full_address = address_mount(address, cap, city)
 
-        self.affiliation_start_date = str_to_date(affiliation_start_date)
-        self.affiliation_end_date = str_to_date(affiliation_end_date)
+        self.affiliation_start_date = affiliation_start_date
+        self.affiliation_end_date = affiliation_end_date
         self.affiliation_status = affiliation_status
 
         self.stable_code = stable_code
@@ -80,10 +67,20 @@ class Farmer(db.Model):
         self.stable_productive_orientation = stable_productive_orientation
         self.stable_breeding_methods = stable_breeding_methods
 
+        if heads is None:
+            heads = []
         self.heads = heads
+
+        if dna_certs is None:
+            dna_certs = []
         self.dna_certs = dna_certs
+
+        if cons_certs is None:
+            cons_certs = []
         self.cons_certs = cons_certs
 
+        if events is None:
+            events = []
         self.events = events
 
         self.note_certificate = note_certificate
@@ -94,7 +91,15 @@ class Farmer(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        if self.affiliation_start_date in ["", None] or isinstance(self.affiliation_start_date, str):
+            pass
+        else:
+            self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
+
+        if self.affiliation_end_date in ["", None] or isinstance(self.affiliation_end_date, str):
+            pass
+        else:
+            self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
 
         return {
             'id': self.id,
@@ -108,18 +113,18 @@ class Farmer(db.Model):
             'city': self.city,
             'full_address': self.full_address,
 
-            'affiliation_start_date': date_to_str(self.affiliation_start_date),
-            'affiliation_end_date': date_to_str(self.affiliation_end_date),
-            'affiliation_status': self.affiliation_status,
-
             'stable_code': self.stable_code,
             'stable_type': self.stable_type,
+            'affiliation_end_date': self.affiliation_end_date,
+            'affiliation_status': self.affiliation_status,
+
+            'affiliation_start_date': self.affiliation_start_date,
             'stable_productive_orientation': self.stable_productive_orientation,
             'stable_breeding_methods': self.stable_breeding_methods,
 
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

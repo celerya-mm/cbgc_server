@@ -44,23 +44,34 @@ def user_create():
             return render_template("admin/admin_create.html", form=form)
 
         # print("SESSION_ADMIN:", _admin["id"])
-        new_user = User(
-            username=form_data["username"].replace(" ", ""),
-            name=form_data["name"].strip(),
-            last_name=form_data["last_name"].strip(),
-            email=form_data["email"].strip(),
-            phone=form_data["phone"].strip(),
-            password=psw_hash(form_data["new_password_1"].replace(" ", "")),
-            note=form_data["note"].strip(),
-        )
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            flash("UTENTE servizio creato correttamente.")
-            return redirect(url_for('admin_view'))
-        except IntegrityError as err:
-            db.session.rollback()
-            flash(f"ERRORE: {str(err.orig)}")
+        valid_email = is_valid_email(form_data["email"])
+        if valid_email:
+            new_user = User(
+                username=form_data["username"].replace(" ", ""),
+                name=form_data["name"].strip(),
+                last_name=form_data["last_name"].strip(),
+                email=form_data["email"].strip(),
+                phone=form_data["phone"].strip(),
+                password=psw_hash(form_data["new_password_1"].replace(" ", "")),
+                note=form_data["note"].strip(),
+            )
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+                flash("UTENTE servizio creato correttamente.")
+                return redirect(url_for('admin_view'))
+            except IntegrityError as err:
+                db.session.rollback()
+                flash(f"ERRORE: {str(err.orig)}")
+                return render_template("user/user_create.html", form=form)
+        else:
+            form.username.data = form_data["username"]
+            form.email.data = form_data["email"]
+            form.name.data = form_data["name"]
+            form.last_name.data = form_data["last_name"]
+            form.note.data = form_data["note"]
+
+            flash("ERRORE: la email inserita non è valida.")
             return render_template("user/user_create.html", form=form)
     else:
         return render_template("user/user_create.html", form=form)

@@ -4,112 +4,64 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('head_view') }}" title="Annulla">
+            <a class="btn btn-update" type="button" href="{{ url_for('user_view') }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
-            Modifica CAPO del Consorzio [ {{ id }} ]:
+            Modifica i dati dell'UTENTE:
         </h5>
-        <div class="col-md-12">
+        <div class="col-md-5">
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
-                    {{ form.headset.label }}
-                    {{ form.headset(class="form-control") }}
-                    {% if form.headset.errors %}
-                        {% for error in form.headset.errors %}
+                    {{ form.username.label }}
+                    {{ form.username(class="form-control") }}
+                    {% if form.username.errors %}
+                        {% for error in form.username.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                    <p class="comment">Lo username non deve contenere spazi.</p>
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.name.label }}
+                    {{ form.name(class="form-control") }}
+                    {% if form.name.errors %}
+                        {% for error in form.name.errors %}
                             <span class="text-danger">{{ error }}</span>
                             <br>
                         {% endfor %}
                     {% endif %}
                 </div>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-6 order-first">
-                        <br>
-                        {{ form.birth_date.label }}
-                        {{ form.birth_date(class="form-control", style="text-align: center;") }}
-                        {% if form.birth_date.errors %}
-                            {% for error in form.birth_date.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
-                        {% endif %}
-                        <br>
-                        <div class="form-group">
-                            {{ form.castration_date.label }}
-                            {{ form.castration_date(class="form-control") }}
-                            {% if form.castration_date.errors %}
-                                {% for error in form.castration_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.slaughter_date.label }}
-                            {{ form.slaughter_date(class="form-control") }}
-                            {% if form.slaughter_date.errors %}
-                                {% for error in form.slaughter_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.sale_date.label }}
-                            {{ form.sale_date(class="form-control") }}
-                            {% if form.sale_date.errors %}
-                                {% for error in form.sale_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6 order-second">
-                        <br>
-                        <div class="form-group">
-                            {{ form.farmer_id.label }}
-                            {{ form.farmer_id(class="form-control", style="text-align: center;") }}
-                            {% if form.farmer_id.errors %}
-                                {% for error in form.farmer_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.buyer_id.label }}
-                            {{ form.buyer_id(class="form-control", style="text-align: center;") }}
-                            {% if form.buyer_id.errors %}
-                                {% for error in form.buyer_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.slaughterhouse_id.label }}
-                            {{ form.slaughterhouse_id(class="form-control", style="text-align: center;") }}
-                            {% if form.slaughterhouse_id.errors %}
-                                {% for error in form.slaughterhouse_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
+                <br>
+                <div class="form-group">
+                    {{ form.last_name.label }}
+                    {{ form.last_name(class="form-control") }}
+                    {% if form.last_name.errors %}
+                        {% for error in form.last_name.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <br>
                 <div class="form-group">
-                    {{ form.note_certificate.label }}
-                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
-                    {{ form.note_certificate(class="form-control") }}
-                    {% if form.note_certificate.errors %}
-                        {% for error in form.note_certificate.errors %}
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control") }}
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.phone.label }}
+                    {{ form.phone(class="form-control") }}
+                    {% if form.phone.errors %}
+                        {% for error in form.phone.errors %}
                             <span class="text-danger">{{ error }}</span>
                             <br>
                         {% endfor %}

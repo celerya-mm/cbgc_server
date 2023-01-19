@@ -1,14 +1,7 @@
 from datetime import datetime
 
-from ..app import db
-
-# importazioni per relazioni "ForeignKey"
-# from .accounts import User # noqa
-
-# importazioni per relazioni "backref"
-from .heads import Head  # noqa
-from .certificates_cons import CertificateCons  # noqa
-from .events_db import EventDB  # noqa
+from app.app import db
+from app.utilitys.functions import address_mount
 
 
 class Buyer(db.Model):
@@ -50,8 +43,6 @@ class Buyer(db.Model):
                  affiliation_start_date=None, affiliation_status=None, affiliation_end_date=None, user_id=None,
                  heads=None, cons_certs=None, events=None, note_certificate=None, note=None, updated_at=datetime.now()):
 
-        from ..utilitys.functions import address_mount, str_to_date
-
         self.buyer_name = buyer_name
         self.buyer_type = buyer_type
 
@@ -63,27 +54,41 @@ class Buyer(db.Model):
         self.city = city
         self.full_address = address_mount(address, cap, city)
 
-        self.affiliation_start_date = str_to_date(affiliation_start_date)
-        self.affiliation_end_date = str_to_date(affiliation_end_date)
+        self.affiliation_start_date = affiliation_start_date
+        self.affiliation_end_date = affiliation_end_date
         self.affiliation_status = affiliation_status
 
         self.user_id = user_id
 
-        self.heads = heads or []
-        self.cons_certs = cons_certs or []
+        if heads is None:
+            heads = []
+        self.heads = heads
 
-        self.events = events or []
+        if cons_certs is None:
+            cons_certs = []
+        self.cons_certs = cons_certs
+
+        if events is None:
+            events = []
+        self.events = events
 
         self.note_certificate = note_certificate
         self.note = note
 
         self.created_at = datetime.now()
-        self.updated_at = str_to_date(updated_at, "%Y-%m-%d %H:%M:%S")
+        self.updated_at = updated_at
 
     def to_dict(self):
         """Esporta in un dict la classe."""
+        if self.affiliation_start_date in ["", None] or isinstance(self.affiliation_start_date, str):
+            pass
+        else:
+            self.affiliation_start_date = datetime.strftime(self.affiliation_start_date, "%Y-%m-%d")
 
-        from ..utilitys.functions import date_to_str
+        if self.affiliation_end_date in ["", None] or isinstance(self.affiliation_end_date, str):
+            pass
+        else:
+            self.affiliation_end_date = datetime.strftime(self.affiliation_end_date, "%Y-%m-%d")
 
         return {
             'id': self.id,
@@ -98,13 +103,13 @@ class Buyer(db.Model):
             'city': self.city,
             'full_address': self.full_address,
 
-            'affiliation_start_date': date_to_str(self.affiliation_start_date),
-            'affiliation_end_date': date_to_str(self.affiliation_end_date),
+            'affiliation_start_date': self.affiliation_start_date,
+            'affiliation_end_date': self.affiliation_end_date,
             'affiliation_status': self.affiliation_status,
 
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
         }

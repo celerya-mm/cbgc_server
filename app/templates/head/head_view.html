@@ -6,21 +6,21 @@
         <div class="row no-gutters justify-content-center">
             <div class="col-md-14">
                 <h2 class="card-title" style="padding: 20px;">
-                    <a class="btn btn-update" type="button" title="Crea nuovo Capo" href="{{ url_for('head_create') }}">
+                    <a class="btn btn-update" type="button" title="Crea nuovo Utente" href="{{ url_for('user_create') }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
-                    Elenco CAPI Consorzio:</h2>
+                    Elenco UTENTI SERVIZIO:</h2>
                 <div>
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="h1" data-defaultsort="asc">ID</th>
-                            <th class="title" id="h2">Auricolare</th>
-                            <th class="title" id="h3">Allevatore</th>
-                            <th class="title" id="h4">Nato</th>
-                            <th class="title" id="h5">Castrato</th>
-                            <th class="title" id="h6">Conforme</th>
-                            <th class="title" id="h7">Venduto</th>
+                            <th class="title" id="h2">Username</th>
+                            <th class="title" id="h3">email</th>
+                            <th class="title" id="h4">Nome</th>
+                            <th class="title" id="h5">Cognome</th>
+                            <th class="title" id="h6">Telefono</th>
+                            <th class="title" id="h7">Modificato</th>
                             <th class="title" id="h8"> </th>
                             <th class="title" id="h9"> </th>
                         </tr>
@@ -32,38 +32,33 @@
                                 {{ row.id|e }}
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.headset|e }}
-                            </td>
-                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.farmer_id|e }}
+                                {{ row.username|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.birth_date|e }}
+                                {{ row.email|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.castration_date|e }}
+                                {{ row.last_name|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.castration_compliance|e }}
-                                {% if row.castration_compliance == True %}
-                                    <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
-                                {% endif %}
+                                {{ row.name|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.sale_date|e }}
+                                {{ row.phone|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.updated_at|e }}
                             </td>
                             <td style="width: 20px;">
-                                <a class="btn-table" type="button" title="Modifica Capo"
-                                   href="{{ url_for('head_update', data=row) }}">
+                                <a class="btn-table" type="button" title="Modifica utente"
+                                   href="{{ url_for('user_update', data=row) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td style="width: 20px;">
-                                <a class="btn-table" type="button" title="Visualizza Capo"
-                                   href="{{ url_for('head_view_history', data=row) }}">
+                                <a class="btn-table" type="button" title="Visualizza utente"
+                                   href="{{ url_for('user_view_history', data=row) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>
@@ -99,6 +94,9 @@
             }
         });
     });
+
+
+
 
 </script>
 {% endblock %}
