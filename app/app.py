@@ -31,5 +31,5 @@ with app.app_context():
                             slaughterhouses, tokens)
 
     db.reflect()  # Verifica tabelle presenti nel DB.
-    db.drop_all()  # Attenzione elimina tutte le tabelle dal DB.
+    # db.drop_all()  # Attenzione elimina tutte le tabelle dal DB.
     db.create_all()  # Crea le tabelle nel DB

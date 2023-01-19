@@ -65,28 +65,28 @@ class FormHeadCreate(FlaskForm):
     submit = SubmitField("CREATE")
 
     @staticmethod
-    def validate_headset(field):
+    def validate_headset(Self, field):  # noqa
         """Valida campo headset."""
         if field.data not in ["", "-", None] and field.data.strip() in list_head():
             raise ValidationError("E' già presente un CAPO con lo stesso AURICOLARE.")
 
     @staticmethod
-    def validate_farmer_id(field):
+    def validate_farmer_id(Self, field):  # noqa
         """Valida campo farmer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_farmer():
-            raise ValidationError("Nessun ALLEVATORE presente con con la Ragione Sociale inserita.")
+            raise ValidationError("Nessun ALLEVATORE presente corrispondente alla Ragione Sociale inserita.")
 
     @staticmethod
-    def validate_buyer_id(field):
+    def validate_buyer_id(Self, field):  # noqa
         """Valida campo buyer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_buyer():
-            raise ValidationError("Nessun ACQUIRENTE presente con con la Ragione Sociale inserita.")
+            raise ValidationError("Nessun ACQUIRENTE presente corrispondente alla Ragione Sociale inserita.")
 
     @staticmethod
-    def validate_slaughterhouse_id(field):
+    def validate_slaughterhouse_id(Self, field):  # noqa
         """Valida campo slaughterhouse_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_slaughterhouse():
-            raise ValidationError("Nessun MACELLO presente con con la Ragione Sociale inserita.")
+            raise ValidationError("Nessun MACELLO presente corrispondente alla Ragione Sociale inserita.")
 
 
 class FormHeadUpdate(FlaskForm):
@@ -112,16 +112,16 @@ class FormHeadUpdate(FlaskForm):
     def validate_farmer_id(self, field):  # noqa
         """Valida campo farmer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_farmer():
-            raise ValidationError("Nessun ALLEVATORE presente con con la Ragione Sociale inserita.")
+            raise ValidationError("Nessun ALLEVATORE presente corrispondente alla Ragione Sociale inserita.")
 
     @staticmethod
     def validate_buyer_id(self, field):  # noqa
         """Valida campo buyer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_buyer():
-            raise ValidationError("Nessun ACQUIRENTE presente con con la Ragione Sociale inserita.")
+            raise ValidationError("Nessun ACQUIRENTE presente corrispondente alla Ragione Sociale inserita.")
 
     @staticmethod
     def validate_slaughterhouse_id(self, field):  # noqa
         """Valida campo slaughterhouse_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_slaughterhouse():
-            raise ValidationError("Nessun MACELLO presente con con la Ragione Sociale inserita.")
+            raise ValidationError("Nessun MACELLO presente corrispondente alla Ragione Sociale inserita.")

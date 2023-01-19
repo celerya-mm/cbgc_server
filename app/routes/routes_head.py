@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ..app import db
 
-from ..models.heads import Head
+from ..models.heads import Head, verify_castration
 from ..models.farmers import Farmer
 from ..models.buyers import Buyer
 from ..models.slaughterhouses import Slaughterhouse
@@ -29,7 +29,7 @@ def head_view():
     """Visualizzo informazioni Capi."""
     _list = Head.query.all()
     _list = [r.to_dict() for r in _list]
-    return render_template("head/head_view.html", form=_list)
+    return render_template("head/head_view.html", form=_list, dict_to_json=url_to_json)
 
 
 @token_admin_validate
@@ -46,6 +46,7 @@ def head_create():
 
             birth_date=not_empty(form_data["birth_date"]),
             castration_date=not_empty(form_data["castration_date"]),
+
             slaughter_date=not_empty(form_data["slaughter_date"]),
             sale_date=not_empty(form_data["sale_date"]),
 
@@ -56,7 +57,7 @@ def head_create():
             note_certificate=form_data["note_certificate"],
             note=form_data["note"].strip(),
         )
-        # print("HEAD_NEW_DATA", json.dumps(new_head.to_dict(), indent=2))
+        print("HEAD_NEW_DATA", json.dumps(new_head.to_dict(), indent=2))
         try:
             db.session.add(new_head)
             db.session.commit()
@@ -74,21 +75,7 @@ def head_create():
 @app.route("/head_view_history/<data>", methods=["GET", "POST"])
 def head_view_history(data):
     """Visualizzo la storia delle modifiche al record del Capo."""
-    # Elaboro i dati ricevuti
-    date_fields = {
-        1: "birth_date",
-        2: "castration_date",
-        3: "slaughter_date",
-        4: "sale_date"
-    }
-    data = url_to_json(data, date_fields)
-    # print("HEAD_DATA_PASS:", json.dumps(data, indent=2))
-
-    # Estraggo l' ID del capo corrente
-    session["head_id"] = data["id"]
-
-    # Interrogo il DB
-    head = Head.query.filter_by(headset=data["headset"]).first()
+    head = Head.query.get(int(data))
     _head = head.to_dict()
     # print("HEAD_FORM:", json.dumps(_head, indent=2), "TYPE:", type(_head))
 
@@ -104,10 +91,14 @@ def head_view_history(data):
         slaughter = Slaughterhouse.query.get(head.slaughterhouse_id)
         _head["buyer_id"] = f"{slaughter.id} - {slaughter.slaughterhouse}"
 
+    head.note = head.note
+    head.note_certificate = head.note_certificate
+
     # Estraggo la storia delle modifiche per l'utente
-    history_list = head.event
+    history_list = head.events
     history_list = [history.to_dict() for history in history_list]
-    return render_template("head/head_view_history.html", form=_head, history_list=history_list)
+    return render_template(
+        "head/head_view_history.html", form=_head, history_list=history_list)
 
 
 @token_admin_validate
@@ -129,31 +120,34 @@ def head_update(data):
 
         head.birth_date = not_empty(form_data["birth_date"])
         head.castration_date = not_empty(form_data["castration_date"])
+        head.castration_compliance = verify_castration(form_data["birth_date"], form_data["castration_date"])
+
         head.slaughter_date = not_empty(form_data["slaughter_date"])
         head.sale_date = not_empty(form_data["sale_date"])
 
         if form_data["farmer_id"] in ["", "-"]:
             head.farmer_id = None
         else:
-            farmer = Farmer.query.filter_by(farmer_name=form_data["farmer_id"]).first()
+            farmer = Farmer.query.filter_by(farmer_name=form_data["farmer_id"].split(" - ")[0]).first()
             head.farmer_id = farmer.id
 
         if form_data["buyer_id"] in ["", "-"]:
             head.buyer_id = None
         else:
-            buyer = Buyer.query.filter_by(buyer_name=form_data["buyer_id"]).first()
+            buyer = Buyer.query.filter_by(buyer_name=form_data["buyer_id"].split(" - ")[0]).first()
             head.buyer_id = buyer.id
 
         if form_data["slaughterhouse_id"] in ["", "-"]:
             head.slaughterhouse_id = None
         else:
-            slaughter = Slaughterhouse.query.filter_by(slaughterhouse=form_data["slaughterhouse_id"]).first()
+            slaughter = Slaughterhouse.query.filter_by(
+                slaughterhouse=form_data["slaughterhouse_id"].split(" - ")[0]).first()
             head.slaughterhouse_id = slaughter.id
 
         head.note_certificate = not_empty(form_data["note_certificate"])
         head.note = not_empty(form_data["note"])
 
-        # print("HEAD_NEW_DATA:", json.dumps(head.to_dict(), indent=2))
+        print("HEAD_NEW_DATA:", json.dumps(head.to_dict(), indent=2))
         try:
             db.session.commit()
             flash("CAPO aggiornato correttamente.")
@@ -169,54 +163,37 @@ def head_update(data):
         }
         # print("EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, head_id=_id):
-            return redirect(url_for('head_view_history', data=head.to_dict()))
+            return redirect(url_for('head_view_history', data=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('head_view_history', data=head.to_dict()))
+            return redirect(url_for('head_view_history', data=_id))
     else:
         # recupero i dati e li converto in dict
-        date_fields = {
-            1: "birth_date",
-            2: "castration_date",
-            3: "slaughter_date",
-            4: "sale_date"
-        }
-        data = url_to_json(data, date_fields)
-        # print("HEAD_DATA_PASS:", json.dumps(data, indent=2))
+        head = Head.query.get(int(data))
+        # print("HEAD_FIND:", head, type(data))
 
-        session["head_id"] = data["id"]
+        session["head_id"] = head.id
 
-        form.headset.data = data["headset"]
+        form.headset.data = head.headset
 
-        form.birth_date.data = str_to_date(data["birth_date"])
-        form.castration_date.data = str_to_date(data["castration_date"])
-        form.slaughter_date.data = str_to_date(data["slaughter_date"])
-        form.sale_date.data = str_to_date(data["sale_date"])
+        form.birth_date.data = str_to_date(head.birth_date)
+        form.castration_date.data = str_to_date(head.castration_date)
+        form.slaughter_date.data = str_to_date(head.slaughter_date)
+        form.sale_date.data = str_to_date(head.sale_date)
 
-        if data["farmer_id"]:
-            try:
-                data["farmer_id"] = int(data["farmer_id"].split(" - ")[0])
-            except:  # noqa
-                pass
-            farmer = Farmer.query.get(data["farmer_id"])
-            form.farmer_id.data = farmer.farmer_name
+        if head.farmer_id and head.farmer_id not in [None, "None", ""]:
+            farmer = Farmer.query.get(head.farmer_id)
+            form.farmer_id.data = str(farmer.id) + " - " + farmer.farmer_name
 
-        if data["buyer_id"]:
-            try:
-                data["buyer_id"] = int(data["buyer_id"].split(" - ")[0])
-            except:  # noqa
-                pass
-            buyer = Buyer.query.get(data["buyer_id"])
-            form.buyer_id.data = buyer.buyer_name
+        if head.buyer_id and head.buyer_id not in [None, "None", ""]:
+            buyer = Buyer.query.get(head.buyer_id)
+            form.buyer_id.data = str(buyer.id) + " - " + buyer.buyer_name
 
-        if data["slaughterhouse_id"]:
-            try:
-                data["slaughterhouse_id"] = int(data["slaughterhouse_id"].split(" - ")[0])
-            except:  # noqa
-                pass
-            slaughter = Slaughterhouse.query.get(data["slaughterhouse_id"])
-            form.slaughterhouse_id.data = slaughter.slaughterhouse
+        if head.slaughterhouse_id and head.slaughterhouse_id not in [None, "None", ""]:
+            slaughter = Slaughterhouse.query.get(head.slaughterhouse_id)
+            form.slaughterhouse_id.data = str(slaughter.id) + " - " + slaughter.slaughterhouse
 
-        form.note_certificate.data = data["note_certificate"]
-        form.note.data = data["note"]
-        return render_template("head/head_update.html", form=form, id=data["id"])
+        form.note_certificate.data = head.note_certificate
+        form.note.data = head.note
+
+        return render_template("head/head_update.html", form=form, id=head.id)

@@ -9,7 +9,7 @@ from ..models.buyers import Buyer
 
 # Importazioni necessarie per mantenere le relazioni valide
 from ..models.heads import Head  # noqa
-from ..models.accounts import User  # noqa
+# from ..models.accounts import User  # noqa
 from ..models.certificates_cons import CertificateCons  # noqa
 
 

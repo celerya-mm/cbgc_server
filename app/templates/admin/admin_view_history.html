@@ -9,10 +9,7 @@
                href="{{ url_for('admin_view') }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
-            Dati account AMMINISTRATORE  [ {{ form.id }} ]:
-        </h5>
-        <h5>
-            "{{form.username}}"
+            Dati AMMINISTRATORE [ {{ form.id }} ]:
         </h5>
         <a class="btn btn-update" type="button" title="Modifica utente" href="{{ url_for('admin_update', data=form) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>

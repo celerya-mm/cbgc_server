@@ -1,7 +1,7 @@
 import json
-from ast import literal_eval
-from datetime import datetime
+from datetime import datetime, date
 from functools import wraps
+from jinja2.utils import htmlsafe_json_dumps
 
 import requests
 from flask import flash, session, url_for, redirect
@@ -16,42 +16,27 @@ from ..var_ambient import variables as var
 disable_warnings(InsecureRequestWarning)
 
 
-def url_to_json(_str, val_date=None):
-    """Converte stringa passata da url in json."""
-    try:
-        _str = literal_eval(_str)
-    except ValueError:
-        _str = _str \
-            .replace("{'", '{"').replace("'}", '"}') \
-            .replace(": '", ': "').replace("':", '":') \
-            .replace(", '", ', "').replace("',", '",')
+def url_to_json(dict_obj):
+    """Converte l'oggetto dict in una stringa JSON"""
+    for k, v in dict_obj.items():
+        dict_obj[k] = str(v).replace("/", "-")
+    new_dict = dict_obj.copy()
+    return htmlsafe_json_dumps(new_dict)
 
-        if val_date:
-            _list_field = []
-            for x in val_date:
-                _list_field.append(val_date[x])
-            # print("LISTA_CAMPI_DATA:", _list_field)
 
-            for d in _list_field:
-                if f'"{d}": datetime.datetime' in _str:
-                    # print("SELECT:", f'"{d}": datetime.datetime')
-                    _split = _str.split(f'"{d}": datetime.datetime')[1]
-                    # print("STR_SPLIT:", _split)
-                    _split = str(_split.split(', "')[0])
-                    # print("STR_DATETIME:", _split)
-                    _replace = f"datetime.datetime{_split}"
-                    # print("REPLACE:", _replace)
-                    _split = _split.replace('(', "").replace(')', "").split(', ')
-                    # print("LIST_DATETIME:", _split)
-                    date = f"{_split[0]}-{_split[1]}-{_split[2]}"
-                    # print("DATETIME:", date)
-                    _str = _str.replace(_replace, f'"{date}"')
-                    # print("STR:", _str)
-        _str = literal_eval(_str)
-
-    # print("URL_WORK:", _str, "TYPE:", type(_str))
-    # print("URL_TO_JSON:", json.dumps(_str, indent=2), "TYPE:", type(_str))
-    return _str
+def json_loads_replace_none(dict_obj):
+    """Rimpiazza 'None' con None in una stringa da convertire in json."""
+    print("SONO DENTRO")
+    for k, v in dict_obj.items():
+        if v == "None":
+            dict_obj[k] = None
+        if v == "True":
+            dict_obj[k] = True
+        if v == "False":
+            dict_obj[k] = False
+    new_dict = dict_obj.copy()
+    print("NEW_DICT:", new_dict, type(new_dict))
+    return new_dict
 
 
 def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=None,
@@ -121,7 +106,6 @@ def admin_log_in(form):
     """API - Login e ottengo il token."""
     url = var.apiUrls_admin["admin_login"]
     payload = json.dumps({"username": form.username.data, "password": form.password.data})
-    print("PAYLOAD:", json.dumps(payload, indent=2))
     headers = {'Content-Type': 'application/json'}
     response = requests.request("POST", url, headers=headers, data=payload, verify=False)
     try:
@@ -184,7 +168,7 @@ def mount_full_name(name, last_name):
     return full_name
 
 
-def year_extract(date):
+def year_extract(date):  # noqa
     """Estrae l'anno da una data"""
     if date:
         print("TYPE_DATA", type(date))
@@ -196,15 +180,17 @@ def year_extract(date):
 
 def str_to_date(_str, _form="%Y-%m-%d"):
     """Converte una stringa in datetime."""
-    if _str is not None and isinstance(_str, str):
+    if _str not in [None, "None", "nan", ""] and isinstance(_str, str):
         return datetime.strptime(_str, _form)
-    else:
+    elif isinstance(_str, datetime) or isinstance(_str, date):
         return _str
+    else:
+        return None
 
 
 def date_to_str(_date, _form="%Y-%m-%d"):
     """Converte datetime in stringa."""
-    if _date is not None and not isinstance(_date, str):
+    if _date not in [None, "None", "nan", ""] and not isinstance(_date, str):
         return datetime.strftime(_date, _form)
     else:
         return _date

@@ -56,14 +56,14 @@
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Modifica Capo"
-                                   href="{{ url_for('head_update', data=row) }}">
+                                   href="{{ url_for('head_update', data=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Visualizza Capo"
-                                   href="{{ url_for('head_view_history', data=row) }}">
+                                   href="{{ url_for('head_view_history', data=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>

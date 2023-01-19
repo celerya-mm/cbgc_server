@@ -36,7 +36,7 @@ class CertificateCons(db.Model):
 
     certificate_pdf = db.Column(db.LargeBinary, index=False, nullable=True)
 
-    cockade_id = db.Column(db.Integer, index=False, unique=False, nullable=False)
+    cockade_id = db.Column(db.Integer, index=False, unique=False, nullable=True)
     cockade_var = db.Column(db.String(10), index=False, unique=False, nullable=True)
     cockade_nr = db.Column(db.String(20), index=False, unique=True, nullable=True)
 

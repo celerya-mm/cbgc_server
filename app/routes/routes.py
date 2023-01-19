@@ -9,7 +9,7 @@ def login():
     """Effettua la log-in."""
     form = FormLogin()
     if form.validate_on_submit():
-        print(f"USER: {form.username.data}; PSW: {form.password.data}")
+        # print(f"USER: {form.username.data}; PSW: {form.password.data}")
         token = admin_log_in(form)
         if token:
             session["token_login"] = token

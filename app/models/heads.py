@@ -3,25 +3,17 @@ from dateutil.relativedelta import relativedelta
 
 from ..app import db
 
-# importazioni per relazioni "ForeignKey"
-# from .farmers import Farmer  # noqa
-# from .buyers import Buyer  # noqa
-# from .slaughterhouses import Slaughterhouse  # noqa
-
 # importazioni per relazioni "backref"
 from .events_db import EventDB  # noqa
 from .certificates_dna import CertificateDna  # noqa
 from .certificates_cons import CertificateCons  # noqa
 
 
-def castration_compliance(birth, castration):
+def verify_castration(birth, castration):
     """Verifica conformità castrazione entro gli OTTO mesi."""
-    from ..utilitys.functions import str_to_date, date_to_str
-    if castration:
-        _max = str_to_date(birth) + relativedelta(month=8)
-        print("BIRTH:", date_to_str(birth))
-        print("MAX:", _max)
-        print("CASTRATION:", date_to_str(castration))
+    from ..utilitys.functions import str_to_date
+    if castration not in [None, "nan", ""]:
+        _max = str_to_date(birth) + relativedelta(months=8)
         return bool(str_to_date(castration) <= _max)
     else:
         return None
@@ -77,7 +69,7 @@ class Head(db.Model):
 
         self.castration_date = str_to_date(castration_date)
         self.castration_year = year_extract(castration_date)
-        self.castration_compliance = castration_compliance(birth_date, castration_date)
+        self.castration_compliance = verify_castration(birth_date, castration_date)
 
         self.slaughter_date = str_to_date(slaughter_date)
 
