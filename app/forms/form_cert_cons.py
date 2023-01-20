@@ -2,22 +2,19 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FloatField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Optional
 
-from app.models.buyers import Buyer
-from app.models.certificates_cons import CertificateCons
-from app.models.farmers import Farmer
-from app.models.heads import Head
-from app.models.slaughterhouses import Slaughterhouse
+from ..models.buyers import Buyer
+from ..models.certificates_cons import CertificateCons
+from ..models.farmers import Farmer
+from ..models.heads import Head
+from ..models.slaughterhouses import Slaughterhouse
 
 
-class FormCertCons(FlaskForm):
-    """Form inserimento dati Certificato Consorzio."""
-    # Estraggo lista records certificati e seleziono l'ultimo
+def calc_id():
+    """Calcola l'id per il nuovo certificato."""
     certificates = CertificateCons.query.all()
     old = max(certificates, key=lambda x: x.id)
-
-    # Calcolo il nuo ID.
     today = datetime.now()
     if today.month >= 7 > old.certificate_date.month and today.year == old.certificate_date.year:
         new_id = 1
@@ -25,22 +22,27 @@ class FormCertCons(FlaskForm):
         new_id = 1
     else:
         new_id = old.certificate_id + 1
-    certificate_id = IntegerField('ID', validators=[DataRequired("Campo obbligatorio!")], default=new_id)
+    return new_id
 
-    certificate_var = StringField('Integrazione ID', validators=[Length(max=10)])
+
+class FormCertCons(FlaskForm):
+    """Form inserimento dati Certificato Consorzio."""
+    certificate_id = IntegerField('ID', validators=[DataRequired("Campo obbligatorio!")], default=calc_id())
+
+    certificate_var = StringField('Integrazione ID', validators=[Length(max=10), Optional()])
     certificate_date = DateField('Data Certificato', format='%Y-%m-%d', default=datetime.now())
 
-    cockade_id = IntegerField('ID Coccarda', default=new_id)
-    cockade_var = StringField('Integrazione ID Coccarda', validators=[Length(max=10)])
+    cockade_id = IntegerField('ID Coccarda', validators=[Optional()], default=certificate_id)
+    cockade_var = StringField('Integrazione ID Coccarda', validators=[Length(max=10), Optional()])
 
     sale_type = SelectField(
         "Tipo Vendita", validators=[DataRequired("Campo obbligatorio!")],
-        choices=["Capo intero", "Mezzena", "Parti Anatomiche"], default=""
+        choices=["Capo intero", "Mezzena", "Parti Anatomiche", "Altro", ""], default=""
     )
-    sale_quantity = FloatField("Quantità Venduta (kg)")
+    sale_quantity = FloatField("Quantità Venduta (kg)", validators=[Optional()])
 
-    invoice_nr = StringField('Fattura NR', validators=[Length(max=20)])
-    invoice_date = DateField('Fattura Data', format='%Y-%m-%d', default=datetime.now())
+    invoice_nr = StringField('Fattura NR', validators=[Length(max=20), Optional()])
+    invoice_date = DateField('Fattura Data', format='%Y-%m-%d',validators=[Optional()], default="")
     invoice_status = SelectField(
         'Fattura Stato', validators=[DataRequired("Campo obbligatorio!")], choices=[
             "Da Emettere", "Emessa", "Annullata", "Non Pagata", "Pagata"
@@ -75,3 +77,9 @@ class FormCertCons(FlaskForm):
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("CREATE")
+
+    def __repr__(self):
+        return f'<CERT_CONSORZIO CREATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
+
+    def __str__(self):
+        return f'<CERT_CONSORZIO CREATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'

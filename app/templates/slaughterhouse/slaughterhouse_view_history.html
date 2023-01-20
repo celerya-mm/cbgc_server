@@ -10,10 +10,10 @@
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
                      alt=""/>
             </a>
-            Dati ACQUIRENTE:
+            Dati MACELLO [ {{ form.id }} ]:
         </h5>
         <h5>
-            "{{form.slaughterhouse}}" - Stato Affiliazione
+            Stato Affiliazione
             {% if form.affiliation_status == True %}
                 <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
             {% else %}
@@ -22,15 +22,20 @@
         </h5>
         <div class="form-group">
             {% if form.affiliation_status != True and form.affiliation_status != "SI"%}
-                {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == None %}
+                {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == "None" %}
                     <span class="text-danger">
-                        ATTENZIONE: manca la data di cessazione affiliazione.
-                        Per inserirla esegui la procedura per il cambio dello stato affiliazione.</span>
+                        ATTENZIONE: manca la data di cessazione affiliazione.</span>
+                {% endif %}
+            {% endif %}
+            {% if form.affiliation_status == True or form.affiliation_status == "SI"%}
+                {% if form.affiliation_end_date != "vuoto" and form.affiliation_end_date != "None" %}
+                    <span class="text-danger">
+                        ATTENZIONE: è presente la data di Fine Affiliazione ma lo stato è ancora "SI".</span>
                 {% endif %}
             {% endif %}
         </div>
         <a class="btn btn-update" type="button" title="Modifica utente"
-           href="{{ url_for('slaughterhouse_update', data=form) }}">
+           href="{{ url_for('slaughterhouse_update', _id=form.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
         </a>
     </div>
@@ -45,26 +50,11 @@
         <div class="row no-gutters justify-content-center">
             <div class="col-md-6 order-first">
                 <div class="form-group">
-                    <h6> Indirizzo </h6>
+                    <h6> Codice Macello </h6>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
-                        {{ form.address }}
+                        {{ form.slaughterhouse_code }}
                     </p>
                 </div>
-                <div class="form-group">
-                    <h6> CAP </h6>
-                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
-                        {{ form.cap }}
-                    </p>
-                </div>
-                <div class="form-group">
-                    <h6> Città </h6>
-                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
-                        {{ form.city }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-md-6 order-second">
                 <div class="form-group">
                     <h6> Telefono </h6>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -77,6 +67,8 @@
                         {{ form.email }}
                     </p>
                 </div>
+            </div>
+            <div class="col-md-6 order-second">
                 <div class="form-group">
                     <h6> Data Affiliazione </h6>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -91,7 +83,14 @@
                 </div>
             </div>
             <div class="form-group">
+                <h6> Indirizzo </h6>
+                <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                    {{ form.full_address }}
+                </p>
+            </div>
+            <div class="form-group">
                 <h6> Note Certificato</h6>
+                <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                 <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                     {{ form.note_certificate }}
                 </p>
@@ -102,8 +101,8 @@
                     {{ form.note }}
                 </p>
             </div>
-            <hr>
         </div>
+        <hr>
     </div>
 </form>
 
@@ -139,7 +138,12 @@
             </div>
         </div>
     </div>
+    <hr>
+    <p class="info">Data Creazione: {{ form.created_at }}</p>
+    <p class="info">Ultima modifica: {{ form.updated_at }}</p>
+    <hr>
 </div>
+
 
 {% endblock %}
 

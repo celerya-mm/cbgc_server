@@ -33,6 +33,7 @@
                                 {{ row.id|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.affiliation_status }}
                                 {% if row.affiliation_status == True %}
                                     <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
                                 {% else %}
@@ -56,14 +57,14 @@
                             </td>
                             <td class="text-center" style="width: 20px;">
                                 <a class="btn-table" type="button" title="Modifica Acquirente"
-                                   href="{{ url_for('slaughterhouse_update', data=row) }}">
+                                   href="{{ url_for('slaughterhouse_update', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td class="text-center" style="width: 20px;">
                                 <a class="btn-table" type="button" title="Visualizza Acquirente"
-                                   href="{{ url_for('slaughterhouse_view_history', data=row) }}">
+                                   href="{{ url_for('slaughterhouse_view_history', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>

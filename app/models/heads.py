@@ -12,9 +12,12 @@ from .certificates_cons import CertificateCons  # noqa
 def verify_castration(birth, castration):
     """Verifica conformità castrazione entro gli OTTO mesi."""
     from ..utilitys.functions import str_to_date
-    if castration not in [None, "nan", ""]:
+    if castration not in [None, "nan", ""] and isinstance(castration, str):
         _max = str_to_date(birth) + relativedelta(months=8)
         return bool(str_to_date(castration) <= _max)
+    elif castration is not None and isinstance(castration, datetime):
+        _max = birth + relativedelta(months=8)
+        return bool(castration <= _max)
     else:
         return None
 
@@ -36,6 +39,7 @@ class Head(db.Model):
     castration_compliance = db.Column(db.Boolean, index=False, nullable=True)
 
     slaughter_date = db.Column(db.DateTime, index=False, nullable=True)
+
     sale_date = db.Column(db.DateTime, index=False, nullable=True)
     sale_year = db.Column(db.Integer, index=False, nullable=True)
 
@@ -50,15 +54,18 @@ class Head(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<Head: {}>'.format(self.headset)
+        return f'<HEAD ID: {self.id}; headset: {self.headset}>'
+
+    def __str__(self):
+        return f'<HEAD ID: {self.id}; headset: {self.headset}>'
 
     def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None,
                  sale_date=None, note_certificate=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
-                 dna_certs=None, cons_certs=None, events=None, note=None, updated_at=datetime.now()):
+                 dna_certs=None, cons_certs=None, events=None, note=None):
 
         from ..utilitys.functions import year_extract, str_to_date
 
@@ -89,7 +96,7 @@ class Head(db.Model):
         self.note = note
 
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
@@ -116,6 +123,6 @@ class Head(db.Model):
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

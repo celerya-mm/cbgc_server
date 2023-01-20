@@ -6,7 +6,8 @@
         <div class="row no-gutters justify-content-center">
             <div class="col-md-14">
                 <h2 class="card-title" style="padding: 20px;">
-                    <a class="btn btn-update" type="button" title="Crea nuovo Acquirente" href="{{ url_for('buyer_create') }}">
+                    <a class="btn btn-update" type="button" title="Crea nuovo Acquirente"
+                       href="{{ url_for('buyer_create') }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco ACQUIRENTI Consorzio:</h2>
@@ -31,7 +32,8 @@
                                 {{ row.id|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {% if row.affiliation_status == True %}
+                                {{ row.affiliation_status }}
+                                {% if row.affiliation_status == True or row.affiliation_status == "SI"%}
                                     <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
                                 {% else %}
                                     <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
@@ -51,14 +53,14 @@
                             </td>
                             <td class="text-center" style="width: 20px;">
                                 <a class="btn-table" type="button" title="Modifica Acquirente"
-                                   href="{{ url_for('buyer_update', data=row) }}">
+                                   href="{{ url_for('buyer_update', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td class="text-center" style="width: 20px;">
                                 <a class="btn-table" type="button" title="Visualizza Acquirente"
-                                   href="{{ url_for('buyer_view_history', data=row) }}">
+                                   href="{{ url_for('buyer_view_history', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>

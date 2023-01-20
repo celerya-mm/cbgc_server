@@ -27,14 +27,17 @@ class Administrator(db.Model):
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<Administrator: {}>'.format(self.username)
+        return f'<Administrator ID: {self.id}; username: {self.username}>'
 
-    def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
-                 events=None, note=None, updated_at=datetime.now()):
+    def __str__(self):
+        return f'<Administrator ID: {self.id}; username: {self.username}>'
+
+    def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
+                 events=None, note=None):
 
         from ..utilitys.functions import mount_full_name
 
@@ -54,10 +57,11 @@ class Administrator(db.Model):
 
         self.note = note
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
+        from ..utilitys.functions import date_to_str
         return {
             'id': self.id,
             'username': self.username,
@@ -70,8 +74,8 @@ class Administrator(db.Model):
             'full_name': self.full_name,
 
             'note': self.note,
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S")
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
         }
 
 
@@ -96,16 +100,16 @@ class User(db.Model):
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
         return '<User: {}>'.format(self.username)
 
-    def __init__(self, username, password, name=None, last_name=None, phone=None, email=None, note=None,
-                 buyers=None, auth_tokens=None, events=None, updated_at=datetime.now()):
+    def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, note=None,
+                 buyers=None, auth_tokens=None, events=None):
 
-        from ..utilitys.functions import mount_full_name
+        from ..utilitys.functions import mount_full_name, str_to_date
 
         self.username = username
         self.password = password
@@ -124,10 +128,11 @@ class User(db.Model):
 
         self.note = note
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
+        from ..utilitys.functions import date_to_str
         return {
             'id': self.id,
             'username': self.username,
@@ -140,6 +145,6 @@ class User(db.Model):
             'email': self.email,
 
             'note': self.note,
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': datetime.strftime(self.updated_at, "%Y-%m-%d %H:%M:%S")
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f")
         }

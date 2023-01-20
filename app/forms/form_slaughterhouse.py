@@ -1,14 +1,10 @@
-from datetime import datetime
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
+from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from app.models.slaughterhouses import Slaughterhouse
-
-# Importazioni necessarie per mantenere le relazioni valide
-from app.models.heads import Head  # noqa
-from app.models.certificates_cons import CertificateCons  # noqa
+from ..models.certificates_cons import CertificateCons  # noqa
+from ..models.heads import Head  # noqa
+from ..models.slaughterhouses import Slaughterhouse
 
 
 def list_slaughterhouse():
@@ -24,26 +20,31 @@ class FormSlaughterhouseCreate(FlaskForm):
         'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
     )
 
-    slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20)])
+    slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20), Optional()])
 
-    email = EmailField('Email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=80)], default="+39 ")
+    email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
+    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
 
-    address = StringField('Indirizzo', validators=[Length(min=5, max=255)])
-    cap = StringField('CAP', validators=[Length(min=5, max=5)])
-    city = StringField('Città', validators=[Length(min=3, max=55)])
+    address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
+    cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
+    city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
 
-    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
+    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()], default="")
     affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="NO")
 
-    note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
-    note = StringField('Note', validators=[Length(max=255)])
+    note_certificate = StringField('Note Certificato', validators=[Length(max=255), Optional()])
+    note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("CREATE")
 
-    @staticmethod
+    def __repr__(self):
+        return f'<SLAUGHTERHOUSE CREATED - Rag. Sociale: {self.slaughterhouse.data}>'
+
+    def __str__(self):
+        return f'<SLAUGHTERHOUSE CREATED - Rag. Sociale: {self.slaughterhouse.data}>'
+
     def validate_slaughterhouse(self, field):  # noqa
-        if field.data.strip() in list_slaughterhouse():
+        if self.slaughterhouse.data.strip() in list_slaughterhouse():
             raise ValidationError("E' già presente un MACELLO con la stessa Ragione Sociale.")
 
 
@@ -53,18 +54,72 @@ class FormSlaughterhouseUpdate(FlaskForm):
         'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
     )
 
-    slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20)])
+    slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20), Optional()])
 
-    email = EmailField('Email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=80)], default="+39 ")
+    email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
+    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
 
-    address = StringField('Indirizzo', validators=[Length(min=5, max=255)])
-    cap = StringField('CAP', validators=[Length(min=5, max=5)])
-    city = StringField('Città', validators=[Length(min=3, max=55)])
+    address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
+    cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
+    city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
 
-    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
+    affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
+    affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
+    affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("CREATE")
+
+    def __repr__(self):
+        return f'<SLAUGHTERHOUSE UPDATED - Rag. Sociale: {self.slaughterhouse.data}>'
+
+    def __str__(self):
+        return f'<SLAUGHTERHOUSE UPDATED - Rag. Sociale: {self.slaughterhouse.data}>'
+
+    def to_dict(self):
+        """Converte form in dict."""
+        from ..utilitys.functions import date_to_str, status_si_no, address_mount
+        return {
+            'slaughterhouse': self.slaughterhouse.data,
+            'slaughterhouse_code': self.slaughterhouse_code.data,
+
+            'email': self.email.data,
+            'phone': self.phone.data,
+
+            'address': self.address.data,
+            'cap': self.cap.data,
+            'city': self.city.data,
+            'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
+
+            'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
+            'affiliation_end_date': date_to_str(self.affiliation_end_date.data),
+            'affiliation_status': status_si_no(self.affiliation_status.data),
+
+            'note_certificate': self.note_certificate.data,
+            'note': self.note.data,
+        }
+
+    def to_db(self):
+        """Converte form in dict."""
+        from ..utilitys.functions import address_mount, str_to_date, status_true_false
+        return {
+            'slaughterhouse': self.slaughterhouse.data,
+            'slaughterhouse_code': self.slaughterhouse_code.data,
+
+            'email': self.email.data,
+            'phone': self.phone.data,
+
+            'address': self.address.data,
+            'cap': self.cap.data,
+            'city': self.city.data,
+            'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
+
+            'affiliation_start_date': str_to_date(self.affiliation_start_date.data),
+            'affiliation_end_date': str_to_date(self.affiliation_end_date.data),
+            'affiliation_status': status_true_false(self.affiliation_status.data),
+
+            'note_certificate': self.note_certificate.data,
+            'note': self.note.data,
+        }

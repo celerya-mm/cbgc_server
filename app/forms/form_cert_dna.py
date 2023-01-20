@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length
 
 from ..models.farmers import Farmer
 from ..models.heads import Head
@@ -39,3 +39,10 @@ class FormCertDNA(FlaskForm):
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("CREATE")
+
+    def __repr__(self):
+        return f'<CERT_DNA CREATED - Nr: {self.dna_cert_id.data} del {self.dna_cert_date.data}>'
+
+    def __str__(self):
+        return f'<CERT_DNA CREATED - Nr: {self.dna_cert_id.data} del {self.dna_cert_date.data}>'
+

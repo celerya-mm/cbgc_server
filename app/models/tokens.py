@@ -1,6 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from ..app import db
+
+
+def calc_expiration_token():
+    _exp = datetime.now() + timedelta(days=1)
+    _exp = _exp.replace(hour=0, minute=0, second=0, microsecond=0)
+    return _exp
 
 
 class AuthToken(db.Model):
@@ -18,19 +24,24 @@ class AuthToken(db.Model):
     def __repr__(self):
         return '<AuthToken: {}>'.format(self.token)
 
-    def __init__(self, token, expires_at, admin_id=None, user_id=None):
+    def __str__(self):
+        return '<AuthToken: {}>'.format(self.token)
+
+    def __init__(self, token, admin_id=None, user_id=None):
         self.token = token
-        self.expires_at = expires_at
         self.admin_id = admin_id
         self.user_id = user_id
         self.created_at = datetime.now()
+        self.expires_at = calc_expiration_token()
 
     def to_dict(self):
+        """Esporta in un dict la classe."""
+        from ..utilitys.functions import date_to_str
         return {
             'id': self.id,
             'token': self.token,
             'admin_id': self.admin_id,
             'user_id': self.user_id,
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'expires_at': datetime.strftime(self.expires_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'expires_at': date_to_str(self.expires_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

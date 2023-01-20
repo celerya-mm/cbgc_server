@@ -38,19 +38,21 @@ class Farmer(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<Farmer: {}>'.format(self.farmer_name)
+        return f'<Farmer Rag. Sociale: {self.farmer_name.data}>'
+
+    def __str__(self):
+        return f'<Farmer Rag. Sociale: {self.farmer_name.data}>'
 
     def __init__(self, farmer_name, email, phone=None, address=None, cap=None, city=None, stable_code=None,
                  stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
                  affiliation_start_date=None, affiliation_end_date=None, affiliation_status=None,
-                 heads=None, dna_certs=None, cons_certs=None, events=None, note_certificate=None, note=None,
-                 updated_at=datetime.now()):
+                 heads=None, dna_certs=None, cons_certs=None, events=None, note_certificate=None, note=None):
 
-        from ..utilitys.functions import address_mount, str_to_date
+        from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.farmer_name = farmer_name
 
@@ -64,7 +66,7 @@ class Farmer(db.Model):
 
         self.affiliation_start_date = str_to_date(affiliation_start_date)
         self.affiliation_end_date = str_to_date(affiliation_end_date)
-        self.affiliation_status = affiliation_status
+        self.affiliation_status = status_true_false(affiliation_status)
 
         self.stable_code = stable_code
         self.stable_type = stable_type
@@ -81,11 +83,11 @@ class Farmer(db.Model):
         self.note = note
 
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        from ..utilitys.functions import date_to_str, status_si_no
 
         return {
             'id': self.id,
@@ -101,7 +103,7 @@ class Farmer(db.Model):
 
             'affiliation_start_date': date_to_str(self.affiliation_start_date),
             'affiliation_end_date': date_to_str(self.affiliation_end_date),
-            'affiliation_status': self.affiliation_status,
+            'affiliation_status': status_si_no(self.affiliation_status),
 
             'stable_code': self.stable_code,
             'stable_type': self.stable_type,
@@ -111,6 +113,6 @@ class Farmer(db.Model):
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

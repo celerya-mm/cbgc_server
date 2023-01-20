@@ -14,6 +14,8 @@
                 {{ form.csrf_token }}
                 <div class="form-group">
                     {{ form.username.label }}
+                    <p class="comment">Lo username non deve contenere spazi,
+                        se li inserisci verranno eliminati prima del salvataggio.</p>
                     {{ form.username(class="form-control") }}
                     {% if form.username.errors %}
                         {% for error in form.username.errors %}
@@ -21,7 +23,6 @@
                             <br>
                         {% endfor %}
                     {% endif %}
-                    <p class="comment">Lo username non deve contenere spazi.</p>
                 </div>
                 <br>
                 <div class="form-group">
@@ -81,6 +82,8 @@
                 <br>
                 <div class="form-group">
                     {{ form.new_password_1.label }}
+                    <p class="comment">La password non deve contenere spazi,
+                        se li inserisci verranno eliminati prima del salvataggio.</p>
                     {{ form.new_password_1(class="form-control") }}
                     {% if form.new_password_1.errors %}
                         {% for error in form.new_password_1.errors %}
@@ -88,7 +91,6 @@
                             <br>
                         {% endfor %}
                     {% endif %}
-                    <p class="comment">La password non deve contenere spazi.</p>
                 </div>
                 <br>
                 <div class="form-group">

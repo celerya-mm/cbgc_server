@@ -55,7 +55,7 @@ class CertificateCons(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
@@ -67,7 +67,7 @@ class CertificateCons(db.Model):
                  sale_type=None, sale_quantity=None, sale_rest=None,
                  head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  invoice_nr=None, invoice_date=None, invoice_status=None,
-                 events=None, note_certificate=None, note=None, updated_at=datetime.now()):
+                 events=None, note_certificate=None, note=None):
 
         from ..utilitys.functions import year_extract, str_to_date
 
@@ -104,7 +104,7 @@ class CertificateCons(db.Model):
         self.note = note
 
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
@@ -138,6 +138,6 @@ class CertificateCons(db.Model):
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

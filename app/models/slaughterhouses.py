@@ -30,7 +30,7 @@ class Slaughterhouse(db.Model):
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse')
     events = db.relationship('EventDB', backref='slaughterhouse')
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
@@ -38,9 +38,9 @@ class Slaughterhouse(db.Model):
 
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
                  affiliation_start_date, affiliation_status, note_certificate, note, affiliation_end_date=None,
-                 head=None, cons_cert=None, events=None, updated_at=datetime.now()):
+                 head=None, cons_cert=None, events=None):
 
-        from ..utilitys.functions import address_mount, str_to_date
+        from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.slaughterhouse = slaughterhouse
         self.slaughterhouse_code = slaughterhouse_code
@@ -55,7 +55,7 @@ class Slaughterhouse(db.Model):
 
         self.affiliation_start_date = str_to_date(affiliation_start_date)
         self.affiliation_end_date = str_to_date(affiliation_end_date)
-        self.affiliation_status = affiliation_status
+        self.affiliation_status = status_true_false(affiliation_status)
 
         self.head = head or []
         self.cons_cert = cons_cert or []
@@ -65,11 +65,11 @@ class Slaughterhouse(db.Model):
         self.note = note
 
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        from ..utilitys.functions import date_to_str, status_si_no
         return {
             'id': self.id,
             'slaughterhouse': self.slaughterhouse,
@@ -85,11 +85,11 @@ class Slaughterhouse(db.Model):
 
             'affiliation_start_date': date_to_str(self.affiliation_start_date),
             'affiliation_end_date': date_to_str(self.affiliation_end_date),
-            'affiliation_status': self.affiliation_status,
+            'affiliation_status': status_si_no(self.affiliation_status),
 
             'note_certificate': self.note_certificate,
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

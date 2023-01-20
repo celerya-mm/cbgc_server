@@ -5,6 +5,7 @@ from ..app import db
 
 # importazioni per relazioni "backref"
 from .events_db import EventDB  # noqa
+from ..utilitys.functions import str_to_date
 
 
 class CertificateDna(db.Model):
@@ -26,14 +27,13 @@ class CertificateDna(db.Model):
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=False)
+    created_at = db.Column(db.DateTime, index=False, nullable=True)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
         return '<DNA Certificate: {}>'.format(self.dna_cert_nr)
 
-    def __init__(self, dna_cert_id, dna_cert_date, head_id, farmer_id, dna_cert_nr=None, events=None, note=None,
-                 updated_at=datetime.now()):
+    def __init__(self, dna_cert_id, dna_cert_date, head_id, farmer_id, dna_cert_nr=None, events=None, note=None):
 
         from ..utilitys.functions import year_extract
 
@@ -49,7 +49,7 @@ class CertificateDna(db.Model):
 
         self.note = note
         self.created_at = datetime.now()
-        self.updated_at = updated_at
+        self.updated_at = datetime.now()
 
     def to_dict(self):
         """Esporta in un dict la classe."""
@@ -67,6 +67,6 @@ class CertificateDna(db.Model):
 
             'note': self.note,
 
-            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S"),
-            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
+            'updated_at': date_to_str(self.updated_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

@@ -4,12 +4,10 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from app.app import db
-
-from app.models.slaughterhouses import Slaughterhouse
-from app.forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterhouseUpdate
-from app.forms.forms import FormAffiliationChange
-from app.utilitys.functions import event_create, token_admin_validate, url_to_json
+from ..app import db
+from ..forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterhouseUpdate
+from ..models.slaughterhouses import Slaughterhouse
+from ..utilitys.functions import event_create, token_admin_validate, str_to_date, status_si_no
 
 
 @token_admin_validate
@@ -29,11 +27,7 @@ def slaughterhouse_create():
     form = FormSlaughterhouseCreate()
     if form.validate_on_submit():
         form_data = json.loads(json.dumps(request.form))
-        print("SLAUGHT_FORM_DATA", json.dumps(form_data, indent=2))
-        if form_data["affiliation_status"] == "NO":
-            form_data["affiliation_status"] = False
-        else:
-            form_data["affiliation_status"] = True
+        # print("SLAUGHT_FORM_DATA", json.dumps(form_data, indent=2))
 
         new_slaughterhouse = Slaughterhouse(
             slaughterhouse=form_data["slaughterhouse"].strip(),
@@ -50,7 +44,8 @@ def slaughterhouse_create():
             affiliation_status=form_data["affiliation_status"],
 
             note_certificate=form_data["note_certificate"],
-            note=form_data["note"]
+            note=form_data["note"],
+            # created_at=datetime.now()
         )
         try:
             db.session.add(new_slaughterhouse)
@@ -66,71 +61,47 @@ def slaughterhouse_create():
 
 
 @token_admin_validate
-@app.route("/slaughterhouse_view_history/<data>", methods=["GET", "POST"])
-def slaughterhouse_view_history(data):
+@app.route("/slaughterhouse_view_history/<_id>", methods=["GET", "POST"])
+def slaughterhouse_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Elaboro i dati ricevuti
-    data = url_to_json(data)
-    print("SLAUGHT_DATA_PASS:", json.dumps(data, indent=2))
-
-    # Estraggo l' ID dell'allevatore corrente
-    session["slaughterhouse"] = data["id"]
-
     # Interrogo il DB
-    slaughterhouse = Slaughterhouse.query.filter_by(id=data["id"]).first()
+    slaughterhouse = Slaughterhouse.query.filter_by(id=_id).first()
     _slaughterhouse = slaughterhouse.to_dict()
 
     # Estraggo la storia delle modifiche per l'utente
-    history_list = slaughterhouse.event
+    history_list = slaughterhouse.events
     history_list = [history.to_dict() for history in history_list]
-    print("HISTORY_EVENTS:", json.dumps(history_list, indent=2))
-    return render_template("slaughterhouse/slaughterhouse_view_history.html",
-                           form=_slaughterhouse, history_list=history_list)
+    return render_template(
+        "slaughterhouse/slaughterhouse_view_history.html", form=_slaughterhouse, history_list=history_list)
 
 
 @token_admin_validate
-@app.route("/slaughterhouse_update/<data>", methods=["GET", "POST"])
-def slaughterhouse_update(data):
+@app.route("/slaughterhouse_update/<_id>", methods=["GET", "POST"])
+def slaughterhouse_update(_id):
     """Aggiorna dati Allevatore."""
     form = FormSlaughterhouseUpdate()
     if form.validate_on_submit():
         # recupero i dati e li converto in dict
-        form_data = json.loads(json.dumps(request.form))
-        # print("FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+        # form_data = json.loads(json.dumps(request.form))
+        new_data = FormSlaughterhouseUpdate(request.form)
+        new_data = new_data.to_db()
+        # print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
-        _id = session["slaughterhouse_id"]
-        # print("SLAUGH_ID:", _id)
         slaughterhouse = Slaughterhouse.query.get(_id)
         previous_data = slaughterhouse.to_dict()
         # print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-        slaughterhouse.slaughterhouse = form_data["slaughterhouse"].strip()
-        slaughterhouse.farmer_name = form_data["slaughterhouse_code"].strip()
-
-        slaughterhouse.email = form_data["email"].strip()
-        slaughterhouse.phone = form_data["phone"].strip()
-
-        slaughterhouse.address = form_data["address"].strip()
-        slaughterhouse.cap = form_data["cap"].strip()
-        slaughterhouse.city = form_data["city"].strip()
-
-        if form_data["affiliation_start_date"]:
-            slaughterhouse.affiliation_start_date = form_data["affiliation_start_date"]
-
-        if form_data["note_certificate"]:
-            slaughterhouse.note_certificate = form_data["note_certificate"].strip()
-        if form_data["note"]:
-            slaughterhouse.note = form_data["note"].strip()
-
-        print("SLAUGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
-
+        new_data["created_at"] = slaughterhouse.created_at
+        new_data["updated_at"] = datetime.now()
+        # print("SLAUGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
         try:
+            db.session.query(Slaughterhouse).filter_by(id=_id).update(new_data)
             db.session.commit()
             flash("MACELLO aggiornato correttamente.")
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
-            return render_template("slaughterhouse/slaughterhouse_update.html", form=form)
+            return render_template("slaughterhouse/slaughterhouse_update.html", form=form, id=_id)
 
         _event = {
             "username": session["username"],
@@ -139,102 +110,36 @@ def slaughterhouse_update(data):
         }
         # print("SLAUGH_EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, slaughterhouse_id=_id):
-            return redirect(url_for('slaughterhouse_view_history', data=slaughterhouse.to_dict()))
+            return redirect(url_for('slaughterhouse_view_history', _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('slaughterhouse_view'))
+            return redirect(url_for('slaughterhouse_view_history', _id=_id))
     else:
-        # recupero i dati e li converto in dict
-        data = url_to_json(data)
-        # print("FARM_DATA_PASS:", json.dumps(data, indent=2))
+        # recupero i dati del record
+        slaughterhouse = Slaughterhouse.query.get(int(_id))
+        # print("SLAUGHT_FIND:", slaughterhouse, type(slaughterhouse))
 
-        session["slaughterhouse_id"] = data["id"]
+        form.slaughterhouse.data = slaughterhouse.slaughterhouse
+        form.slaughterhouse_code.data = slaughterhouse.slaughterhouse_code
 
-        form.slaughterhouse.data = data["slaughterhouse"]
-        form.slaughterhouse_code.data = data["slaughterhouse_code"]
-        
-        form.email.data = data["email"]
-        form.phone.data = data["phone"]
+        form.email.data = slaughterhouse.email
+        form.phone.data = slaughterhouse.phone
 
-        form.address.data = data["address"]
-        form.cap.data = data["cap"]
-        form.city.data = data["city"]
+        form.address.data = slaughterhouse.address
+        form.cap.data = slaughterhouse.cap
+        form.city.data = slaughterhouse.city
 
-        if "affiliation_start_date" in data.keys() and data["affiliation_start_date"] not in ["", None]:
-            form.affiliation_start_date.data = datetime.strptime(data["affiliation_start_date"], '%Y-%m-%d')
+        form.affiliation_start_date.data = str_to_date(slaughterhouse.affiliation_start_date)
+        form.affiliation_end_date.data = str_to_date(slaughterhouse.affiliation_end_date)
+        form.affiliation_status.data = status_si_no(slaughterhouse.affiliation_status)
 
-        if "note_certificate" in data.keys() and data["note_certificate"] not in ["", None]:
-            form.note_certificate.data = data["note_certificate"]
+        form.note_certificate.data = slaughterhouse.note_certificate
+        form.note.data = slaughterhouse.note
 
-        form.note.data = data["note"]
-
-        status = data["affiliation_status"]
-
-        if data["affiliation_end_date"]:
-            end_date = data["affiliation_end_date"]
-        else:
-            end_date = "vuoto"
-
-        return render_template("slaughterhouse/slaughterhouse_update.html", form=form, status=status, end_date=end_date)
-
-
-@token_admin_validate
-@app.route("/slaughterhouse_affiliation_change/<data>", methods=["GET", "POST"])
-def slaughterhouse_affiliation_change(data):
-    """Aggiorna dati Allevatore."""
-    form = FormAffiliationChange()
-    if form.validate_on_submit():
-        # recupero i dati e li converto in dict
-        form_data = json.loads(json.dumps(request.form))
-        # print("SLAGH_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
-
-        slaughterhouse = Slaughterhouse.query.filter_by(slaughterhouse=session["slaughterhouse"]).first()
-        previous_data = slaughterhouse.to_dict()
-        # print("SLAGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-
-        if form_data["affiliation_status"] in ["SI", True]:
-            slaughterhouse.affiliation_status = True
-        else:
-            slaughterhouse.affiliation_status = False
-
-        slaughterhouse.affiliation_start_date = form_data["affiliation_start_date"]
-        slaughterhouse.affiliation_end_date = form_data["affiliation_end_date"]
-
-        print("SLAGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
-
-        try:
-            db.session.commit()
-            flash("MACELLO aggiornato correttamente.")
-        except IntegrityError as err:
-            db.session.rollback()
-            flash(f"ERRORE: {str(err.orig)}")
-            return render_template("slaughterhouse/slaughterhouse_affiliation_change.html", form=slaughterhouse.to_dict())
-
-        _event = {
-            "username": session["username"],
-            "Modification": f"Update Macello whit id: {slaughterhouse.id}",
-            "Previous_data": previous_data
+        _info = {
+            'created_at': slaughterhouse.created_at,
+            'updated_at': slaughterhouse.updated_at,
         }
-        # print("EVENT:", json.dumps(_event, indent=2))
-        if event_create(_event, slaughterhouse_id=slaughterhouse.id):
-            return redirect(url_for('slaughterhouse_view_history', data=slaughterhouse.to_dict()))
-        else:
-            flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('slaughterhouse_view'))
-    else:
-        # recupero i dati e li converto in dict
-        # print("FARM_DATA_FROM_HTML:", data, "TYPE:", type(data))
-
-        # data = data.to_dict()
-        val_date = {
-            1: "affiliation_start_date",
-            2: "affiliation_end_date"
-        }
-
-        data = url_to_json(data, val_date)
-        print("FARM_DATA_PASS_DICT:", json.dumps(data, indent=2))
-
-        form.name.data = data["slaughterhouse"]
-        session["slaughterhouse"] = data["slaughterhouse"]
-
-        return render_template("slaughterhouse/slaughterhouse_affiliation_change.html", form=form)
+        # print("SLAUGHT_:", form)
+        # print("SLAUGHT_FORM:", json.dumps(form.to_dict(form), indent=2))
+        return render_template("slaughterhouse/slaughterhouse_update.html", form=form, id=_id, info=_info)

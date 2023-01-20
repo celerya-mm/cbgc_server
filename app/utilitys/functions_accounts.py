@@ -1,6 +1,5 @@
-from uuid import uuid4
-from datetime import datetime, timedelta
 import hashlib
+from uuid import uuid4
 
 from email_validator import validate_email, EmailNotValidError
 from password_strength import PasswordPolicy
@@ -18,24 +17,14 @@ def __generate_auth_token():
 
 def __save_auth_token(admin_id, user_id, token):
     """Salvo il token nel DB."""
-    if admin_id in [""]:
+    if admin_id in ["", None]:
         admin_id = None
-    if user_id in [""]:
+    if user_id in ["", None]:
         user_id = None
 
-    EXPIRATION = datetime.now() + timedelta(days=1)
-    EXPIRATION = EXPIRATION.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    auth_token = AuthToken(
-        admin_id=admin_id,
-        user_id=user_id,
-        token=token,
-        expires_at=EXPIRATION
-    )
-
+    auth_token = AuthToken(admin_id=admin_id, user_id=user_id, token=token)
     db.session.add(auth_token)
     db.session.commit()
-
     return auth_token
 
 

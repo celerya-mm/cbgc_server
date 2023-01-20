@@ -4,7 +4,8 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('farmer_view') }}" title="Annulla">
+            <a class="btn btn-update" type="button" title="Annulla"
+               href="{{ url_for('farmer_view_history', _id=id) }}" >
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
             Modifica ALLEVATORE [ {{ id }} ]:
@@ -13,19 +14,10 @@
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
-                    Stato Affiliazione
-                    {% if status == True %}
-                       <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {% if status != True %}
-                        {% if end_date == "vuoto" or end_date == None %}
+                    {% if form.affiliation_status != True %}
+                        {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == None %}
                             <span class="text-danger">
-                                ATTENZIONE: manca la data di cessazione affiliazione.
-                                Per inserirla esegui la procedura per il cambio dello stato affiliazione.</span>
+                                ATTENZIONE: manca la data di cessazione affiliazione.</span>
                         {% endif %}
                     {% endif %}
                 </div>
@@ -41,7 +33,18 @@
                     {% endif %}
                 </div>
                 <div class="row no-gutters justify-content-center">
-                    <div class="col-md-4 order-first">
+                    <div class="col-md-6 order-first">
+                        <br>
+                        <div class="form-group">
+                            {{ form.stable_code.label }}
+                            {{ form.stable_code(class="form-control") }}
+                            {% if form.stable_code.errors %}
+                                {% for error in form.stable_code.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
                         <br>
                         <div class="form-group">
                             {{ form.address.label }}
@@ -76,9 +79,6 @@
                             {% endif %}
                         </div>
                         <br>
-                    </div>
-                    <div class="col-md-4 order-second">
-                        <br>
                         <div class="form-group">
                             {{ form.email.label }}
                             {{ form.email(class="form-control") }}
@@ -101,18 +101,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4 order-third">
-                        <br>
-                        <div class="form-group">
-                            {{ form.stable_code.label }}
-                            {{ form.stable_code(class="form-control") }}
-                            {% if form.stable_code.errors %}
-                                {% for error in form.stable_code.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                    <div class="col-md-6 order-third">
                         <br>
                         <div class="form-group">
                             {{ form.stable_type.label }}
@@ -147,10 +136,44 @@
                             {% endif %}
                         </div>
                         <br>
+                        <div class="form-group">
+                            {{ form.affiliation_start_date.label }}
+                            {{ form.affiliation_start_date(class="form-control") }}
+                            {% if form.affiliation_start_date.errors %}
+                                {% for error in form.affiliation_start_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.affiliation_end_date.label }}
+                            {{ form.affiliation_end_date(class="form-control") }}
+                            {% if form.affiliation_end_date.errors %}
+                                {% for error in form.affiliation_end_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.affiliation_status.label }}
+                            {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
+                            {% if form.affiliation_status.errors %}
+                                {% for error in form.affiliation_status.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
+                <br>
                 <div class="form-group">
                     {{ form.note_certificate.label }}
+                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                     {{ form.note_certificate(class="form-control") }}
                     {% if form.note_certificate.errors %}
                         {% for error in form.note_certificate.errors %}
@@ -158,8 +181,8 @@
                             <br>
                         {% endfor %}
                     {% endif %}
-                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                 </div>
+                <br>
                 <div class="form-group">
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
@@ -178,6 +201,10 @@
                 <br>
             </form>
         </div>
+        <hr>
+        <p class="info">Data Creazione: {{ info.created_at }}</p>
+        <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
+        <hr>
     </div>
 </div>
 {% endblock %}

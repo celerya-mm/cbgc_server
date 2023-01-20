@@ -6,7 +6,8 @@
         <div class="row no-gutters justify-content-center">
             <div class="col-md-14">
                 <h2 class="card-title" style="padding: 20px;">
-                    <a class="btn btn-update" type="button" title="Crea nuovo Utente" href="{{ url_for('user_create') }}">
+                    <a class="btn btn-update" type="button" title="Crea nuovo Utente"
+                       href="{{ url_for('user_create') }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco UTENTI SERVIZIO:</h2>
@@ -51,14 +52,14 @@
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Modifica utente"
-                                   href="{{ url_for('user_update', data=row) }}">
+                                   href="{{ url_for('user_update', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Visualizza utente"
-                                   href="{{ url_for('user_view_history', data=row) }}">
+                                   href="{{ url_for('user_view_history', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>

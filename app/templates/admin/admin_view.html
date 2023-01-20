@@ -10,15 +10,15 @@
             </a>
             Bentornatə "{{admin.name}}"
         </h5>
-        <a class="btn-update" type="button" title="Modifica utente" href="{{ url_for('admin_update', data=admin) }}">
+        <a class="btn-update" type="button" title="Modifica utente" href="{{ url_for('admin_update', _id=admin.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
         </a>
         <a class="btn-update" type="button" title="Cambia password utente"
-           href="{{ url_for('admin_update_password') }}">
+           href="{{ url_for('admin_update_password', _id=admin.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_grey.svg') }}" alt=""/>
         </a>
         <a class="btn-update" type="button" title="Visualizza storia modifiche al record"
-           href="{{ url_for('admin_view_history', data=admin) }}">
+           href="{{ url_for('admin_view_history', _id=admin.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/history_grey.svg') }}" alt=""/>
         </a>
     </div>
@@ -54,7 +54,8 @@
     <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
         <div class="row no-gutters justify-content-center">
             <div class="col-md-14">
-                <h2 class="card-title" style="padding: 20px;">Elenco Amministratori:</h2>
+                <h2 class="card-title" style="padding: 20px;">
+                    Elenco Amministratori:</h2>
                 <div>
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
@@ -96,14 +97,14 @@
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Modifica utente"
-                                   href="{{ url_for('admin_update', data=row) }}">
+                                   href="{{ url_for('admin_update', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
                             <td style="width: 20px;">
                                 <a class="btn-table" type="button" title="Visualizza utente"
-                                   href="{{ url_for('admin_view_history', data=row) }}">
+                                   href="{{ url_for('admin_view_history', _id=row.id) }}">
                                     <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>

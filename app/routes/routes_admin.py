@@ -5,11 +5,11 @@ from flask import current_app as app, flash, redirect, render_template, session,
 from sqlalchemy.exc import IntegrityError
 
 from ..app import db
-from ..forms.forms import FormPswChange
 from ..forms.form_account import FormAccountUpdate, FormAdminSignup
+from ..forms.forms import FormPswChange
 from ..models.accounts import Administrator
-from ..utilitys.functions import event_create, token_admin_validate, url_to_json
-from ..utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
+from ..utilitys.functions import event_create, token_admin_validate
+from ..utilitys.functions_accounts import psw_contain_usr, psw_verify, psw_hash
 
 
 @token_admin_validate
@@ -25,7 +25,6 @@ def admin_view():
         # Estraggo la lista degli utenti amministratori
         _list = Administrator.query.all()
         _list = [r.to_dict() for r in _list]
-
         return render_template("admin/admin_view.html", admin=_admin, form=_list)
     else:
         flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
@@ -55,55 +54,38 @@ def admin_create():
             flash(message)
             return render_template("admin/admin_create.html", form=form)
 
-        # print("SESSION_ADMIN:", _admin["id"])
-        valid_email = is_valid_email(form_data["email"])
-        if valid_email:
-            new_admin = Administrator(
-                username=form_data["username"].replace(" ", ""),
-                name=form_data["name"].strip(),
-                last_name=form_data["last_name"].strip(),
-                email=form_data["email"].strip(),
-                phone=form_data["phone"].strip(),
-                password=psw_hash(form_data["new_password_1"].replace(" ", "")),
-                note=form_data["note"].strip()
-            )
-            try:
-                db.session.add(new_admin)
-                db.session.commit()
-                flash("Utente amministratore creato correttamente.")
-                return redirect(url_for('admin_view'))
-            except IntegrityError as err:
-                db.session.rollback()
-                flash(f"ERRORE: {str(err.orig)}")
-                return render_template("admin/admin_create.html", form=form)
-        else:
-            form.username.data = form_data["username"]
-            form.email.data = form_data["email"]
-            form.name.data = form_data["name"]
-            form.last_name.data = form_data["last_name"]
-            form.note.data = form_data["note"]
-
-            flash("ERRORE: la email inserita non è valida.")
+        new_admin = Administrator(
+            username=form_data["username"].replace(" ", ""),
+            name=form_data["name"].strip(),
+            last_name=form_data["last_name"].strip(),
+            email=form_data["email"].strip(),
+            phone=form_data["phone"].strip(),
+            password=psw_hash(form_data["new_password_1"].replace(" ", "")),
+            note=form_data["note"].strip(),
+        )
+        try:
+            db.session.add(new_admin)
+            db.session.commit()
+            flash("Utente amministratore creato correttamente.")
+            return redirect(url_for('admin_view'))
+        except IntegrityError as err:
+            db.session.rollback()
+            flash(f"ERRORE: {str(err.orig)}")
             return render_template("admin/admin_create.html", form=form)
     else:
         return render_template("admin/admin_create.html", form=form)
 
 
 @token_admin_validate
-@app.route("/admin_view_history/<data>", methods=["GET", "POST"])
-def admin_view_history(data):
+@app.route("/admin_view_history/<_id>", methods=["GET", "POST"])
+def admin_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Elaboro i dati ricevuti
-    data = url_to_json(data)
-    print("DATA_PASS:", json.dumps(data, indent=2))
-
     # Estraggo l'ID dell'utente amministratore corrente
-    session["id_admin"] = data["id"]
+    session["id_admin"] = _id
 
     # Interrogo il DB
-    admin = Administrator.query.filter_by(username=data["username"]).first()
+    admin = Administrator.query.get(_id)
     _admin = admin.to_dict()
-    session["admin"] = _admin
 
     # Estraggo la storia delle modifiche per l'utente
     history_list = admin.events
@@ -112,81 +94,66 @@ def admin_view_history(data):
 
 
 @token_admin_validate
-@app.route("/admin_update/<data>", methods=["GET", "POST"])
-def admin_update(data):
+@app.route("/admin_update/<_id>", methods=["GET", "POST"])
+def admin_update(_id):
     """Aggiorna Utente Amministratore."""
     form = FormAccountUpdate()
     if form.validate_on_submit():
-        form_data = json.loads(json.dumps(request.form))
+        new_data = json.loads(json.dumps(request.form))
+        new_data = new_data.to_db()
         # print("FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-        _id = session["id_admin"]
-        # print("ADMIN_ID:", _admin, "TYPE:", type(_admin))
-        valid_email = is_valid_email(form_data["email"])
-        if valid_email:
-            administrator = Administrator.query.get(_id)
-            previous_data = administrator.to_dict()
-            # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+        administrator = Administrator.query.get(_id)
+        previous_data = administrator.to_dict()
+        # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-            administrator.username = form_data["username"].replace(" ", "")
-            administrator.name = form_data["name"].strip()
-            administrator.last_name = form_data["last_name"].strip()
-            administrator.email = form_data["email"].strip()
-            administrator.phone = form_data["phone"].strip()
-            administrator.note = form_data["note"].strip()
+        new_data["created_at"] = administrator.created_at
+        new_data["updated_at"] = datetime.now()
+        # print("DATA:", json.dumps(administrator.to_dict(), indent=2))
+        try:
+            db.session.query(Administrator).filter_by(id=_id).update(new_data)
+            db.session.commit()
+            flash("UTENTE aggiornato correttamente.")
+        except IntegrityError as err:
+            db.session.rollback()
+            flash(f"ERRORE: {str(err.orig)}")
+            return render_template("admin/admin_update.html", form=form, id=_id)
 
-            # print("DATA:", json.dumps(administrator.to_dict(), indent=2))
-            try:
-                db.session.commit()
-                flash("UTENTE aggiornato correttamente.")
-            except IntegrityError as err:
-                db.session.rollback()
-                flash(f"ERRORE: {str(err.orig)}")
-                return render_template("admin/admin_update.html", form=form)
-
-            _event = {
-                "username": session["username"],
-                "Modification": f"Update account Administrator whit id: {_id}",
-                "Previous_data": previous_data
-            }
-            if event_create(_event, admin_id=_id):
-                return redirect(url_for('admin_view_history', data=administrator.to_dict()))
-            else:
-                flash("ERRORE creazione evento. Ma il record è stato modificato correttamente.")
-                return redirect(url_for('admin_view'))
+        _event = {
+            "username": session["username"],
+            "Modification": f"Update account Administrator whit id: {_id}",
+            "Previous_data": previous_data
+        }
+        if event_create(_event, admin_id=_id):
+            return redirect(url_for('admin_view_history', _id=_id))
         else:
-            form.username.data = form_data["username"]
-            form.name.data = form_data["name"]
-            form.last_name.data = form_data["last_name"]
-            form.email.data = form_data["email"]
-            form.phone.data = form_data["phone"]
-            form.note.data = form_data["note"]
+            flash("ERRORE creazione evento. Ma il record è stato modificato correttamente.")
+            return redirect(url_for('admin_view_history', _id=_id))
 
-            flash("ERRORE: la email inserita non è valida.")
-            return render_template("admin/admin_update.html", form=form)
     else:
-        form = FormAccountUpdate()
-        # recupero i dati e li converto in dict
-        data = url_to_json(data)
-        print("DATA_PASS:", json.dumps(data, indent=2))
+        # recupero i dati
+        admin = Administrator.query.get(_id)
+        # print("ADMIN:", admin)
+        # print("ADMIN_FIND:", json.dumps(admin.to_dict(), indent=2))
 
-        session["id_admin"] = data["id"]
+        form.username.data = admin.username
+        form.name.data = admin.name
+        form.last_name.data = admin.last_name
+        form.email.data = admin.email
+        form.phone.data = admin.phone
+        form.note.data = admin.note
 
-        form.username.data = data["username"]
-        form.email.data = data["email"]
-        form.name.data = data["name"]
-        form.last_name.data = data["last_name"]
-        form.email.data = data["email"]
-        form.phone.data = data["phone"]
-        form.note.data = data["note"]
-
-        print(form.username.data)
-        return render_template("admin/admin_update.html", form=form)
+        _info = {
+            'created_at': admin.created_at,
+            'updated_at': admin.updated_at,
+        }
+        # print("ADMIN_UPDATE:", json.dumps(form.to_dict(form), indent=2))
+        return render_template("admin/admin_update.html", form=form, id=_id, info=_info)
 
 
 @token_admin_validate
-@app.route("/admin_update_password/", methods=["GET", "POST"])
-def admin_update_password():
+@app.route("/admin_update_password/<_id>", methods=["GET", "POST"])
+def admin_update_password(_id):
     """Aggiorna password Utente Amministratore."""
     form = FormPswChange()
     if form.validate_on_submit():
@@ -207,32 +174,33 @@ def admin_update_password():
             flash(message)
             return render_template("admin/admin_update_password.html", form=form)
 
-        old_password = psw_hash(form_data["old_password"])
+        old_password = psw_hash(form_data["old_password"].replace(" ", "").strip())
         # print("OLD:", old_password)
-        new_password = psw_hash(form_data["new_password_1"].replace(" ", ""))
+        new_password = psw_hash(form_data["new_password_1"].replace(" ", "").strip())
         # print("NEW:", new_password)
-        administrator = Administrator.query.get(_admin["id"])
+
+        administrator = Administrator.query.get(_id)
+
         if new_password == administrator.password:
             flash("The 'New Password' inserted is equal to 'Registered Password'.")
-            return render_template("admin/admin_update_password.html", form=form)
+            return render_template("admin/admin_update_password.html", form=form, id=_id)
         elif old_password != administrator.password:
             flash("The 'Current Passwort' inserted does not match the 'Registered Password'.")
-            return render_template("admin/admin_update_password.html", form=form)
+            return render_template("admin/admin_update_password.html", form=form, id=_id)
         else:
             administrator.password = new_password
             administrator.updated_at = datetime.now()
 
             db.session.commit()
-            flash("PASSWORD aggiornata correttamente!")
-
+            flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
             _event = {
-                "User": session["username"],
-                "Modification": "Change Password"
+                "User ID": _id,
+                "Modification": "Password changed"
             }
-            if event_create(_event, admin_id=_admin["id"]):
-                return redirect(url_for('admin_view'))
+            if event_create(_event, admin_id=_id):
+                return redirect(url_for('logout'))
             else:
                 flash("ERRORE creazione evento DB. Ma la password è stata modificata correttamente.")
-                return redirect(url_for('admin/admin_view'))
+                return redirect(url_for('logout'))
     else:
-        return render_template("admin/admin_update_password.html", form=form)
+        return render_template("admin/admin_update_password.html", form=form, id=_id)

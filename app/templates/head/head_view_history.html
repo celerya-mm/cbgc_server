@@ -11,7 +11,7 @@
             Dati CAPO [ {{ form.id }} ]:
         </h5>
         <a class="btn btn-update" type="button" title="Modifica Capo"
-           href="{{ url_for('head_update', data=form.id) }}">
+           href="{{ url_for('head_update', _id=form.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
         </a>
     </div>
@@ -126,6 +126,10 @@
                 </div>
             </div>
         </div>
+        <hr>
+        <p class="info">Data Creazione: {{ form.created_at }}</p>
+        <p class="info">Ultima modifica: {{ form.updated_at }}</p>
+        <hr>
     </div>
 </form>
 {% endblock %}

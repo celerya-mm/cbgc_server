@@ -42,6 +42,8 @@ class EventDB(db.Model):
         self.created_at = datetime.now()
 
     def to_dict(self):
+        """Esporta in un dict la classe."""
+        from ..utilitys.functions import date_to_str
         return {
             'id': self.id,
             'event': self.event,
@@ -55,5 +57,5 @@ class EventDB(db.Model):
             'cert_cons_id': self.cert_cons_id,
             'cert_dna_id': self.cert_dna_id,
 
-            'created_at': datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S"),
+            'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),
         }

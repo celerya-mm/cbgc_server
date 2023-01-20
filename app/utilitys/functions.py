@@ -1,10 +1,10 @@
 import json
 from datetime import datetime, date
 from functools import wraps
-from jinja2.utils import htmlsafe_json_dumps
 
 import requests
 from flask import flash, session, url_for, redirect
+from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -76,6 +76,7 @@ def token_user_validate(_token):
 
 def token_admin_validate(func):
     """Eseguo la funzione solo se presente token autenticazione valido."""
+
     @wraps(func)
     def wrap(*args, **kwargs):
         if "token_login" in session.keys() or session["token_login"]:
@@ -99,6 +100,7 @@ def token_admin_validate(func):
         else:
             flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
             return redirect(url_for('logout'))
+
     return wrap
 
 
@@ -170,19 +172,18 @@ def mount_full_name(name, last_name):
 
 def year_extract(date):  # noqa
     """Estrae l'anno da una data"""
-    if date:
-        print("TYPE_DATA", type(date))
+    if isinstance(date, str):
         year = datetime.strptime(date, "%Y-%m-%d")
         return year.year
     else:
-        return None
+        return date.year
 
 
 def str_to_date(_str, _form="%Y-%m-%d"):
     """Converte una stringa in datetime."""
     if _str not in [None, "None", "nan", ""] and isinstance(_str, str):
         return datetime.strptime(_str, _form)
-    elif isinstance(_str, datetime) or isinstance(_str, date):
+    elif isinstance(_str, datetime) or isinstance(_str, date) and _str not in ["", None]:
         return _str
     else:
         return None
@@ -190,15 +191,36 @@ def str_to_date(_str, _form="%Y-%m-%d"):
 
 def date_to_str(_date, _form="%Y-%m-%d"):
     """Converte datetime in stringa."""
-    if _date not in [None, "None", "nan", ""] and not isinstance(_date, str):
+    if _date not in [None, "None", "nan", ""] and isinstance(_date, datetime) or isinstance(_date, date):
         return datetime.strftime(_date, _form)
-    else:
+    elif isinstance(_date, str) and date not in ["", None]:
         return _date
+    else:
+        return None
 
 
-def affiliation_status(_stat):
+def not_empty(_v):
+    """Verifica se il dato passato è vuoto o da non considerare."""
+    if _v in ["", "-", None]:
+        return None
+    else:
+        _v = _v.strip()
+        return _v
+
+
+def status_true_false(_stat):
     """Cambia valori SI, NO in True, False."""
     if _stat == "NO":
         return False
     else:
         return True
+
+
+def status_si_no(_str):
+    """Verifica se il dato passato contiene True o False e li converte in SI o NO."""
+    if _str in ["SI", "si", "NO", "no"]:
+        return _str
+    elif _str is True:
+        return "SI"
+    else:
+        return "NO"

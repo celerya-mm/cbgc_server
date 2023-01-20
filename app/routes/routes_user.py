@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, session, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -6,8 +7,9 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db
 from ..forms.form_account import FormAccountUpdate, FormUserSignup
 from ..models.accounts import User
-from ..utilitys.functions import event_create, token_admin_validate, url_to_json
-from ..utilitys.functions_accounts import is_valid_email, psw_contain_usr, psw_verify, psw_hash
+from ..models.buyers import Buyer
+from ..utilitys.functions import event_create, token_admin_validate
+from ..utilitys.functions_accounts import psw_contain_usr, psw_verify, psw_hash
 
 
 @token_admin_validate
@@ -41,57 +43,40 @@ def user_create():
             message = json.loads(json.dumps(contain_usr))
             flash(f"PASSWORD_CONTIENE_UTENTE:")
             flash(message)
-            return render_template("admin/admin_create.html", form=form)
+            return render_template("user/user_create.html", form=form)
 
-        # print("SESSION_ADMIN:", _admin["id"])
-        valid_email = is_valid_email(form_data["email"])
-        if valid_email:
-            new_user = User(
-                username=form_data["username"].replace(" ", ""),
-                name=form_data["name"].strip(),
-                last_name=form_data["last_name"].strip(),
-                email=form_data["email"].strip(),
-                phone=form_data["phone"].strip(),
-                password=psw_hash(form_data["new_password_1"].replace(" ", "")),
-                note=form_data["note"].strip(),
-            )
-            try:
-                db.session.add(new_user)
-                db.session.commit()
-                flash("UTENTE servizio creato correttamente.")
-                return redirect(url_for('admin_view'))
-            except IntegrityError as err:
-                db.session.rollback()
-                flash(f"ERRORE: {str(err.orig)}")
-                return render_template("user/user_create.html", form=form)
-        else:
-            form.username.data = form_data["username"]
-            form.email.data = form_data["email"]
-            form.name.data = form_data["name"]
-            form.last_name.data = form_data["last_name"]
-            form.note.data = form_data["note"]
-
-            flash("ERRORE: la email inserita non è valida.")
+        new_user = User(
+            username=form_data["username"].replace(" ", ""),
+            name=form_data["name"].strip(),
+            last_name=form_data["last_name"].strip(),
+            email=form_data["email"].strip(),
+            phone=form_data["phone"].strip(),
+            password=psw_hash(form_data["new_password_1"].replace(" ", "")),
+            note=form_data["note"].strip()
+        )
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash("UTENTE servizio creato correttamente.")
+            return redirect(url_for('user_view'))
+        except IntegrityError as err:
+            db.session.rollback()
+            flash(f"ERRORE: {str(err.orig)}")
             return render_template("user/user_create.html", form=form)
     else:
         return render_template("user/user_create.html", form=form)
 
 
 @token_admin_validate
-@app.route("/user_view_history/<data>", methods=["GET", "POST"])
-def user_view_history(data):
+@app.route("/user_view_history/<_id>", methods=["GET", "POST"])
+def user_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
-    # Elaboro i dati ricevuti
-    data = url_to_json(data)
-    print("USER_DATA_PASS:", json.dumps(data, indent=2))
-
     # Estraggo l' ID dell'utente corrente
-    session["id_user"] = data["id"]
+    session["id_user"] = _id
 
     # Interrogo il DB
-    user = User.query.filter_by(username=data["username"]).first()
+    user = User.query.get(_id)
     _user = user.to_dict()
-    session["user"] = _user
 
     # Estraggo la storia delle modifiche per l'utente
     history_list = user.events
@@ -100,73 +85,65 @@ def user_view_history(data):
 
 
 @token_admin_validate
-@app.route("/user_update/<data>", methods=["GET", "POST"])
-def user_update(data):
+@app.route("/user_update/<_id>", methods=["GET", "POST"])
+def user_update(_id):
     """Aggiorna dati Utente."""
     form = FormAccountUpdate()
     if form.validate_on_submit():
-        form_data = json.loads(json.dumps(request.form))
-        print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
-        _id = session["id_user"]
-        # print("USER_ID:", _id)
-        valid_email = is_valid_email(form_data["email"])
-        if valid_email:
-            user = User.query.get(_id)
-            previous_data = user.to_dict()
-            # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-            user.username = form_data["username"].replace(" ", "")
-            user.name = form_data["name"].strip()
-            user.last_name = form_data["last_name"].strip()
-            user.email = form_data["email"].strip()
-            user.phone = form_data["phone"].strip()
-            if form_data["note"] is None:
-                user.note = "Null"
-            else:
-                user.note = form_data["note"].strip()
+        new_data = json.loads(json.dumps(request.form))
+        new_data = new_data.to_db()
+        # print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-            # print("NEW_DATA:", json.dumps(user.to_dict(), indent=2))
-            try:
-                db.session.commit()
-                flash("UTENTE aggiornato correttamente.")
-            except IntegrityError as err:
-                db.session.rollback()
-                flash(f"ERRORE: {str(err.orig)}")
-                return render_template("user/user_update.html", form=form)
+        user = User.query.get(_id)
+        previous_data = user.to_dict()
+        # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-            _event = {
-                "username": session["username"],
-                "Modification": f"Update account User whit id: {_id}",
-                "Previous_data": previous_data
-            }
-            # print("EVENT:", json.dumps(_event, indent=2))
-            if event_create(_event, user_id=_id):
-                return redirect(url_for('user_view_history', data=user.to_dict()))
-            else:
-                flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-                return redirect(url_for('user_view'))
+        if new_data["buyer_id"] not in ["", "-", None]:
+            buyer = Buyer.query.filter_by(buyer_name=new_data["buyer_id"].split(" - ")[0]).first()
+            buyer_id = buyer.id
         else:
-            form.username.data = form_data["username"]
-            form.name.data = form_data["name"]
-            form.last_name.data = form_data["last_name"]
-            form.email.data = form_data["email"]
-            form.phone.data = form_data["phone"]
-            form.note.data = form_data["note"]
+            buyer_id = None
 
-            flash("ERRORE: la email inserita non è valida.")
-            return render_template("user/user_update.html", form=form)
+        new_data["buyer_id"] = buyer_id
+        new_data["created_at"] = user.created_at
+        new_data["updated_at"] = datetime.now()
+        # print("DATA:", json.dumps(administrator.to_dict(), indent=2))
+        try:
+            db.session.query(User).filter_by(id=_id).update(new_data)
+            db.session.commit()
+            flash("UTENTE aggiornato correttamente.")
+        except IntegrityError as err:
+            db.session.rollback()
+            flash(f"ERRORE: {str(err.orig)}")
+            return render_template("user/user_update.html", form=form, id=_id)
+
+        _event = {
+            "username": session["username"],
+            "Modification": f"Update account USER whit id: {_id}",
+            "Previous_data": previous_data
+        }
+        # print("EVENT:", json.dumps(_event, indent=2))
+        if event_create(_event, user_id=_id):
+            return redirect(url_for('user_view_history', _id=_id))
+        else:
+            flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+            return redirect(url_for('user_view_history', _id=_id))
     else:
-        # recupero i dati e li converto in dict
-        data = url_to_json(data)
-        # print("DATA_PASS:", json.dumps(data, indent=2))
-        session["id_user"] = data["id"]
+        # recupero i dati
+        user = User.query.get(_id)
+        # print("USER:", user)
+        # print("USER_FIND:", json.dumps(user.to_dict(), indent=2))
 
-        form.username.data = data["username"]
-        form.email.data = data["email"]
-        form.name.data = data["name"]
-        form.last_name.data = data["last_name"]
-        form.email.data = data["email"]
-        form.phone.data = data["phone"]
-        form.note.data = data["note"]
+        form.username.data = user.username
+        form.name.data = user.name
+        form.last_name.data = user.last_name
+        form.email.data = user.email
+        form.phone.data = user.phone
+        form.note.data = user.note
 
-        # print(form.username.data)
-        return render_template("user/user_update.html", form=form)
+        _info = {
+            'created_at': user.created_at,
+            'updated_at': user.updated_at,
+        }
+        # print("USER_UPDATE:", json.dumps(form.to_dict(form), indent=2))
+        return render_template("user/user_update.html", form=form, id=_id, info=_info)
