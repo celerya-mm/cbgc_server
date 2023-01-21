@@ -13,6 +13,12 @@
     padding: 20px;
 }
 
+.accordion-button {
+    color: #2B4692;
+    font-weight: bold;
+    height: 40px;
+}
+
 .active {
     color: #9BB5E8;
     fill: #9BB5E8;
@@ -54,9 +60,9 @@ body {
 .icon-table,
 .btn-table {
     background-color: transparent;
-    width: 18px;
-    height: 18px;
-    margin: 2px;
+    width: 16px;
+    height: 16px;
+    margin: 0px;
     background-position: center;
     align-items: center;
     vertical-align: middle;
@@ -119,6 +125,8 @@ checkbox {
 
 .dataTables_info {
     text-align: left;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.6rem;
 }
 
 .delete {
@@ -138,6 +146,15 @@ checkbox {
 .form-control {
     border-color: #DEDEDE;
     box-shadow: #9BB5E8;
+}
+
+.form-select {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+}
+
+.hidden {
+    color: transparent !important;
 }
 
 hr {
@@ -184,6 +201,11 @@ input,
     box-shadow: #9BB5E8;
     padding-left: 2px;
     text-align: center;
+}
+
+label {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
 }
 
 .message {
@@ -235,6 +257,11 @@ input,
     --bs-pagination-active-color: #DEDEDE;
     --bs-pagination-active-bg: #2B4692;
     --bs-pagination-active-border-color: #2B4692;
+    font-family: 'Inter', sans-serif;
+}
+
+.page-link {
+    font-size: 0.5rem !important;
 }
 
 .post-page-block {
@@ -247,7 +274,7 @@ input,
 
 .primary {
     color: #2B4692;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     width: auto;
 }
 
@@ -279,6 +306,11 @@ input,
     text-decoration: underline;
 }
 
+.rounded {
+    border: solid 0.9px #DEDEDE;
+    margin: 2px;
+}
+
 .select {
     border-radius: 5%;
     border: solid 1px #5B5A5B
@@ -286,7 +318,7 @@ input,
 
 .secondary {
     color: #5B5A5B;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     width: auto;
 }
 
@@ -303,9 +335,13 @@ input,
     font-size: 0.8rem;
 }
 
+th.sorting_asc,th.sorting_desc{
+    background:none;
+}
+
 .title {
     color: #ffffff;
-    font-size: 0.8rem;
+    font-size: 0.65rem;
 }
 
 

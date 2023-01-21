@@ -72,10 +72,10 @@ class FormBuyerUpdate(FlaskForm):
     buyer_name = StringField(
         'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
     )
-    buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Macello", "Ristorante"], default="Ristorante")
+    buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Macello", "Ristorante"])
 
     email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
+    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
 
     address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
     cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
@@ -85,7 +85,7 @@ class FormBuyerUpdate(FlaskForm):
     affiliation_end_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
     affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
 
-    user_id = SelectField("Utente Assegnato", choices=list_user(), default="-", validators=[Optional()])
+    user_id = SelectField("Utente Assegnato", choices=list_user(), validators=[Optional()])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255), Optional()])
     note = StringField('Note', validators=[Length(max=255), Optional()])

@@ -10,7 +10,7 @@
             </a>
             Modifica ACQUIRENTE [ {{ id }} ]:
         </h5>
-        <div class="col-md-12">
+        <div class="col-md-12 shadow rounded" style="border: solid 0.7px #ED6666 !important;">
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
@@ -149,6 +149,7 @@
                 <br>
                 <div class="form-group">
                     {{ form.note_certificate.label }}
+                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                     {{ form.note_certificate(class="form-control") }}
                     {% if form.note_certificate.errors %}
                     {% for error in form.note_certificate.errors %}
@@ -168,18 +169,15 @@
                     {% endfor %}
                     {% endif %}
                 </div>
-                <hr>
+                <br>
                 <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
                          alt=""/>
                 </button>
-                <br>
+                <p class="info">Data Creazione: {{ info.created_at }}</p>
+                <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
             </form>
         </div>
-        <hr>
-        <p class="info">Data Creazione: {{ info.created_at }}</p>
-        <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
-        <hr>
     </div>
 </div>
 {% endblock %}

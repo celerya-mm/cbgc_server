@@ -4,25 +4,25 @@
 <form enctype="multipart/form-data" method="POST">
     <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
         <div class="row no-gutters justify-content-center">
-            <div class="col-md-14">
+            <div class="col-md-12 shadow rounded">
                 <h2 class="card-title" style="padding: 20px;">
                     <a class="btn btn-update" type="button" title="Crea nuovo Capo" href="{{ url_for('head_create') }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco CAPI Consorzio:</h2>
-                <div>
+                <div class="table-responsive">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="h1" data-defaultsort="asc">ID</th>
-                            <th class="title" id="h2">Auricolare</th>
-                            <th class="title" id="h3">Allevatore</th>
-                            <th class="title" id="h4">Nato</th>
-                            <th class="title" id="h5">Castrato</th>
-                            <th class="title" id="h6">Conforme</th>
-                            <th class="title" id="h7">Venduto</th>
-                            <th class="title" id="h8"> </th>
-                            <th class="title" id="h9"> </th>
+                            <th class="title" id="h2" data-sortable="false"></th>
+                            <th class="title" id="h3">Auricolare</th>
+                            <th class="title" id="h4">Allevatore</th>
+                            <th class="title" id="h5">Nato</th>
+                            <th class="title" id="h6">Castrato</th>
+                            <th class="title" id="h7">Conf.</th>
+                            <th class="title" id="h8">Venduto</th>
+                            <th class="title" id="h9" data-sortable="false"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -30,6 +30,14 @@
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.id|e }}
+                            </td>
+                            <td style="width: 20px; padding:2px;">
+                                <a class="btn-table" type="button" title="Visualizza Capo"
+                                   href="{{ url_for('head_view_history', _id=row.id) }}">
+                                    <img class="icon-table"
+                                         src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
+                                         alt=""/>
+                                </a>
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.headset|e }}
@@ -43,28 +51,22 @@
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.castration_date|e }}
                             </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.castration_compliance|e }}
+                            <td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {% if row.castration_compliance == True %}
-                                    <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
+                                <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
                                 {% else %}
-                                    <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
+                                <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
                                 {% endif %}
+                                {{ row.castration_compliance|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.sale_date|e }}
                             </td>
-                            <td style="width: 20px;">
+                            <td style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Modifica Capo"
                                    href="{{ url_for('head_update', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
-                                         alt=""/>
-                                </a>
-                            </td>
-                            <td style="width: 20px;">
-                                <a class="btn-table" type="button" title="Visualizza Capo"
-                                   href="{{ url_for('head_view_history', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
+                                    <img class="icon-table"
+                                         src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
@@ -73,6 +75,7 @@
                         </tbody>
                     </table>
                 </div>
+                <br>
             </div>
         </div>
     </div>
@@ -99,6 +102,7 @@
             }
         });
     });
+
 
 </script>
 {% endblock %}

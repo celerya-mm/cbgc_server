@@ -27,7 +27,7 @@ class CertificateCons(db.Model):
     certificate_date = db.Column(db.DateTime, index=False, nullable=False)
     certificate_year = db.Column(db.Integer, index=False, nullable=False)
 
-    certificate_nr = db.Column(db.String(50), index=False, unique=True, nullable=False)
+    certificate_nr = db.Column(db.String(50), primary_key=True, index=False, unique=True, nullable=False)
 
     certificate_pdf = db.Column(db.LargeBinary, index=False, nullable=True)
 
@@ -55,11 +55,14 @@ class CertificateCons(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<CONSORZIO Certificate: {}>'.format(self.headset)
+        return '<CONSORZIO Certificato: {}>'.format(self.headset)
+
+    def __str__(self):
+        return '<CONSORZIO Certificato: {}>'.format(self.headset)
 
     def __init__(self,
                  certificate_var, certificate_date, certificate_id, certificate_pdf=None,

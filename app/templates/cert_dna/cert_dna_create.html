@@ -1,0 +1,64 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+    <div class="row no-gutters justify-content-center">
+        <h3 class="card-title">
+            <a class="btn btn-update" type="button" href="{{ url_for('head_view_history', _id=h_id) }}" title="Annulla">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
+            </a>
+           Aggiungi Certificato DNA al Capo:
+
+        </h3>
+        <h4>[ {{ h_set }} ]</h4>
+        Allevatore: [ {{ f_id }} ]
+        <div class="col-md-12">
+            <form enctype="multipart/form-data" method="POST">
+                {{ form.csrf_token }}
+                <div class="row no-gutters justify-content-center">
+                    <div class="col-md-6 order-first">
+                        <br>
+                        {{ form.dna_cert_id.label }}
+                        <p class="comment">Inserisci il numero del certificato senza il riferimento all'anno "/20XX".
+                        Verrà assegnato dalla Data del Certificato.</p>
+                        {{ form.dna_cert_id(class="form-control", style="text-align: center;") }}
+                        {% if form.dna_cert_id.errors %}
+                            {% for error in form.dna_cert_id.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                                <br>
+                            {% endfor %}
+                        {% endif %}
+                        <br>
+                        <div class="form-group">
+                            {{ form.dna_cert_date.label }}
+                            {{ form.dna_cert_date(class="form-control") }}
+                            {% if form.dna_cert_date.errors %}
+                                {% for error in form.dna_cert_date.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group">
+                    {{ form.note.label }}
+                    {{ form.note(class="form-control") }}
+                    {% if form.note.errors %}
+                        {% for error in form.note.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
+                    <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
+                         alt=""/>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

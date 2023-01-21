@@ -4,22 +4,28 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('head_view') }}" title="Annulla">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
+            <a class="btn btn-update" type="button" href="{{ url_for('head_view_history', _id=id) }}" title="Annulla">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Modifica CAPO [ {{ id }} ]:
         </h5>
-        <div class="col-md-12">
+        {% if form.headset != None and f_id != None %}
+        <a class="btn btn-update" type="button" title="Aggiungi Certificato DNA"
+           href="{{ url_for('cert_dna_create', h_id=id, f_id=form.farmer_id.data, h_set=form.headset.data) }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/dna.png') }}" alt=""/>
+        </a>
+        {% endif %}
+        <div class="col-md-12 shadow rounded" style="border: solid 0.7px #ED6666 !important;">
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
                     {{ form.headset.label }}
                     {{ form.headset(class="form-control") }}
                     {% if form.headset.errors %}
-                        {% for error in form.headset.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.headset.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <div class="row no-gutters justify-content-center">
@@ -28,20 +34,20 @@
                         {{ form.birth_date.label }}
                         {{ form.birth_date(class="form-control", style="text-align: center;") }}
                         {% if form.birth_date.errors %}
-                            {% for error in form.birth_date.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.birth_date.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                         <br>
                         <div class="form-group">
                             {{ form.castration_date.label }}
                             {{ form.castration_date(class="form-control") }}
                             {% if form.castration_date.errors %}
-                                {% for error in form.castration_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.castration_date.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -49,10 +55,10 @@
                             {{ form.slaughter_date.label }}
                             {{ form.slaughter_date(class="form-control") }}
                             {% if form.slaughter_date.errors %}
-                                {% for error in form.slaughter_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.slaughter_date.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -60,10 +66,10 @@
                             {{ form.sale_date.label }}
                             {{ form.sale_date(class="form-control") }}
                             {% if form.sale_date.errors %}
-                                {% for error in form.sale_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.sale_date.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                     </div>
@@ -73,10 +79,10 @@
                             {{ form.farmer_id.label }}
                             {{ form.farmer_id(class="form-control", style="text-align: center;") }}
                             {% if form.farmer_id.errors %}
-                                {% for error in form.farmer_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.farmer_id.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -84,10 +90,10 @@
                             {{ form.buyer_id.label }}
                             {{ form.buyer_id(class="form-control", style="text-align: center;") }}
                             {% if form.buyer_id.errors %}
-                                {% for error in form.buyer_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.buyer_id.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -95,10 +101,10 @@
                             {{ form.slaughterhouse_id.label }}
                             {{ form.slaughterhouse_id(class="form-control", style="text-align: center;") }}
                             {% if form.slaughterhouse_id.errors %}
-                                {% for error in form.slaughterhouse_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.slaughterhouse_id.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                     </div>
@@ -109,10 +115,10 @@
                     <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                     {{ form.note_certificate(class="form-control") }}
                     {% if form.note_certificate.errors %}
-                        {% for error in form.note_certificate.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note_certificate.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <br>
@@ -120,24 +126,21 @@
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}
-                        {% for error in form.note.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
-                <hr>
+                <br>
                 <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
                          alt=""/>
                 </button>
-                <br>
+                <p class="info">Data Creazione: {{ info.created_at }}</p>
+                <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
             </form>
         </div>
-        <hr>
-        <p class="info">Data Creazione: {{ info.created_at }}</p>
-        <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
-        <hr>
     </div>
 </div>
 {% endblock %}

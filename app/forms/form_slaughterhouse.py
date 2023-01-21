@@ -57,7 +57,7 @@ class FormSlaughterhouseUpdate(FlaskForm):
     slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20), Optional()])
 
     email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
+    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
 
     address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
     cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])

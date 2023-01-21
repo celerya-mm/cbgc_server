@@ -27,14 +27,14 @@ class Administrator(db.Model):
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return f'<Administrator ID: {self.id}; username: {self.username}>'
+        return f'<AMMINISTRATORE ID: {self.id}; username: {self.username}>'
 
     def __str__(self):
-        return f'<Administrator ID: {self.id}; username: {self.username}>'
+        return f'<AMMINISTRATORE ID: {self.id}; username: {self.username}>'
 
     def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
                  events=None, note=None):
@@ -100,11 +100,14 @@ class User(db.Model):
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<User: {}>'.format(self.username)
+        return '<UTENTE: {}>'.format(self.username)
+
+    def __str__(self):
+        return '<UTENTE: {}>'.format(self.username)
 
     def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, note=None,
                  buyers=None, auth_tokens=None, events=None):

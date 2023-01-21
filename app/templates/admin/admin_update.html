@@ -2,16 +2,17 @@
 
 {% block content %}
 <div class="container text-center mt-2">
-    <div class="row no-gutters justify-content-center">
+    <div class="row no-gutters justify-content-center ">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('admin_view') }}" title="Annulla">
+            <a class="btn btn-update" type="button" href="{{ url_for('admin_view_history', _id=id) }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Modifica l'AMMINISTRATORE [ {{ id }} ]:
         </h5>
         <form enctype="multipart/form-data" method="POST">
             {{ form.csrf_token }}
-            <div class="row no-gutters justify-content-center">
+            <div class="row no-gutters justify-content-center shadow rounded"
+                 style="border: solid 0.7px #ED6666 !important;">
                 <div class="col-md-6">
                     <br>
                     <div class="form-group">
@@ -19,10 +20,10 @@
                         <p class="comment">Lo username non deve contenere spazi.</p>
                         {{ form.username(class="form-control") }}
                         {% if form.username.errors %}
-                            {% for error in form.username.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.username.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <br>
@@ -30,10 +31,10 @@
                         {{ form.name.label }}
                         {{ form.name(class="form-control") }}
                         {% if form.name.errors %}
-                            {% for error in form.name.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <br>
@@ -41,12 +42,13 @@
                         {{ form.last_name.label }}
                         {{ form.last_name(class="form-control") }}
                         {% if form.last_name.errors %}
-                            {% for error in form.last_name.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.last_name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
+                    <br>
                 </div>
                 <div class="col-md-6">
                     <br>
@@ -54,10 +56,10 @@
                         {{ form.email.label }}
                         {{ form.email(class="form-control") }}
                         {% if form.email.errors %}
-                            {% for error in form.email.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.email.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <br>
@@ -65,37 +67,41 @@
                         {{ form.phone.label }}
                         {{ form.phone(class="form-control") }}
                         {% if form.phone.errors %}
-                            {% for error in form.phone.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.phone.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
+                    <br>
                 </div>
                 <br>
                 <div class="form-group">
+                    <br>
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}
-                        {% for error in form.note.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
+                    <br>
                 </div>
                 <br>
-                <hr>
                 <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
                          alt=""/>
                 </button>
+                <div>
+                    <p class="info">Data Creazione: {{ info.created_at }}</p>
+                    <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
+                </div>
             </div>
         </form>
-        </div>
-        <hr>
-        <p class="info">Data Creazione: {{ info.created_at }}</p>
-        <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
-        <hr>
     </div>
+
 </div>
+</div>
+
 {% endblock %}

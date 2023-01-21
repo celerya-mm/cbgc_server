@@ -102,7 +102,7 @@ class FormAccountUpdate(FlaskForm):
     last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
 
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)], default="+39 ")
+    phone = StringField('Telefono', validators=[Length(min=7, max=25)])
 
     note = StringField('Note', validators=[Length(max=255)])
 

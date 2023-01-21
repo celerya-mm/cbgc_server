@@ -22,10 +22,10 @@ class AuthToken(db.Model):
     expires_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<AuthToken: {}>'.format(self.token)
+        return f'<AuthToken: {self.token}>'
 
     def __str__(self):
-        return '<AuthToken: {}>'.format(self.token)
+        return f'<AuthToken: {self.token}>'
 
     def __init__(self, token, admin_id=None, user_id=None):
         self.token = token

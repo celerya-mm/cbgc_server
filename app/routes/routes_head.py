@@ -14,7 +14,7 @@ from ..utilitys.functions import event_create, not_empty, token_admin_validate, 
 
 
 @token_admin_validate
-@app.route("/head_view/", methods=["GET", "POST"])
+@app.route("/head/view/", methods=["GET", "POST"])
 def head_view():
     """Visualizzo informazioni Capi."""
     _list = Head.query.all()
@@ -23,7 +23,7 @@ def head_view():
 
 
 @token_admin_validate
-@app.route("/head_create/", methods=["GET", "POST"])
+@app.route("/head/create/", methods=["GET", "POST"])
 def head_create():
     """Creazione Capo Consorzio."""
     form = FormHeadCreate()
@@ -62,7 +62,7 @@ def head_create():
 
 
 @token_admin_validate
-@app.route("/head_view_history/<_id>", methods=["GET", "POST"])
+@app.route("/head/view/history/<_id>", methods=["GET", "POST"])
 def head_view_history(_id):
     """Visualizzo la storia delle modifiche al record del Capo."""
     head = Head.query.get(int(_id))
@@ -84,12 +84,27 @@ def head_view_history(_id):
     # Estraggo la storia delle modifiche per l'utente
     history_list = head.events
     history_list = [history.to_dict() for history in history_list]
+    len_history = len(history_list)
+
+    # estraggo il certificato DNA
+    dna_list = head.dna_cert
+    dna_list = [dna.to_dict() for dna in dna_list]
+    len_dna = len(dna_list)
+
+    # estraggo i certificati del consorzio
+    cons_list = head.cons_cert
+    cons_list = [cert.to_dict() for cert in cons_list]
+    len_cons = len(cons_list)
     return render_template(
-        "head/head_view_history.html", form=_head, history_list=history_list)
+        "head/head_view_history.html", form=_head,
+        history_list=history_list, h_len=len_history,
+        dna_list=dna_list, len_dna=len_dna,
+        cons_list=cons_list, len_cons=len_cons
+    )
 
 
 @token_admin_validate
-@app.route("/head_update/<_id>", methods=["GET", "POST"])
+@app.route("/head/update/<_id>", methods=["GET", "POST"])
 def head_update(_id):
     """Aggiorna dati Capo."""
     form = FormHeadUpdate()
@@ -143,10 +158,10 @@ def head_update(_id):
         }
         # print("EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, head_id=_id):
-            return redirect(url_for('head_view_history', _id=_id))
+            return redirect(url_for('head/view/history', _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('head_view_history', _id=_id))
+            return redirect(url_for('head/view/history', _id=_id))
     else:
         # recupero i dati del record
         head = Head.query.get(int(_id))
@@ -159,17 +174,16 @@ def head_update(_id):
         form.slaughter_date.data = str_to_date(head.slaughter_date)
         form.sale_date.data = str_to_date(head.sale_date)
 
-        if head.farmer_id and head.farmer_id not in [None, "None", ""]:
-            farmer = Farmer.query.get(head.farmer_id)
-            form.farmer_id.data = str(farmer.id) + " - " + farmer.farmer_name
+        farmer = Farmer.query.get(head.farmer_id)
+        form.farmer_id.data = f"{farmer.id} - {farmer.farmer_name}"
 
         if head.buyer_id and head.buyer_id not in [None, "None", ""]:
             buyer = Buyer.query.get(head.buyer_id)
-            form.buyer_id.data = str(buyer.id) + " - " + buyer.buyer_name
+            form.buyer_id.data = f"{buyer.id} - {buyer.buyer_name}"
 
         if head.slaughterhouse_id and head.slaughterhouse_id not in [None, "None", ""]:
             slaughter = Slaughterhouse.query.get(head.slaughterhouse_id)
-            form.slaughterhouse_id.data = str(slaughter.id) + " - " + slaughter.slaughterhouse
+            form.slaughterhouse_id.data = f"{slaughter.id} - {slaughter.slaughterhouse}"
 
         form.note_certificate.data = head.note_certificate
         form.note.data = head.note
@@ -178,6 +192,6 @@ def head_update(_id):
             'created_at': head.created_at,
             'updated_at': head.updated_at,
         }
-        # print("HEAD_:", form)
-        # print("HEAD_FORM:", json.dumps(form.to_dict(form), indent=2))
-        return render_template("head/head_update.html", form=form, id=_id, info=_info)
+        print("HEAD_:", form)
+        print("HEAD_FORM:", json.dumps(form.to_dict(), indent=2))
+        return render_template("head/head_update.html", form=form, id=_id, info=_info, f_id=head.farmer_id)

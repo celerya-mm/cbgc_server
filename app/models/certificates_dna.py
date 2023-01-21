@@ -17,35 +17,36 @@ class CertificateDna(db.Model):
     dna_cert_id = db.Column(db.String(20), index=False, unique=False, nullable=False)
     dna_cert_date = db.Column(db.DateTime, index=False, nullable=False)
     dna_cert_year = db.Column(db.Integer, index=False, nullable=False)
-    dna_cert_nr = db.Column(db.String(20), index=False, unique=True, nullable=False)
+    dna_cert_nr = db.Column(db.String(20), primary_key=True, index=False, unique=True, nullable=False)
     dna_cert_pdf = db.Column(db.LargeBinary, index=False, nullable=True)
 
-    head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False)
-    farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
+    head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False, unique=True)
+    farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False, unique=False)
 
     events = db.relationship('EventDB', backref='cert_dna')
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<DNA Certificate: {}>'.format(self.dna_cert_nr)
+        return '<DNA Certificato: {}>'.format(self.dna_cert_nr)
 
-    def __init__(self, dna_cert_id, dna_cert_date, head_id, farmer_id, dna_cert_nr=None, events=None, note=None):
+    def __str__(self):
+        return '<DNA Certificato: {}>'.format(self.dna_cert_nr)
 
-        from ..utilitys.functions import year_extract
+    def __init__(self, dna_cert_id, dna_cert_date, head_id, farmer_id, note=None):
+
+        from ..utilitys.functions import year_extract, str_to_date
 
         self.dna_cert_id = dna_cert_id
-        self.dna_cert_date = dna_cert_date
+        self.dna_cert_date = str_to_date(dna_cert_date)
         self.dna_cert_year = year_extract(dna_cert_date)
-        self.dna_cert_nr = dna_cert_nr or f"{dna_cert_id}/{self.dna_cert_year}"
+        self.dna_cert_nr = f"{dna_cert_id}/{self.dna_cert_year}"
 
         self.head_id = head_id
         self.farmer_id = farmer_id
-
-        self.events = events or []
 
         self.note = note
         self.created_at = datetime.now()

@@ -54,18 +54,18 @@ class Head(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return f'<HEAD ID: {self.id}; headset: {self.headset}>'
+        return f'<CAPO: {self.headset}>'
 
     def __str__(self):
-        return f'<HEAD ID: {self.id}; headset: {self.headset}>'
+        return f'<CAPO: {self.headset}>'
 
     def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None,
                  sale_date=None, note_certificate=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
-                 dna_certs=None, cons_certs=None, events=None, note=None):
+                 dna_cert=None, cons_cert=None, events=None, note=None):
 
         from ..utilitys.functions import year_extract, str_to_date
 
@@ -87,8 +87,8 @@ class Head(db.Model):
         self.buyer_id = buyer_id
         self.slaughterhouse_id = slaughterhouse_id
 
-        self.dna_certs = dna_certs or []
-        self.cons_certs = cons_certs or []
+        self.dna_cert = dna_cert or []
+        self.cons_cert = cons_cert or []
 
         self.events = events or []
 

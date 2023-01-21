@@ -11,7 +11,7 @@ from ..utilitys.functions import event_create, token_admin_validate, status_true
 
 
 @token_admin_validate
-@app.route("/farmer_view/", methods=["GET", "POST"])
+@app.route("/farmer/view/", methods=["GET", "POST"])
 def farmer_view():
     """Visualizzo informazioni Allevatori."""
     # Estraggo la lista degli allevatori
@@ -21,7 +21,7 @@ def farmer_view():
 
 
 @token_admin_validate
-@app.route("/farmer_create/", methods=["GET", "POST"])
+@app.route("/farmer/create/", methods=["GET", "POST"])
 def farmer_create():
     """Creazione Allevatore Consorzio."""
     form = FormFarmerCreate()
@@ -54,7 +54,7 @@ def farmer_create():
             db.session.add(new_farmer)
             db.session.commit()
             flash("ALLEVATORE creato correttamente.")
-            return redirect(url_for('farmer_view'))
+            return redirect(url_for('farmer/view'))
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
@@ -64,7 +64,7 @@ def farmer_create():
 
 
 @token_admin_validate
-@app.route("/farmer_view_history/<_id>", methods=["GET", "POST"])
+@app.route("/farmer/view/history/<_id>", methods=["GET", "POST"])
 def farmer_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Interrogo il DB
@@ -74,17 +74,18 @@ def farmer_view_history(_id):
     # Estraggo la storia delle modifiche per l'utente
     history_list = farmer.events
     history_list = [history.to_dict() for history in history_list]
+    len_history = len(history_list)
 
     # Estraggo l'elenco dei capi dell' Allevatore
     heads = farmer.heads
     heads = [head.to_dict() for head in heads]
 
     return render_template("farmer/farmer_view_history.html", form=_farmer, history_list=history_list,
-                           heads=heads)
+                           heads=heads, h_len=len_history)
 
 
 @token_admin_validate
-@app.route("/farmer_update/<_id>", methods=["GET", "POST"])
+@app.route("/farmer/update/<_id>", methods=["GET", "POST"])
 def farmer_update(_id):
     """Aggiorna dati Allevatore."""
     form = FormFarmerUpdate()
@@ -117,10 +118,10 @@ def farmer_update(_id):
         }
         # print("EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, farmer_id=_id):
-            return redirect(url_for('farmer_view_history', _id=_id))
+            return redirect(url_for('farmer/view/history', _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('farmer_view_history', _id=_id))
+            return redirect(url_for('farmer/view/history', _id=_id))
     else:
         # recupero i dati del record
         farmer = Farmer.query.get(_id)

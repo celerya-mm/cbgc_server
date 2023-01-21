@@ -64,18 +64,18 @@ class FormFarmerUpdate(FlaskForm):
         Length(min=3, max=100)])
 
     email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
+    phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
 
     address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
     cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
     city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
 
     stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25)])
-    stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"], default="Allevamento")
+    stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"])
     stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
-        "Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Carne")
+        "Da Latte", "Da Carne", "Da Latte e Da Carne"])
     stable_breeding_methods = SelectField("Modalità Allevamento", choices=[
-        "Estensivo", "Intensivo", "Transumante", "Brado"], default="Estensivo")
+        "Estensivo", "Intensivo", "Transumante", "Brado"])
 
     affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
     affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])

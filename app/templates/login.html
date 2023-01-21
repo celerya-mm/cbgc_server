@@ -6,9 +6,9 @@
         <img class="img-fluid justify-content-center" style="max-width: 300px; margin: 10px;"
              src="{{ url_for('static', filename='Logo.png') }}" alt="">
     </div>
-    <br>
     <div class="row no-gutters justify-content-center">
-        <div class="col-md-5">
+        <div class="col-md-5 shadow rounded">
+            <br>
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
@@ -32,7 +32,7 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <hr>
+                <br>
                 <button id="button" class="btn btn-update" type="submit" title="Log In" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/box-arrow-in-right.svg') }}"
                          alt=""/>

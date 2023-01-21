@@ -24,7 +24,7 @@ migrate.init_app(app, db)
 
 with app.app_context():
     from app.routes import (routes, routes_admin, routes_buyer, routes_head, routes_farmer, routes_slaughterhouse,  # noqa
-                            routes_user)
+                            routes_user, routes_cert_dna)
     from app.api import (api_administrators, api_buyers, api_certificates_cons, api_certificates_dna, api_farmers,  # noqa
                          api_heads, api_slaughterhouses, api_users)
     from app.models import (accounts, buyers, certificates_dna, certificates_cons, events_db, farmers, heads,  # noqa

@@ -121,48 +121,58 @@
                 {{ form.note }}
             </p>
         </div>
-        <hr>
     </div>
 </form>
 
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
-    <div class="row no-gutters justify-content-center">
-        <div class="col-md-12">
-            <h2 class="card-title" style="padding: 20px;">Elenco modifiche al record:</h2>
-            <div>
-                <table id="data" class="table table-striped" style="width:100%">
-                    <thead>
-                    <tr style="background-color: #2B4692; vertical-align: center;">
-                        <th class="title" id="h1" data-defaultsort="desc">ID</th>
-                        <th class="title" id="h2">Modifica</th>
-                        <th class="title" id="h3">Data</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for row in history_list %}
-                    <tr style="border: 0pz; vertical-align: center;">
-                        <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                            {{ row.id|e }}
-                        </td>
-                        <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                            {{ row.event|e }}
-                        </td>
-                        <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                            {{ row.created_at|e }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <div class="accordion" id="accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="1">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne"
+                        aria-expanded="true"
+                        aria-controls="collapseOne">
+                    Elenco Modifiche al Record [ {{ h_len }} ]
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse"
+                 aria-labelledby="headingOne"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive">
+                    <br>
+                    <table id="data" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="h1" data-defaultsort="desc">ID</th>
+                            <th class="title" id="h2">Modifica</th>
+                            <th class="title" id="h3">Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in history_list %}
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.id|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.event|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.created_at|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <hr>
-    <p class="info">Data Creazione: {{ form.created_at }}</p>
-    <p class="info">Ultima modifica: {{ form.updated_at }}</p>
-    <hr>
 </div>
-
+<br>
+<p class="info">Data Creazione: {{ form.created_at }}</p>
+<p class="info">Ultima modifica: {{ form.updated_at }}</p>
 {% endblock %}
 
 {% block scripts %}

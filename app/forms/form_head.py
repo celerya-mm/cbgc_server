@@ -21,25 +21,28 @@ def list_head():
 
 def list_farmer():
     records = Farmer.query.all()
-    _list = [x.to_dict() for x in records]
-    _list = [d["farmer_name"] for d in _list if "farmer_name" in d]
-    _list.append("-")
+    _dicts = [x.to_dict() for x in records]
+    _list = ["-"]
+    for d in _dicts:
+        _list.append(f"{str(d['id'])} - {d['farmer_name']}")
     return _list
 
 
 def list_buyer():
     records = Buyer.query.all()
-    _list = [x.to_dict() for x in records]
-    _list = [d["buyer_name"] for d in _list if "buyer_name" in d]
-    _list.append("-")
+    _dicts = [x.to_dict() for x in records]
+    _list = ["-"]
+    for d in _dicts:
+        _list.append(f"{str(d['id'])} - {d['buyer_name']}")
     return _list
 
 
 def list_slaughterhouse():
     records = Slaughterhouse.query.all()
-    _list = [x.to_dict() for x in records]
-    _list = [d["slaughterhouse"] for d in _list if "slaughterhouse" in d]
-    _list.append("-")
+    _dicts = [x.to_dict() for x in records]
+    _list = ["-"]
+    for d in _dicts:
+        _list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
     return _list
 
 
@@ -49,13 +52,13 @@ class FormHeadCreate(FlaskForm):
 
     birth_date = DateField('Data Nascita', format='%Y-%m-%d', default=datetime.now())
 
-    castration_date = DateField('Castrazione', format='%Y-%m-%d', default="", validators=[Optional()])
-    slaughter_date = DateField('Macellazione', format='%Y-%m-%d', default="", validators=[Optional()])
-    sale_date = DateField('Vendita', format='%Y-%m-%d', default="", validators=[Optional()])
+    castration_date = DateField('Castrazione', format='%Y-%m-%d', validators=[Optional()])
+    slaughter_date = DateField('Macellazione', format='%Y-%m-%d', validators=[Optional()])
+    sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
-    farmer_id = SelectField("Allevatore", choices=list_farmer(), default="")
-    buyer_id = SelectField("Acquirente", choices=list_buyer(), default="", validators=[Optional()])
-    slaughterhouse_id = SelectField("Macello", choices=list_slaughterhouse(), default="", validators=[Optional()])
+    farmer_id = SelectField("Allevatore", choices=list_farmer(), default="-")
+    buyer_id = SelectField("Acquirente", choices=list_buyer(), default="-", validators=[Optional()])
+    slaughterhouse_id = SelectField("Macello", choices=list_slaughterhouse(), default="-", validators=[Optional()])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
@@ -93,14 +96,14 @@ class FormHeadUpdate(FlaskForm):
     """Form modifica dati Capo."""
     headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=14, max=14)])
 
-    birth_date = DateField('Data Nascita', format='%Y-%m-%d', default=datetime.now())
-    castration_date = DateField('Castrazione', format='%Y-%m-%d', default="", validators=[Optional()])
-    slaughter_date = DateField('Macellazione', format='%Y-%m-%d', default="", validators=[Optional()])
-    sale_date = DateField('Vendita', format='%Y-%m-%d', default="", validators=[Optional()])
+    birth_date = DateField('Data Nascita', format='%Y-%m-%d')
+    castration_date = DateField('Castrazione', format='%Y-%m-%d', validators=[Optional()])
+    slaughter_date = DateField('Macellazione', format='%Y-%m-%d', validators=[Optional()])
+    sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
-    farmer_id = SelectField("Allevatore", choices=list_farmer(), default="-")
-    buyer_id = SelectField("Acquirente", choices=list_buyer(), default="-", validators=[Optional()])
-    slaughterhouse_id = SelectField("Macello", choices=list_slaughterhouse(), default="-", validators=[Optional()])
+    farmer_id = SelectField("Allevatore", choices=list_farmer())
+    buyer_id = SelectField("Acquirente", choices=list_buyer(), validators=[Optional()])
+    slaughterhouse_id = SelectField("Macello", choices=list_slaughterhouse(), validators=[Optional()])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
@@ -128,7 +131,7 @@ class FormHeadUpdate(FlaskForm):
         if field.data not in ["", "-", None] and field.data.strip() not in list_slaughterhouse():
             raise ValidationError("Nessun MACELLO presente corrispondente alla Ragione Sociale inserita.")
 
-    def to_dict(self, dna_cer=None, cons_cert=None):
+    def to_dict(self):
         """Converte form in dict."""
         from ..utilitys.functions import date_to_str, year_extract
         return {
@@ -150,14 +153,11 @@ class FormHeadUpdate(FlaskForm):
             'buyer_id': self.buyer_id.data,
             'slaughterhouse_id': self.slaughterhouse_id.data,
 
-            'dna_cert': dna_cer,
-            'cons_cert': cons_cert,
-
             'note_certificate': self.note_certificate.data,
             'note': self.note.data,
         }
 
-    def to_db(self, dna_cer=None, cons_cert=None):
+    def to_db(self):
         """Converte form in dict."""
         from ..utilitys.functions import str_to_date, year_extract
         return {
@@ -178,9 +178,6 @@ class FormHeadUpdate(FlaskForm):
             'farmer_id': self.farmer_id.data,
             'buyer_id': self.buyer_id.data,
             'slaughterhouse_id': self.slaughterhouse_id.data,
-
-            'dna_cert': dna_cer,
-            'cons_cert': cons_cert,
 
             'note_certificate': self.note_certificate.data,
             'note': self.note.data,

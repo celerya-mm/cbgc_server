@@ -13,7 +13,7 @@ from ..utilitys.functions_accounts import psw_contain_usr, psw_verify, psw_hash
 
 
 @token_admin_validate
-@app.route("/user_view/", methods=["GET", "POST"])
+@app.route("/user/view/", methods=["GET", "POST"])
 def user_view():
     """Visualizzo informazioni User."""
     # Estraggo la lista degli utenti amministratori
@@ -23,7 +23,7 @@ def user_view():
 
 
 @token_admin_validate
-@app.route("/user_create/", methods=["GET", "POST"])
+@app.route("/user/create/", methods=["GET", "POST"])
 def user_create():
     """Creazione Utente Consorzio."""
     form = FormUserSignup()
@@ -36,7 +36,7 @@ def user_create():
             message = json.loads(json.dumps(verify_password))
             flash(f"PASSWORD_DEBOLE:")
             flash(message)
-            return render_template("admin/admin_create.html", form=form)
+            return render_template("user/user_create.html", form=form)
 
         contain_usr = psw_contain_usr(form_data["new_password_1"], form_data["username"])
         if contain_usr is not False:
@@ -58,7 +58,7 @@ def user_create():
             db.session.add(new_user)
             db.session.commit()
             flash("UTENTE servizio creato correttamente.")
-            return redirect(url_for('user_view'))
+            return redirect(url_for('user/view'))
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
@@ -68,7 +68,7 @@ def user_create():
 
 
 @token_admin_validate
-@app.route("/user_view_history/<_id>", methods=["GET", "POST"])
+@app.route("/user/view/history/<_id>", methods=["GET", "POST"])
 def user_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Estraggo l' ID dell'utente corrente
@@ -81,11 +81,12 @@ def user_view_history(_id):
     # Estraggo la storia delle modifiche per l'utente
     history_list = user.events
     history_list = [history.to_dict() for history in history_list]
-    return render_template("user/user_view_history.html", form=_user, history_list=history_list)
+    len_history = len(history_list)
+    return render_template("user/user_view_history.html", form=_user, history_list=history_list, h_len=len_history)
 
 
 @token_admin_validate
-@app.route("/user_update/<_id>", methods=["GET", "POST"])
+@app.route("/user/update/<_id>", methods=["GET", "POST"])
 def user_update(_id):
     """Aggiorna dati Utente."""
     form = FormAccountUpdate()
@@ -124,10 +125,10 @@ def user_update(_id):
         }
         # print("EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, user_id=_id):
-            return redirect(url_for('user_view_history', _id=_id))
+            return redirect(url_for('user/view/history', _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('user_view_history', _id=_id))
+            return redirect(url_for('user/view/history', _id=_id))
     else:
         # recupero i dati
         user = User.query.get(_id)

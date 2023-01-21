@@ -22,7 +22,7 @@ def login():
         return render_template("login.html", form=form)
 
 
-@app.route("/logout")
+@app.route("/logout/")
 def logout():
     """Effettua il log-out ed elimina i dati della sessione."""
     session.clear()

@@ -24,7 +24,10 @@ class EventDB(db.Model):
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<Event: {}>'.format(self.event)
+        return '<EVENTO: {}>'.format(self.event)
+
+    def __str__(self):
+        return '<EVENTO: {}>'.format(self.event)
 
     def __init__(self, event, admin_id=None, user_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  head_id=None, cert_cons_id=None, cert_dna_id=None):

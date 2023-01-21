@@ -172,7 +172,9 @@ def mount_full_name(name, last_name):
 
 def year_extract(date):  # noqa
     """Estrae l'anno da una data"""
-    if isinstance(date, str):
+    if date is None:
+        return None
+    elif isinstance(date, str):
         year = datetime.strptime(date, "%Y-%m-%d")
         return year.year
     else:
@@ -181,22 +183,22 @@ def year_extract(date):  # noqa
 
 def str_to_date(_str, _form="%Y-%m-%d"):
     """Converte una stringa in datetime."""
-    if _str not in [None, "None", "nan", ""] and isinstance(_str, str):
-        return datetime.strptime(_str, _form)
-    elif isinstance(_str, datetime) or isinstance(_str, date) and _str not in ["", None]:
-        return _str
-    else:
+    if _str is None:
         return None
+    elif _str not in [None, "None", "nan", ""] and isinstance(_str, str):
+        return datetime.strptime(_str, _form)
+    else:
+        return _str
 
 
 def date_to_str(_date, _form="%Y-%m-%d"):
     """Converte datetime in stringa."""
-    if _date not in [None, "None", "nan", ""] and isinstance(_date, datetime) or isinstance(_date, date):
-        return datetime.strftime(_date, _form)
-    elif isinstance(_date, str) and date not in ["", None]:
-        return _date
-    else:
+    if _date is None:
         return None
+    elif _date not in [None, "None", "nan", ""] and isinstance(_date, datetime) or isinstance(_date, date):
+        return datetime.strftime(_date, _form)
+    else:
+        return _date
 
 
 def not_empty(_v):

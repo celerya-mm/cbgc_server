@@ -38,14 +38,14 @@ class Farmer(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return f'<Farmer Rag. Sociale: {self.farmer_name.data}>'
+        return f'<ALLEVATORE: {self.farmer_name.data}>'
 
     def __str__(self):
-        return f'<Farmer Rag. Sociale: {self.farmer_name.data}>'
+        return f'<ALLEVATORE: {self.farmer_name.data}>'
 
     def __init__(self, farmer_name, email, phone=None, address=None, cap=None, city=None, stable_code=None,
                  stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,

@@ -13,7 +13,7 @@ from ..utilitys.functions_accounts import psw_contain_usr, psw_verify, psw_hash
 
 
 @token_admin_validate
-@app.route("/admin_view/", methods=["GET", "POST"])
+@app.route("/admin/view/", methods=["GET", "POST"])
 def admin_view():
     """Visualizzo informazioni Utente Amministratore."""
     if "username" in session.keys():
@@ -32,7 +32,7 @@ def admin_view():
 
 
 @token_admin_validate
-@app.route("/admin_create/", methods=["GET", "POST"])
+@app.route("/admin/create/", methods=["GET", "POST"])
 def admin_create():
     """Creazione Utente Amministratore."""
     form = FormAdminSignup()
@@ -67,7 +67,7 @@ def admin_create():
             db.session.add(new_admin)
             db.session.commit()
             flash("Utente amministratore creato correttamente.")
-            return redirect(url_for('admin_view'))
+            return redirect(url_for('admin/view'))
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
@@ -77,7 +77,7 @@ def admin_create():
 
 
 @token_admin_validate
-@app.route("/admin_view_history/<_id>", methods=["GET", "POST"])
+@app.route("/admin/view/history/<_id>", methods=["GET", "POST"])
 def admin_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Estraggo l'ID dell'utente amministratore corrente
@@ -90,11 +90,13 @@ def admin_view_history(_id):
     # Estraggo la storia delle modifiche per l'utente
     history_list = admin.events
     history_list = [history.to_dict() for history in history_list]
-    return render_template("admin/admin_view_history.html", form=_admin, history_list=history_list)
+    len_history = len(history_list)
+
+    return render_template("admin/admin_view_history.html", form=_admin, history_list=history_list, h_len=len_history)
 
 
 @token_admin_validate
-@app.route("/admin_update/<_id>", methods=["GET", "POST"])
+@app.route("/admin/update/<_id>", methods=["GET", "POST"])
 def admin_update(_id):
     """Aggiorna Utente Amministratore."""
     form = FormAccountUpdate()
@@ -125,10 +127,10 @@ def admin_update(_id):
             "Previous_data": previous_data
         }
         if event_create(_event, admin_id=_id):
-            return redirect(url_for('admin_view_history', _id=_id))
+            return redirect(url_for('admin/view/history', _id=_id))
         else:
             flash("ERRORE creazione evento. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('admin_view_history', _id=_id))
+            return redirect(url_for('admin/view/history', _id=_id))
 
     else:
         # recupero i dati
@@ -152,7 +154,7 @@ def admin_update(_id):
 
 
 @token_admin_validate
-@app.route("/admin_update_password/<_id>", methods=["GET", "POST"])
+@app.route("/admin/update/password/<_id>", methods=["GET", "POST"])
 def admin_update_password(_id):
     """Aggiorna password Utente Amministratore."""
     form = FormPswChange()
@@ -194,7 +196,7 @@ def admin_update_password(_id):
             db.session.commit()
             flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
             _event = {
-                "User ID": _id,
+                "username": session["username"],
                 "Modification": "Password changed"
             }
             if event_create(_event, admin_id=_id):

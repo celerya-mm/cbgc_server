@@ -47,7 +47,7 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav ml-auto">
-                    <a class="nav-item nav-link {% if request.path == '/admin_view/' %} active {% endif %}"
+                    <a class="nav-item nav-link {% if request.path == '/admin/view/' %} active {% endif %}"
                        title="Admin" href="{{ url_for('admin_view') }}">
                         {% if request.path == '/admin_view/' %}
                             <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
@@ -56,7 +56,7 @@
                         {% endif %}
                         Amministratori
                     </a>
-                    <a class="nav-item nav-link {% if request.path == '/user_view/' %} active {% endif %}"
+                    <a class="nav-item nav-link {% if request.path == '/user/view/' %} active {% endif %}"
                        title="Users" href="{{ url_for('user_view') }}">
                         {% if request.path == '/user_view/' %}
                             <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
@@ -65,7 +65,7 @@
                         {% endif %}
                         Utenti
                     </a>
-                    <a class="nav-item nav-link {% if request.path == '/head_view/' %} active {% endif %}"
+                    <a class="nav-item nav-link {% if request.path == '/head/view/' %} active {% endif %}"
                        title="Allevatori" href="{{ url_for('head_view') }}">
                         {% if request.path == '/farmer_view/' %}
                             <img src="{{ url_for('static', filename='icons/head-active.svg') }}" alt="">
@@ -74,7 +74,7 @@
                         {% endif %}
                         Capi
                     </a>
-                    <a class="nav-item nav-link {% if request.path == '/farmer_view/' %} active {% endif %}"
+                    <a class="nav-item nav-link {% if request.path == '/farmer/view/' %} active {% endif %}"
                        title="Allevatori" href="{{ url_for('farmer_view') }}">
                         {% if request.path == '/farmer_view/' %}
                             <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
@@ -83,7 +83,7 @@
                         {% endif %}
                         Allevatori
                     </a>
-                    <a class="nav-item nav-link {% if request.path == '/buyer_view/' %} active {% endif %}"
+                    <a class="nav-item nav-link {% if request.path == '/buyer/view/' %} active {% endif %}"
                        title="Acquirenti" href="{{ url_for('buyer_view') }}">
                         {% if request.path == '/buyer_view/' %}
                             <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
@@ -92,7 +92,7 @@
                         {% endif %}
                         Acquirenti
                     </a>
-                    <a class="nav-item nav-link {% if request.path == '/slaughterhouse_view/' %} active {% endif %}"
+                    <a class="nav-item nav-link {% if request.path == '/slaughterhouse/view/' %} active {% endif %}"
                        title="Acquirenti" href="{{ url_for('slaughterhouse_view') }}">
                         {% if request.path == '/slaughterhouse_view/' %}
                             <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
@@ -142,8 +142,9 @@
     {% endblock %}
 </body>
 <footer class="footer">
+    <hr>
     <br>
-    <th class="footer-text"> Consorzio del Bue Grasso di Carrù - © Copyright 2017 - Tutti i diritti riservati – I marchi
+    <th class="footer-text"> Consorzio del Bue Grasso di Carrù - © Copyright 2017 - Tutti i diritti riservati - I marchi
         riportati in questo sito appartengono ai legittimi proprietari
     </th>
     <br>
@@ -151,6 +152,8 @@
         Powered by - © 2021 Celerya S.r.l. |
         <a href="https://celerya.com">celerya.com</a> | info@celerya.com
     </th>
+    <br><br>
+    <hr>
 </footer>
 
 </html>

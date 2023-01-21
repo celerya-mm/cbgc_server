@@ -24,6 +24,7 @@
     </div>
 
     <div class="container text-center mt-2">
+        <br>
         <div class="row no-gutters justify-content-center">
             <div class="col-md-3 order-first">
                 <div class="form-group">
@@ -53,22 +54,21 @@
     </div>
     <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
         <div class="row no-gutters justify-content-center">
-            <div class="col-md-14">
-                <h2 class="card-title" style="padding: 20px;">
-                    Elenco Amministratori:</h2>
-                <div>
+            <div class="col-md-12 shadow rounded">
+                <h3 style="padding-top: 10px;">Elenco Amministratori:</h3>
+                <div class="table-responsive">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="h1" data-defaultsort="asc">ID</th>
-                            <th class="title" id="h2">Username</th>
-                            <th class="title" id="h3">email</th>
-                            <th class="title" id="h4">Nome</th>
-                            <th class="title" id="h5">Cognome</th>
-                            <th class="title" id="h6">Telefono</th>
-                            <th class="title" id="h7">Modificato</th>
-                            <th class="title" id="h8"> </th>
-                            <th class="title" id="h9"> </th>
+                            <th class="title" id="h2" data-sortable="false"></th>
+                            <th class="title" id="h3">Username</th>
+                            <th class="title" id="h4">email</th>
+                            <th class="title" id="h5">Nome</th>
+                            <th class="title" id="h6">Cognome</th>
+                            <th class="title" id="h7" data-sortable="false">Telefono</th>
+                            <th class="title" id="h8">Modificato</th>
+                            <th class="title" id="h9" data-sortable="false"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -76,6 +76,14 @@
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.id|e }}
+                            </td>
+                            <td style="width: 20px; padding:2px;">
+                                <a class="btn-table" type="button" title="Visualizza utente"
+                                   href="{{ url_for('admin_view_history', _id=row.id) }}">
+                                    <img class="icon-table"
+                                         src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
+                                         alt=""/>
+                                </a>
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.username|e }}
@@ -95,17 +103,11 @@
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.updated_at|e }}
                             </td>
-                            <td style="width: 20px;">
+                            <td style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Modifica utente"
                                    href="{{ url_for('admin_update', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
-                                         alt=""/>
-                                </a>
-                            </td>
-                            <td style="width: 20px;">
-                                <a class="btn-table" type="button" title="Visualizza utente"
-                                   href="{{ url_for('admin_view_history', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
+                                    <img class="icon-table"
+                                         src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
@@ -114,6 +116,7 @@
                         </tbody>
                     </table>
                 </div>
+                <br>
             </div>
         </div>
     </div>
@@ -140,8 +143,6 @@
             }
         });
     });
-
-
 
 
 </script>

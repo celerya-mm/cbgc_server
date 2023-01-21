@@ -4,14 +4,15 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('user_view') }}" title="Annulla">
+            <a class="btn btn-update" type="button" href="{{ url_for('user_view_history', _id=id) }}" title="Annulla">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
             </a>
             Modifica UTENTE [ {{ id }} ]:
         </h5>
         <form enctype="multipart/form-data" method="POST">
             {{ form.csrf_token }}
-            <div class="row no-gutters justify-content-center">
+            <div class="row no-gutters justify-content-center shadow rounded"
+                 style="border: solid 0.7px #ED6666 !important;">
                 <div class="col-md-6">
                     <div class="form-group">
                         {{ form.username.label }}
@@ -80,17 +81,15 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <hr>
+                <br>
                 <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
                          alt=""/>
                 </button>
+                <p class="info">Data Creazione: {{ info.created_at }}</p>
+                <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
             </div>
         </form>
-        <hr>
-        <p class="info">Data Creazione: {{ info.created_at }}</p>
-        <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
-        <hr>
     </div>
 </div>
 {% endblock %}

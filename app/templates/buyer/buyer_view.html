@@ -4,7 +4,7 @@
 <form enctype="multipart/form-data" method="POST">
     <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
         <div class="row no-gutters justify-content-center">
-            <div class="col-md-14">
+            <div class="shadow rounded">
                 <h2 class="card-title" style="padding: 20px;">
                     <a class="btn btn-update" type="button" title="Crea nuovo Acquirente"
                        href="{{ url_for('buyer_create') }}">
@@ -12,63 +12,68 @@
                     </a>
                     Elenco ACQUIRENTI Consorzio:</h2>
                 <div>
-                    <table id="data" class="table table-striped" style="width:100%">
-                        <thead>
-                        <tr style="background-color: #2B4692; vertical-align: center;">
-                            <th class="title text-center" id="h1" data-defaultsort="asc">ID</th>
-                            <th class="title" id="h5"></th>
-                            <th class="title text-start" id="h2">Rag. Sociale</th>
-                            <th class="title text-start" id="h3">Email</th>
-                            <th class="title text-start" id="h4">Phone</th>
-                            <th class="title text-start" id="h7">Città</th>
-                            <th class="title" id="h9"> </th>
-                            <th class="title" id="h10"> </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in form %}
-                        <tr style="border: 0pz; vertical-align: center;">
-                            <td class="primary fw-bold text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
-                            </td>
-                            <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.affiliation_status }}
-                                {% if row.affiliation_status == True or row.affiliation_status == "SI"%}
+                    <div class="table-responsive">
+                        <table id="data" class="table table-striped" style="width:100%">
+                            <thead>
+                            <tr style="background-color: #2B4692; vertical-align: center;">
+                                <th class="title text-center" id="h1" data-defaultsort="asc">ID</th>
+                                <th class="title" data-sortable="false" id="h2"></th>
+                                <th class="title" id="h3">Aff.</th>
+                                <th class="title text-start" id="h4">Rag. Sociale</th>
+                                <th class="title text-start" id="h5">Email</th>
+                                <th class="title text-start" data-sortable="false" id="h6">Telefono</th>
+                                <th class="title text-start" id="h7">Città</th>
+                                <th class="title" data-sortable="false" id="h8"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for row in form %}
+                            <tr style="border: 0pz; vertical-align: center;">
+                                <td class="primary fw-bold text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.id|e }}
+                                </td>
+                                <td class="text-center" style="width: 20px; padding:2px;">
+                                    <a class="btn-table" type="button" title="Visualizza Acquirente"
+                                       href="{{ url_for('buyer_view_history', _id=row.id) }}">
+                                        <img class="icon-table"
+                                             src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
+                                             alt=""/>
+                                    </a>
+                                </td>
+                                <td class="secondary text-start hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {% if row.affiliation_status == True or row.affiliation_status == "SI"%}
                                     <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
-                                {% else %}
+                                    {% else %}
                                     <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
-                                {% endif %}
-                            </td>
-                            <td class="primary fw-bold text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.buyer_name|e }}
-                            </td>
-                            <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.email|e }}
-                            </td>
-                            <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.phone|e }}
-                            </td>
-                            <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.city|e }}
-                            </td>
-                            <td class="text-center" style="width: 20px;">
-                                <a class="btn-table" type="button" title="Modifica Acquirente"
-                                   href="{{ url_for('buyer_update', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
-                                         alt=""/>
-                                </a>
-                            </td>
-                            <td class="text-center" style="width: 20px;">
-                                <a class="btn-table" type="button" title="Visualizza Acquirente"
-                                   href="{{ url_for('buyer_view_history', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
-                                         alt=""/>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                                    {% endif %}
+                                    {{ row.affiliation_status }}
+                                </td>
+                                <td class="primary fw-bold text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.buyer_name|e }}
+                                </td>
+                                <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.email|e }}
+                                </td>
+                                <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.phone|e }}
+                                </td>
+                                <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                    {{ row.city|e }}
+                                </td>
+                                <td class="text-center" style="width: 20px; padding:2px;">
+                                    <a class="btn-table" type="button" title="Modifica Acquirente"
+                                       href="{{ url_for('buyer_update', _id=row.id) }}">
+                                        <img class="icon-table"
+                                             src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
+                                             alt=""/>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <br>
                 </div>
             </div>
         </div>
@@ -96,6 +101,7 @@
             }
         });
     });
+
 
 
 

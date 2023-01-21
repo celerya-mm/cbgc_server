@@ -14,6 +14,12 @@
            href="{{ url_for('head_update', _id=form.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
         </a>
+        {% if form.headset != None and f_id != None %}
+        <a class="btn btn-update" type="button" title="Aggiungi Certificato DNA"
+           href="{{ url_for('cert_dna_create', h_id=form.id, f_id=form.farmer_id, h_set=form.headset) }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/dna.png') }}" alt=""/>
+        </a>
+        {% endif %}
     </div>
 
     <div class="container text-center mt-2">
@@ -92,14 +98,134 @@
                 {{ form.note }}
             </p>
         </div>
-        <hr>
     </div>
-    <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
-        <div class="row no-gutters justify-content-center">
-            <div class="col-md-14">
-                <h2 class="card-title" style="padding: 20px;">Elenco modifiche al record:</h2>
-                <div>
-                    <table id="data" class="table table-striped" style="width:100%">
+</form>
+<div class="container text-center mt-2 mx-auto" style="margin: 0px;">
+    <div class="accordion" id="dna_accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="1">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse1"
+                        aria-expanded="true"
+                        aria-controls="collapse1">
+                    Certificato DNA [ {{ len_dna }} ]
+                </button>
+            </h2>
+            <div id="collapse1" class="accordion-collapse collapse"
+                 aria-labelledby="headingOne"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive">
+                    <br>
+                    <table id="DNA" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="d1" data-defaultsort="desc">ID</th>
+                            <th class="title" id="d2">Data</th>
+                            <th class="title" id="d3">Allevatore</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in dna_list %}
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.id|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.dna_cert_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.farmer_id|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="2">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse2"
+                        aria-expanded="true"
+                        aria-controls="collapse2">
+                    Certificati del Consorzio [ {{ len_cons }} ]
+                </button>
+            </h2>
+            <div id="collapse2" class="accordion-collapse collapse"
+                 aria-labelledby="heading2"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive">
+                    <br>
+                    <table id="cert_cons" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="c1" data-defaultsort="desc">ID</th>
+                            <th class="title" id="c2">Nr.</th>
+                            <th class="title" id="c4">Anno</th>
+                            <th class="title" id="c5">Data</th>
+                            <th class="title" id="c6">Coccarda</th>
+                            <th class="title" id="c7">Tipo</th>
+                            <th class="title" id="c8">Quantità</th>
+                            <th class="title" id="c9">Resto</th>
+                            <th class="title" id="c10">Acquirente</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in cons_list %}
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.id|e }}
+                            </td>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_nr|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_year|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.cockade_nr|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_type|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_quantity|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_rest|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.buyer_id|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="3">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse3"
+                        aria-expanded="true"
+                        aria-controls="collapse3">
+                    Elenco Modifiche al Record [ {{ h_len }} ]
+                </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse"
+                 aria-labelledby="heading3"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive">
+                    <br>
+                    <table id="history" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="h1" data-defaultsort="desc">ID</th>
@@ -109,7 +235,7 @@
                         </thead>
                         <tbody>
                         {% for row in history_list %}
-                        <tr style="border: 0pz; vertical-align: center;">
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.id|e }}
                             </td>
@@ -126,19 +252,38 @@
                 </div>
             </div>
         </div>
-        <hr>
-        <p class="info">Data Creazione: {{ form.created_at }}</p>
-        <p class="info">Ultima modifica: {{ form.updated_at }}</p>
-        <hr>
     </div>
-</form>
+</div>
+
+<br>
+<p class="info">Data Creazione: {{ form.created_at }}</p>
+<p class="info">Ultima modifica: {{ form.updated_at }}</p>
+
 {% endblock %}
 
 
 {% block scripts %}
 <script>
     $(document).ready(function () {
-        $('#data').DataTable({
+        $('#history').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#cert_cons').DataTable({
             responsive: {
                 breakpoints: [
                     { name: 'bigdesktop', width: 1920 },

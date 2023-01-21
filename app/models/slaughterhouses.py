@@ -30,11 +30,14 @@ class Slaughterhouse(db.Model):
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse')
     events = db.relationship('EventDB', backref='slaughterhouse')
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return '<Slaughterhouse: {}>'.format(self.farmer_name)
+        return f'<MACELLO: {self.farmer_name}>'
+
+    def __str__(self):
+        return f'<MACELLO: {self.farmer_name}>'
 
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
                  affiliation_start_date, affiliation_status, note_certificate, note, affiliation_end_date=None,

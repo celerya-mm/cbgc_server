@@ -12,7 +12,7 @@ from ..utilitys.functions import event_create, status_si_no, status_true_false, 
 
 
 @token_admin_validate
-@app.route("/buyer_view/", methods=["GET", "POST"])
+@app.route("/buyer/view/", methods=["GET", "POST"])
 def buyer_view():
     """Visualizza informazioni Acquirenti."""
     # Estraggo la lista degli allevatori
@@ -22,7 +22,7 @@ def buyer_view():
 
 
 @token_admin_validate
-@app.route("/buyer_create/", methods=["GET", "POST"])
+@app.route("/buyer/create/", methods=["GET", "POST"])
 def buyer_create():
     """Creazione Acquirente Consorzio."""
     form = FormBuyerCreate()
@@ -56,7 +56,7 @@ def buyer_create():
             db.session.add(new_farmer)
             db.session.commit()
             flash("ACQUIRENTE creato correttamente.")
-            return redirect(url_for('buyer_view'))
+            return redirect(url_for('buyer/view'))
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
@@ -66,7 +66,7 @@ def buyer_create():
 
 
 @token_admin_validate
-@app.route("/buyer_view_history/<_id>", methods=["GET", "POST"])
+@app.route("/buyer/view/history/<_id>", methods=["GET", "POST"])
 def buyer_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Interrogo il DB
@@ -82,11 +82,12 @@ def buyer_view_history(_id):
     # Estraggo la storia delle modifiche per l'utente
     history_list = buyer.events
     history_list = [history.to_dict() for history in history_list]
-    return render_template("buyer/buyer_view_history.html", form=_buyer, history_list=history_list)
+    len_history = len(history_list)
+    return render_template("buyer/buyer_view_history.html", form=_buyer, history_list=history_list, h_len=len_history)
 
 
 @token_admin_validate
-@app.route("/buyer_update/<_id>", methods=["GET", "POST"])
+@app.route("/buyer/update/<_id>", methods=["GET", "POST"])
 def buyer_update(_id):
     """Aggiorna dati Acquirente."""
     form = FormBuyerUpdate()
@@ -119,7 +120,7 @@ def buyer_update(_id):
         }
         # print("BUYER_EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, buyer_id=_id):
-            return redirect(url_for('buyer_view_history', _id=_id))
+            return redirect(url_for('buyer/view/history', _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
             return redirect(url_for('buyer_view'))

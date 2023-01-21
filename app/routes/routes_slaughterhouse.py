@@ -21,7 +21,7 @@ def slaughterhouse_view():
 
 
 @token_admin_validate
-@app.route("/slaughterhouse_create/", methods=["GET", "POST"])
+@app.route("/slaughterhouse/create/", methods=["GET", "POST"])
 def slaughterhouse_create():
     """Creazione Allevatore Consorzio."""
     form = FormSlaughterhouseCreate()
@@ -51,7 +51,7 @@ def slaughterhouse_create():
             db.session.add(new_slaughterhouse)
             db.session.commit()
             flash("MACELLO creato correttamente.")
-            return redirect(url_for('slaughterhouse_view'))
+            return redirect(url_for('slaughterhouse/view'))
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
@@ -61,7 +61,7 @@ def slaughterhouse_create():
 
 
 @token_admin_validate
-@app.route("/slaughterhouse_view_history/<_id>", methods=["GET", "POST"])
+@app.route("/slaughterhouse/view/history/<_id>", methods=["GET", "POST"])
 def slaughterhouse_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Interrogo il DB
@@ -71,12 +71,14 @@ def slaughterhouse_view_history(_id):
     # Estraggo la storia delle modifiche per l'utente
     history_list = slaughterhouse.events
     history_list = [history.to_dict() for history in history_list]
+    len_history = len(history_list)
     return render_template(
-        "slaughterhouse/slaughterhouse_view_history.html", form=_slaughterhouse, history_list=history_list)
+        "slaughterhouse/slaughterhouse_view_history.html", form=_slaughterhouse, history_list=history_list,
+        h_len=len_history)
 
 
 @token_admin_validate
-@app.route("/slaughterhouse_update/<_id>", methods=["GET", "POST"])
+@app.route("/slaughterhouse/update/<_id>", methods=["GET", "POST"])
 def slaughterhouse_update(_id):
     """Aggiorna dati Allevatore."""
     form = FormSlaughterhouseUpdate()
@@ -110,10 +112,10 @@ def slaughterhouse_update(_id):
         }
         # print("SLAUGH_EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, slaughterhouse_id=_id):
-            return redirect(url_for('slaughterhouse_view_history', _id=_id))
+            return redirect(url_for('slaughterhouse/view/history', _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('slaughterhouse_view_history', _id=_id))
+            return redirect(url_for('slaughterhouse/view/history', _id=_id))
     else:
         # recupero i dati del record
         slaughterhouse = Slaughterhouse.query.get(int(_id))

@@ -38,14 +38,14 @@ class Buyer(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    created_at = db.Column(db.DateTime, index=False, nullable=True)
+    created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
     def __repr__(self):
-        return f'<Buyer ID: {self.id.data}; Rag. Sociale: {self.buyer_name.data}>'
+        return f'<BUYER ID: {self.id.data}; Rag. Sociale: {self.buyer_name.data}>'
 
     def __str__(self):
-        return f'<Buyer ID: {self.id.data}; Rag. Sociale: {self.buyer_name.data}>'
+        return f'<BUYER ID: {self.id.data}; Rag. Sociale: {self.buyer_name.data}>'
 
     def __init__(self, buyer_name, buyer_type, email=None, phone=None, address=None, cap=None, city=None,
                  affiliation_start_date=None, affiliation_status=None, affiliation_end_date=None, user_id=None,
