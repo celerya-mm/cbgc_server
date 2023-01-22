@@ -4,8 +4,9 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('farmer_view') }}" title="Annulla">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
+            <a class="btn btn-update" type="button" title="Annulla"
+               href="{{ url_for(view) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Aggiungi ALLEVATORE al Consorzio:
         </h5>
@@ -20,10 +21,10 @@
                             {{ form.farmer_name.label }}
                             {{ form.farmer_name(class="form-control") }}
                             {% if form.farmer_name.errors %}
-                                {% for error in form.farmer_name.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.farmer_name.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -31,10 +32,10 @@
                             {{ form.email.label }}
                             {{ form.email(class="form-control") }}
                             {% if form.email.errors %}
-                                {% for error in form.email.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.email.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -42,10 +43,10 @@
                             {{ form.phone.label }}
                             {{ form.phone(class="form-control") }}
                             {% if form.phone.errors %}
-                                {% for error in form.phone.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.phone.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -53,10 +54,10 @@
                             {{ form.address.label }}
                             {{ form.address(class="form-control") }}
                             {% if form.address.errors %}
-                                {% for error in form.address.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.address.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                     </div>
@@ -67,10 +68,10 @@
                             {{ form.cap.label }}
                             {{ form.cap(class="form-control") }}
                             {% if form.cap.errors %}
-                                {% for error in form.cap.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.cap.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -78,10 +79,10 @@
                             {{ form.city.label }}
                             {{ form.city(class="form-control") }}
                             {% if form.city.errors %}
-                                {% for error in form.city.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.city.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -89,10 +90,10 @@
                             {{ form.affiliation_start_date.label }}
                             {{ form.affiliation_start_date(class="form-control") }}
                             {% if form.affiliation_start_date.errors %}
-                                {% for error in form.affiliation_start_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.affiliation_start_date.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
@@ -100,10 +101,10 @@
                             {{ form.affiliation_status.label }}
                             {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
                             {% if form.affiliation_status.errors %}
-                                {% for error in form.affiliation_status.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.affiliation_status.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                     </div>
@@ -137,20 +138,20 @@
                     <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                     {{ form.note_certificate(class="form-control") }}
                     {% if form.note_certificate.errors %}
-                        {% for error in form.note_certificate.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note_certificate.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <div class="form-group">
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}
-                        {% for error in form.note.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <hr>

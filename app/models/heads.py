@@ -44,12 +44,10 @@ class Head(db.Model):
     sale_year = db.Column(db.Integer, index=False, nullable=True)
 
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=True)
-    buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id'), nullable=True)
-    slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id'), nullable=True)
 
-    dna_cert = db.relationship('CertificateDna', backref='head')
-    cons_cert = db.relationship('CertificateCons', backref='head')
-    events = db.relationship('EventDB', backref='head')
+    dna_cert = db.relationship('CertificateDna', backref='head', lazy=True)
+    cons_cert = db.relationship('CertificateCons', backref='head', lazy=True)
+    events = db.relationship('EventDB', backref='head', lazy=True)
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -63,10 +61,8 @@ class Head(db.Model):
     def __str__(self):
         return f'<CAPO: {self.headset}>'
 
-    def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None,
-                 sale_date=None, note_certificate=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
-                 dna_cert=None, cons_cert=None, events=None, note=None):
-
+    def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None, sale_date=None,
+                 note_certificate=None, farmer_id=None, dna_cert=None, cons_cert=None, events=None, note=None):
         from ..utilitys.functions import year_extract, str_to_date
 
         self.headset = headset
@@ -84,8 +80,6 @@ class Head(db.Model):
         self.sale_year = year_extract(sale_date)
 
         self.farmer_id = farmer_id
-        self.buyer_id = buyer_id
-        self.slaughterhouse_id = slaughterhouse_id
 
         self.dna_cert = dna_cert or []
         self.cons_cert = cons_cert or []
@@ -117,8 +111,6 @@ class Head(db.Model):
             'sale_year': self.sale_year,
 
             'farmer_id': self.farmer_id,
-            'buyer_id': self.buyer_id,
-            'slaughterhouse_id': self.slaughterhouse_id,
 
             'note_certificate': self.note_certificate,
             'note': self.note,

@@ -5,7 +5,7 @@
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
             <a class="btn btn-update" type="button" title="Annulla"
-               href="{{ url_for('buyer_view_history', _id=id) }}">
+               href="{{ url_for(history, _id=id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Modifica ACQUIRENTE [ {{ id }} ]:
@@ -17,7 +17,7 @@
                     {% if form.affiliation_status != True %}
                     {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == None %}
                     <span class="text-danger">
-                                ATTENZIONE: manca la data di cessazione affiliazione.</span>
+                        ATTENZIONE: manca la data di cessazione affiliazione.</span>
                     {% endif %}
                     {% endif %}
                 </div>

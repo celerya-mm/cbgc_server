@@ -6,12 +6,13 @@
     <div class="container text-center mt-2">
         <h5 class="card-title">
             <a class="btn btn-update" type="button" title="Torna indietro"
-               href="{{ url_for('user_view') }}">
+               href="{{ url_for(view) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Dati UTENTE SERVIZIO [ {{ form.id }} ]:
         </h5>
-        <a class="btn btn-update" type="button" title="Modifica utente" href="{{ url_for('user_update', _id=form.id) }}">
+        <a class="btn btn-update" type="button" title="Modifica utente"
+           href="{{ url_for(update, _id=form.id) }}">
             <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
         </a>
     </div>
@@ -76,8 +77,7 @@
             <div id="collapseOne" class="accordion-collapse collapse"
                  aria-labelledby="headingOne"
                  data-bs-parent="#accordion">
-                <div class="table-responsive">
-                    <br>
+                <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
@@ -105,8 +105,60 @@
                 </div>
             </div>
         </div>
+        <!--        Tabella Compratori-->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="3">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse3"
+                        aria-expanded="true"
+                        aria-controls="collapse3">
+                    Acquirenti gestiti [ {{ len_buyers }} ]
+                </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse"
+                 aria-labelledby="heading3"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive" style="padding: 10px">
+                    <table id="buyer" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="b1" data-defaultsort="desc">ID</th>
+                            <th class="title" id="b2">Rag. Sociale</th>
+                            <th class="title" id="b3">Indirizzo</th>
+                            <th class="title" id="b4">email</th>
+                            <th class="title" id="b5">Tel.</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in buyer_list %}
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.id|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.buyer_name|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.full_address|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.email|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.phone|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+<p class="info">Data Creazione: {{ form.created_at }}</p>
+<p class="info">Ultima modifica: {{ form.updated_at }}</p>
 
 {% endblock %}
 
@@ -130,6 +182,26 @@
             }
         });
     });
+
+    $(document).ready(function () {
+        $('#buyer').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+
 
 </script>
 {% endblock %}

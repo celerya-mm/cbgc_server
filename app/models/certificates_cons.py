@@ -2,7 +2,6 @@ from datetime import datetime
 
 from ..app import db
 
-
 # importazioni per relazioni "backref"
 from .events_db import EventDB  # noqa
 
@@ -50,7 +49,7 @@ class CertificateCons(db.Model):
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
     slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id'), nullable=True)
 
-    events = db.relationship('EventDB', backref='cert_cons')
+    events = db.relationship('EventDB', backref='cert_cons', lazy=True)
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -71,7 +70,6 @@ class CertificateCons(db.Model):
                  head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  invoice_nr=None, invoice_date=None, invoice_status=None,
                  events=None, note_certificate=None, note=None):
-
         from ..utilitys.functions import year_extract, str_to_date
 
         self.certificate_id = certificate_id

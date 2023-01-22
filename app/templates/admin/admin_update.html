@@ -4,7 +4,8 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center ">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('admin_view_history', _id=id) }}" title="Annulla">
+            <a class="btn btn-update" type="button" title="Annulla"
+               href="{{ url_for(history, _id=id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Modifica l'AMMINISTRATORE [ {{ id }} ]:

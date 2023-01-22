@@ -7,11 +7,11 @@
             <div class="col-md-14">
                 <h2 class="card-title" style="padding: 20px;">
                     <a class="btn btn-update" type="button" title="Crea nuovo Utente"
-                       href="{{ url_for('user_create') }}">
+                       href="{{ url_for(create) }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco UTENTI SERVIZIO:</h2>
-                <div class="table-responsive">
+                <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
@@ -34,8 +34,9 @@
                             </td>
                             <td style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Visualizza utente"
-                                   href="{{ url_for('user_view_history', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
+                                   href="{{ url_for(history, _id=row.id) }}">
+                                    <img class="icon-table"
+                                         src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
@@ -59,8 +60,9 @@
                             </td>
                             <td style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Modifica utente"
-                                   href="{{ url_for('user_update', _id=row.id) }}">
-                                    <img class="icon-table" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
+                                   href="{{ url_for(update, _id=row.id) }}">
+                                    <img class="icon-table"
+                                         src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
                                 </a>
                             </td>
@@ -95,6 +97,8 @@
             }
         });
     });
+
+
 
 
 

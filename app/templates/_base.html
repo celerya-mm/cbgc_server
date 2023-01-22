@@ -31,115 +31,126 @@
 </head>
 
 <body>
-    <div>
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-bg-white"
-             style="padding-left: 10px; padding-rigth: 10px;">
-            <a class="navbar-brand" title="Home" href="{{ url_for('admin_view') }}">
-                <img src="{{ url_for('static', filename='Logo.png') }}" alt="" width="56" height="50"/>
-            </a>
+<div>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-bg-white"
+         style="padding-left: 10px; padding-rigth: 10px;">
+        <a class="navbar-brand" title="Home" href="{{ url_for('admin_view') }}">
+            <img src="{{ url_for('static', filename='Logo.png') }}" alt="" width="56" height="50"/>
+        </a>
 
-            <button class="navbar-toggler" style="color: white;" type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon" style="color: white"></span>
-            </button>
+        <button class="navbar-toggler" style="color: white;" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon" style="color: white"></span>
+        </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="navbar-nav ml-auto">
-                    <a class="nav-item nav-link {% if request.path == '/admin/view/' %} active {% endif %}"
-                       title="Admin" href="{{ url_for('admin_view') }}">
-                        {% if request.path == '/admin_view/' %}
-                            <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='icons/admin.svg') }}" alt="">
-                        {% endif %}
-                        Amministratori
-                    </a>
-                    <a class="nav-item nav-link {% if request.path == '/user/view/' %} active {% endif %}"
-                       title="Users" href="{{ url_for('user_view') }}">
-                        {% if request.path == '/user_view/' %}
-                            <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
-                        {% endif %}
-                        Utenti
-                    </a>
-                    <a class="nav-item nav-link {% if request.path == '/head/view/' %} active {% endif %}"
-                       title="Allevatori" href="{{ url_for('head_view') }}">
-                        {% if request.path == '/farmer_view/' %}
-                            <img src="{{ url_for('static', filename='icons/head-active.svg') }}" alt="">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='icons/head.svg') }}" alt="">
-                        {% endif %}
-                        Capi
-                    </a>
-                    <a class="nav-item nav-link {% if request.path == '/farmer/view/' %} active {% endif %}"
-                       title="Allevatori" href="{{ url_for('farmer_view') }}">
-                        {% if request.path == '/farmer_view/' %}
-                            <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='icons/agriculture.svg') }}" alt="">
-                        {% endif %}
-                        Allevatori
-                    </a>
-                    <a class="nav-item nav-link {% if request.path == '/buyer/view/' %} active {% endif %}"
-                       title="Acquirenti" href="{{ url_for('buyer_view') }}">
-                        {% if request.path == '/buyer_view/' %}
-                            <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
-                        {% endif %}
-                        Acquirenti
-                    </a>
-                    <a class="nav-item nav-link {% if request.path == '/slaughterhouse/view/' %} active {% endif %}"
-                       title="Acquirenti" href="{{ url_for('slaughterhouse_view') }}">
-                        {% if request.path == '/slaughterhouse_view/' %}
-                            <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
-                        {% endif %}
-                        Macelli
-                    </a>
-                    <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
-                        <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">
-                        LogOut
-                    </a>
-                </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link {% if request.path == '/admin/view/' %} active {% endif %}"
+                   title="Admin" href="{{ url_for('admin_view') }}">
+                    {% if request.path == '/admin/view/' %}
+                    <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/admin.svg') }}" alt="">
+                    {% endif %}
+                    Ammin.
+                </a>
+                <a class="nav-item nav-link {% if request.path == '/user/view/' %} active {% endif %}"
+                   title="Users" href="{{ url_for('user_view') }}">
+                    {% if request.path == '/user/view/' %}
+                    <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
+                    {% endif %}
+                    Utenti
+                </a>
+                <a class="nav-item nav-link {% if request.path == '/head/view/' %} active {% endif %}"
+                   title="Allevatori" href="{{ url_for('head_view') }}">
+                    {% if request.path == '/head/view/' %}
+                    <img src="{{ url_for('static', filename='icons/head-active.svg') }}" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/head.svg') }}" alt="">
+                    {% endif %}
+                    Capi
+                </a>
+                <a class="nav-item nav-link {% if request.path == '/farmer/view/' %} active {% endif %}"
+                   title="Allevatori" href="{{ url_for('farmer_view') }}">
+                    {% if request.path == '/farmer/view/' %}
+                    <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/agriculture.svg') }}" alt="">
+                    {% endif %}
+                    Allevatori
+                </a>
+                <a class="nav-item nav-link {% if request.path == '/buyer/view/' %} active {% endif %}"
+                   title="Acquirenti" href="{{ url_for('buyer_view') }}">
+                    {% if request.path == '/buyer/view/' %}
+                    <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
+                    {% endif %}
+                    Acquirenti
+                </a>
+                <a class="nav-item nav-link {% if request.path == '/slaughterhouse/view/' %} active {% endif %}"
+                   title="Acquirenti" href="{{ url_for('slaughterhouse_view') }}">
+                    {% if request.path == '/slaughterhouse/view/' %}
+                    <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
+                    {% endif %}
+                    Macelli
+                </a>
+                <a class="nav-item nav-link {% if request.path == '/cert_dna/view/' %} active {% endif %}"
+                   title="Certificati DNA" href="{{ url_for('cert_dna_view') }}">
+                    {% if request.path == '/cert_dna/view/' %}
+                    <img src="{{ url_for('static', filename='icons/dna-blue-light.png') }}"
+                         style="height: 24px; width: 24px;" alt="">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='icons/dna-white.png') }}"
+                         style="height: 24px; width: 24px;" alt="">
+                    {% endif %}
+                    DNA
+                </a>
+                <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
+                    <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">
+                    LogOut
+                </a>
             </div>
-        </nav>
-        <!-- Messaggio gestione errori std -->
-        <div class="container text-center mt-3 message">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <p style="color: #ED6666">{{ message }}</p>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
         </div>
+    </nav>
+    <!-- Messaggio gestione errori std -->
+    <div class="container text-center mt-3 message">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <p style="color: #ED6666">{{ message }}</p>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
+</div>
 
-    {% block content %}
-    {% endblock %}
+{% block content %}
+{% endblock %}
 
-    <!-- JavaScript Bundle with Popper for boostrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-            crossorigin="anonymous">
-    </script>
-    <script type="text/javascript" charset="utf8"
-            src="https://code.jquery.com/jquery-3.6.0.min.js">
-    </script>
-    <script type="text/javascript" charset="utf8"
-            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
-    </script>
-    <script type="text/javascript" charset="utf8"
-            src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js">
-    </script>
+<!-- JavaScript Bundle with Popper for boostrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous">
+</script>
+<script type="text/javascript" charset="utf8"
+        src="https://code.jquery.com/jquery-3.6.0.min.js">
+</script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
+</script>
+<script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js">
+</script>
 
-    {% block scripts %}
-    {% endblock %}
+{% block scripts %}
+{% endblock %}
 </body>
 <footer class="footer">
     <hr>

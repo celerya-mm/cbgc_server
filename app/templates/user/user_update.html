@@ -4,8 +4,9 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" href="{{ url_for('user_view_history', _id=id) }}" title="Annulla">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
+            <a class="btn btn-update" type="button" title="Annulla"
+               href="{{ url_for(history, _id=id) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Modifica UTENTE [ {{ id }} ]:
         </h5>
@@ -14,15 +15,16 @@
             <div class="row no-gutters justify-content-center shadow rounded"
                  style="border: solid 0.7px #ED6666 !important;">
                 <div class="col-md-6">
+                    <br>
                     <div class="form-group">
                         {{ form.username.label }}
                         <p class="comment">Lo username non deve contenere spazi.</p>
                         {{ form.username(class="form-control") }}
                         {% if form.username.errors %}
-                            {% for error in form.username.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.username.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <br>
@@ -30,10 +32,10 @@
                         {{ form.name.label }}
                         {{ form.name(class="form-control") }}
                         {% if form.name.errors %}
-                            {% for error in form.name.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <br>
@@ -41,21 +43,23 @@
                         {{ form.last_name.label }}
                         {{ form.last_name(class="form-control") }}
                         {% if form.last_name.errors %}
-                            {% for error in form.last_name.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.last_name.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
+                </div>
+                <div class="col-md-6">
                     <br>
                     <div class="form-group">
                         {{ form.email.label }}
                         {{ form.email(class="form-control") }}
                         {% if form.email.errors %}
-                            {% for error in form.email.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.email.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
                     <br>
@@ -63,25 +67,27 @@
                         {{ form.phone.label }}
                         {{ form.phone(class="form-control") }}
                         {% if form.phone.errors %}
-                            {% for error in form.phone.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.phone.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                     </div>
-                 </div>
+                </div>
                 <br>
+                <p></p>
                 <div class="form-group">
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}
-                        {% for error in form.note.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <br>
+                <p></p>
                 <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil-fill_green.svg') }}"
                          alt=""/>

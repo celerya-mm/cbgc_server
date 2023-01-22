@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, validators
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
+from app.utilitys.functions_accounts import psw_verify
+
 
 class FormLogin(FlaskForm):
     """Form di login."""
@@ -13,7 +15,7 @@ class FormLogin(FlaskForm):
 
 class FormInsertMail(FlaskForm):
     """Form d'invio mail per reset password"""
-    email = EmailField('Current e-mail', validators=[DataRequired("Campo obbligatorio!"), Email()])
+    email = EmailField('Current e-mail', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
     submit = SubmitField("SEND EMAIL")
 
 
@@ -26,11 +28,13 @@ class FormPswChange(FlaskForm):
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
     new_password_2 = PasswordField('Conferma Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
-        EqualTo('new_password_1',
-                message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
+        EqualTo('new_password_1', message='Le password non corrispondono.')
+    ])
 
     submit = SubmitField("SEND_NEW_PASSWORD")
 
-    def validate_password(self):
-        if self.new_password_1.data != self.new_password_2.data:
-            raise validators.ValidationError('Passwords do not match')
+    def validate_new_password_1(self, field):  # noqa
+        """Valida la nuova password."""
+        message = psw_verify(field.data)
+        if message:
+            raise validators.ValidationError(message)

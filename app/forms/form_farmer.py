@@ -8,7 +8,6 @@ from ..models.certificates_cons import CertificateCons  # noqa
 from ..models.certificates_dna import CertificateDna  # noqa
 from ..models.farmers import Farmer
 from ..models.heads import Head  # noqa
-from ..utilitys.functions import date_to_str
 
 
 def list_farmer():
@@ -94,7 +93,7 @@ class FormFarmerUpdate(FlaskForm):
 
     def validate_affiliation_status(self, field):
         """Valida stato affiliazione in base alle date inserite."""
-        if field.data == "NO" and self.affiliation_end_date.data not in [None, ""]:
+        if field.data == "SI" and self.affiliation_end_date.data not in [None, ""]:
             raise ValidationError(
                 "Attenzione lo Stato Affiliazione non può essere SI se è presente una data di cessazione affiliazione.")
 
@@ -120,33 +119,6 @@ class FormFarmerUpdate(FlaskForm):
             'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
             'affiliation_end_date': date_to_str(self.affiliation_end_date),
             'affiliation_status': status_si_no(self.affiliation_status.data),
-
-            'note_certificate': self.note_certificate.data,
-            'note': self.note.data,
-        }
-
-    def to_db(self):
-        """Esporta in un dict la classe."""
-        from ..utilitys.functions import address_mount, str_to_date, status_true_false
-        return {
-            'farmer_name': self.farmer_name.data,
-
-            'email': self.email.data,
-            'phone': self.phone.data,
-
-            'address': self.address.data,
-            'cap': self.cap.data,
-            'city': self.city.data,
-            'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
-
-            'stable_code': self.stable_code.data,
-            'stable_type': self.stable_type.data,
-            'stable_productive_orientation': self.stable_productive_orientation.data,
-            'stable_breeding_methods': self.stable_breeding_methods.data,
-
-            'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
-            'affiliation_end_date': date_to_str(self.affiliation_end_date),
-            'affiliation_status': status_true_false(self.affiliation_status.data),
 
             'note_certificate': self.note_certificate.data,
             'note': self.note.data,

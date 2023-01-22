@@ -4,12 +4,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
-from ..models.buyers import Buyer
 from ..models.certificates_cons import CertificateCons  # noqa
 from ..models.certificates_dna import CertificateDna  # noqa
 from ..models.farmers import Farmer
 from ..models.heads import Head, verify_castration
-from ..models.slaughterhouses import Slaughterhouse
 
 
 def list_head():
@@ -28,24 +26,6 @@ def list_farmer():
     return _list
 
 
-def list_buyer():
-    records = Buyer.query.all()
-    _dicts = [x.to_dict() for x in records]
-    _list = ["-"]
-    for d in _dicts:
-        _list.append(f"{str(d['id'])} - {d['buyer_name']}")
-    return _list
-
-
-def list_slaughterhouse():
-    records = Slaughterhouse.query.all()
-    _dicts = [x.to_dict() for x in records]
-    _list = ["-"]
-    for d in _dicts:
-        _list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
-    return _list
-
-
 class FormHeadCreate(FlaskForm):
     """Form inserimento dati Capo."""
     headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=14, max=14)])
@@ -57,8 +37,6 @@ class FormHeadCreate(FlaskForm):
     sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
     farmer_id = SelectField("Allevatore", choices=list_farmer(), default="-")
-    buyer_id = SelectField("Acquirente", choices=list_buyer(), default="-", validators=[Optional()])
-    slaughterhouse_id = SelectField("Macello", choices=list_slaughterhouse(), default="-", validators=[Optional()])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
@@ -81,16 +59,6 @@ class FormHeadCreate(FlaskForm):
         if field.data not in ["", "-", None] and field.data.strip() not in list_farmer():
             raise ValidationError("Nessun ALLEVATORE presente corrispondente alla Ragione Sociale inserita.")
 
-    def validate_buyer_id(Self, field):  # noqa
-        """Valida campo buyer_id."""
-        if field.data not in ["", "-", None] and field.data.strip() not in list_buyer():
-            raise ValidationError("Nessun ACQUIRENTE presente corrispondente alla Ragione Sociale inserita.")
-
-    def validate_slaughterhouse_id(Self, field):  # noqa
-        """Valida campo slaughterhouse_id."""
-        if field.data not in ["", "-", None] and field.data.strip() not in list_slaughterhouse():
-            raise ValidationError("Nessun MACELLO presente corrispondente alla Ragione Sociale inserita.")
-
 
 class FormHeadUpdate(FlaskForm):
     """Form modifica dati Capo."""
@@ -102,8 +70,6 @@ class FormHeadUpdate(FlaskForm):
     sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
     farmer_id = SelectField("Allevatore", choices=list_farmer())
-    buyer_id = SelectField("Acquirente", choices=list_buyer(), validators=[Optional()])
-    slaughterhouse_id = SelectField("Macello", choices=list_slaughterhouse(), validators=[Optional()])
 
     note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
@@ -120,16 +86,6 @@ class FormHeadUpdate(FlaskForm):
         """Valida campo farmer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_farmer():
             raise ValidationError("Nessun ALLEVATORE presente corrispondente alla Ragione Sociale inserita.")
-
-    def validate_buyer_id(self, field):  # noqa
-        """Valida campo buyer_id."""
-        if field.data not in ["", "-", None] and field.data.strip() not in list_buyer():
-            raise ValidationError("Nessun ACQUIRENTE presente corrispondente alla Ragione Sociale inserita.")
-
-    def validate_slaughterhouse_id(self, field):  # noqa
-        """Valida campo slaughterhouse_id."""
-        if field.data not in ["", "-", None] and field.data.strip() not in list_slaughterhouse():
-            raise ValidationError("Nessun MACELLO presente corrispondente alla Ragione Sociale inserita.")
 
     def to_dict(self):
         """Converte form in dict."""
@@ -150,34 +106,6 @@ class FormHeadUpdate(FlaskForm):
             'sale_year': year_extract(self.sale_date.data),
 
             'farmer_id': self.farmer_id.data,
-            'buyer_id': self.buyer_id.data,
-            'slaughterhouse_id': self.slaughterhouse_id.data,
-
-            'note_certificate': self.note_certificate.data,
-            'note': self.note.data,
-        }
-
-    def to_db(self):
-        """Converte form in dict."""
-        from ..utilitys.functions import str_to_date, year_extract
-        return {
-            'headset': self.headset.data,
-
-            'birth_date': str_to_date(self.birth_date.data),
-            'birth_year': year_extract(self.birth_date.data),
-
-            'castration_date': str_to_date(self.castration_date.data),
-            'castration_year': year_extract(self.castration_date.data),
-            'castration_compliance': verify_castration(self.birth_date.data, self.castration_date.data),
-
-            'slaughter_date': str_to_date(self.slaughter_date.data),
-
-            'sale_date': str_to_date(self.sale_date.data),
-            'sale_year': year_extract(self.sale_date.data),
-
-            'farmer_id': self.farmer_id.data,
-            'buyer_id': self.buyer_id.data,
-            'slaughterhouse_id': self.slaughterhouse_id.data,
 
             'note_certificate': self.note_certificate.data,
             'note': self.note.data,

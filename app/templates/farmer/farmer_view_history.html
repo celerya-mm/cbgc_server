@@ -6,43 +6,44 @@
     <div class="container text-center mt-2">
         <h5 class="card-title">
             <a class="btn btn-update" type="button" title="Torna indietro"
-               href="{{ url_for('farmer_view') }}">
+               href="{{ url_for(view) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
                      alt=""/>
             </a>
             Dati ALLEVATORE [ {{ form.id }} ]:
+            <a class="btn btn-update" type="button" title="Modifica utente"
+               href="{{ url_for(update, _id=form.id) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+            </a>
         </h5>
         <h5>
             Stato Affiliazione
             {% if form.affiliation_status == True or form.affiliation_status == "SI" %}
-                <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
+            <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
             {% else %}
-                <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
+            <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
             {% endif %}
         </h5>
         <div class="form-group">
             {% if form.affiliation_status != True and form.affiliation_status != "SI"%}
-                {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == None %}
-                    <span class="text-danger">
+            {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == None %}
+            <span class="text-danger">
                         ATTENZIONE: manca la data di cessazione affiliazione.</span>
-                {% endif %}
+            {% endif %}
             {% endif %}
             {% if form.affiliation_status == True or form.affiliation_status == "SI"%}
-                {% if form.affiliation_end_date != "vuoto" and form.affiliation_end_date != None %}
-                    <span class="text-danger">
+            {% if form.affiliation_end_date != "vuoto" and form.affiliation_end_date != None %}
+            <span class="text-danger">
                         ATTENZIONE: è presente la data di Fine Affiliazione ma lo stato è ancora "SI".</span>
-                {% endif %}
+            {% endif %}
             {% endif %}
         </div>
-        <a class="btn btn-update" type="button" title="Modifica utente"
-           href="{{ url_for('farmer_update', _id=form.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
-        </a>
     </div>
 
     <div class="container text-center mt-2">
         <div class="form-group">
-            <h6> Ragione Sociale </h6>
+            <!--            <h6> Ragione Sociale </h6>-->
+            <br>
             <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                 {{ form.farmer_name }}
             </p>
@@ -139,8 +140,7 @@
             <div id="collapseOne" class="accordion-collapse collapse"
                  aria-labelledby="headingOne"
                  data-bs-parent="#accordion">
-                <div class="table-responsive">
-                    <br>
+                <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
@@ -194,6 +194,11 @@
             }
         });
     });
+
+
+
+
+
 
 
 </script>

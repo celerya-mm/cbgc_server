@@ -6,11 +6,12 @@
         <div class="row no-gutters justify-content-center">
             <div class="col-md-12 shadow rounded">
                 <h2 class="card-title" style="padding: 20px;">
-                    <a class="btn btn-update" type="button" title="Crea nuovo Capo" href="{{ url_for('head_create') }}">
+                    <a class="btn btn-update" type="button" title="Crea nuovo Capo"
+                       href="{{ url_for(create) }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco CAPI Consorzio:</h2>
-                <div class="table-responsive">
+                <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
@@ -33,7 +34,7 @@
                             </td>
                             <td style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Visualizza Capo"
-                                   href="{{ url_for('head_view_history', _id=row.id) }}">
+                                   href="{{ url_for(history, _id=row.id) }}">
                                     <img class="icon-table"
                                          src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
@@ -64,7 +65,7 @@
                             </td>
                             <td style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Modifica Capo"
-                                   href="{{ url_for('head_update', _id=row.id) }}">
+                                   href="{{ url_for(update, _id=row.id) }}">
                                     <img class="icon-table"
                                          src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
@@ -102,6 +103,8 @@
             }
         });
     });
+
+
 
 
 </script>

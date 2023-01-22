@@ -19,11 +19,12 @@ class Administrator(db.Model):
     name = db.Column(db.String(50), index=False, unique=False, nullable=True)
     last_name = db.Column(db.String(50), index=False, unique=False, nullable=True)
     full_name = db.Column(db.String(101), index=False, unique=False, nullable=True)
+
     email = db.Column(db.String(80), index=False, unique=True, nullable=True)
     phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-    auth_tokens = db.relationship('AuthToken', backref='administrator')
-    events = db.relationship('EventDB', backref='administrator')
+    auth_tokens = db.relationship('AuthToken', backref='administrator', lazy=True)
+    events = db.relationship('EventDB', backref='administrator', lazy=True)
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -38,7 +39,6 @@ class Administrator(db.Model):
 
     def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
                  events=None, note=None):
-
         from ..utilitys.functions import mount_full_name
 
         self.username = username
@@ -94,9 +94,9 @@ class User(db.Model):
     email = db.Column(db.String(80), index=False, unique=True, nullable=True)
     phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-    buyers = db.relationship('Buyer', backref='user')
-    auth_tokens = db.relationship('AuthToken', backref='user')
-    events = db.relationship('EventDB', backref='user')
+    buyers = db.relationship('Buyer', backref='user', lazy=True)
+    auth_tokens = db.relationship('AuthToken', backref='user', lazy=True)
+    events = db.relationship('EventDB', backref='user', lazy=True)
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -111,8 +111,7 @@ class User(db.Model):
 
     def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, note=None,
                  buyers=None, auth_tokens=None, events=None):
-
-        from ..utilitys.functions import mount_full_name, str_to_date
+        from ..utilitys.functions import mount_full_name
 
         self.username = username
         self.password = password

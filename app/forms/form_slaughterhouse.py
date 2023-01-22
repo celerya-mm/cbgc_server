@@ -100,26 +100,3 @@ class FormSlaughterhouseUpdate(FlaskForm):
             'note_certificate': self.note_certificate.data,
             'note': self.note.data,
         }
-
-    def to_db(self):
-        """Converte form in dict."""
-        from ..utilitys.functions import address_mount, str_to_date, status_true_false
-        return {
-            'slaughterhouse': self.slaughterhouse.data,
-            'slaughterhouse_code': self.slaughterhouse_code.data,
-
-            'email': self.email.data,
-            'phone': self.phone.data,
-
-            'address': self.address.data,
-            'cap': self.cap.data,
-            'city': self.city.data,
-            'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
-
-            'affiliation_start_date': str_to_date(self.affiliation_start_date.data),
-            'affiliation_end_date': str_to_date(self.affiliation_end_date.data),
-            'affiliation_status': status_true_false(self.affiliation_status.data),
-
-            'note_certificate': self.note_certificate.data,
-            'note': self.note.data,
-        }

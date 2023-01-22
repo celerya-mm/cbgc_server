@@ -5,22 +5,28 @@
     {{ form.csrf_token }}
     <div class="container text-center mt-2">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Torna indietro"
-               href="{{ url_for('head_view', _id=form.head_id) }}">
+            <a class="btn btn-update" type="button" title="Torna alla lista dei certificati DNA"
+               href="{{ url_for(view, _id=form.id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
                      alt=""/>
             </a>
-            Dati Certificato DNA [ {{ form.dna_cert_nr }} ]:
+            Dati Certificato DNA [ {{ _id }} ]:
+            <a class="btn btn-update" type="button" title="Modifica Certificato DNA"
+               href="{{ url_for(update, _id=_id) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+            </a>
         </h5>
-        <a class="btn btn-update" type="button" title="Modifica Certificato DNA"
-           href="{{ url_for('cert_dna_update', _id=form.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
-        </a>
     </div>
 
     <div class="container text-center mt-2">
         <div class="row no-gutters justify-content-center">
             <div class="col-md-6 order-first">
+                <div class="form-group">
+                    <h6> Nr. certificato </h6>
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.dna_cert_nr }}
+                    </p>
+                </div>
                 <div class="form-group">
                     <h6> Data </h6>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
@@ -36,15 +42,25 @@
             </div>
             <div class="col-md-6 order-second">
                 <div class="form-group">
-                    <h6> Capo </h6>
+                    <a title="Vai al capo" href="{{ url_for(view_head, _id=form.head_id) }}">
+                        Capo
+                    </a>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                         {{ form.head_id }}
                     </p>
                 </div>
                 <div class="form-group">
-                    <h6> Allevatore </h6>
+                    <a title="Vai ad Allevatore" href="{{ url_for(view_farmer, _id=form.farmer_id) }}">
+                        Allevatore
+                    </a>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                         {{ form.farmer_id }}
+                    </p>
+                </div>
+                <div class="form-group">
+                    <h6> Veterinario </h6>
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.veterinarian }}
                     </p>
                 </div>
             </div>
@@ -72,8 +88,7 @@
             <div id="collapseOne" class="accordion-collapse collapse"
                  aria-labelledby="headingOne"
                  data-bs-parent="#accordion">
-                <div class="table-responsive">
-                    <br>
+                <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
@@ -128,6 +143,44 @@
             }
         });
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </script>

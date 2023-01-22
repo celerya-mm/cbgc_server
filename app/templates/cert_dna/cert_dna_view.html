@@ -7,7 +7,7 @@
             <div class="shadow rounded">
                 <h2 class="card-title" style="padding: 20px;">
                     Elenco Certificati DNA Capi del Consorzio:</h2>
-                <div class="table-responsive">
+                <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
@@ -17,8 +17,9 @@
                             <th class="title text-center" id="h4">Data</th>
                             <th class="title text-center" id="h5">Anno</th>
                             <th class="title text-center" id="h6">Capo</th>
-                            <th class="title text-center" id="h7">Allevatore</th>
-                            <th class="title" data-sortable="false" id="h8"></th>
+                            <th class="title text-center" id="h8">Allevatore</th>
+                            <th class="title text-center" id="h9">Vet.</th>
+                            <th class="title" data-sortable="false" id="h10"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -29,7 +30,7 @@
                             </td>
                             <td class="text-center" style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Visualizza Acquirente"
-                                   href="{{ url_for('cert_dna_view_history', _id=row.id) }}">
+                                   href="{{ url_for(history, _id=row.id) }}">
                                     <img class="icon-table"
                                          src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                          alt=""/>
@@ -50,9 +51,12 @@
                             <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.farmer_id|e }}
                             </td>
+                            <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.veterinarian|e }}
+                            </td>
                             <td class="text-center" style="width: 20px; padding:2px;">
                                 <a class="btn-table" type="button" title="Modifica Acquirente"
-                                   href="{{ url_for('cert_dna_update', _id=row.id) }}">
+                                   href="{{ url_for(update, _id=row.id) }}">
                                     <img class="icon-table"
                                          src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                          alt=""/>
@@ -90,6 +94,12 @@
             }
         });
     });
+
+
+
+
+
+
 
 
 

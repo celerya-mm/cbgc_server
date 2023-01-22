@@ -2,7 +2,6 @@ from datetime import datetime
 
 from ..app import db
 
-
 # importazioni per relazioni "backref"
 from .heads import Head  # noqa
 from .certificates_cons import CertificateCons  # noqa
@@ -31,9 +30,8 @@ class Buyer(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
-    heads = db.relationship('Head', backref='buyer')
-    cons_certs = db.relationship('CertificateCons', backref='buyer')
-    events = db.relationship('EventDB', backref='buyer')
+    cons_certs = db.relationship('CertificateCons', backref='buyer', lazy=True)
+    events = db.relationship('EventDB', backref='buyer', lazy=True)
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -50,7 +48,6 @@ class Buyer(db.Model):
     def __init__(self, buyer_name, buyer_type, email=None, phone=None, address=None, cap=None, city=None,
                  affiliation_start_date=None, affiliation_status=None, affiliation_end_date=None, user_id=None,
                  heads=None, cons_certs=None, events=None, note_certificate=None, note=None):
-
         from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.buyer_name = buyer_name

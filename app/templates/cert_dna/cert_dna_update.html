@@ -4,9 +4,9 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button"  title="Annulla"
-               href="{{ url_for('head_view_history', _id=h_id) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt="" />
+            <a class="btn btn-update" type="button" title="Annulla"
+               href="{{ url_for(history, _id=id) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Modifica Certificato DNA [ {{ id }} ]:
         </h5>
@@ -18,45 +18,56 @@
                         <br>
                         {{ form.dna_cert_id.label }}
                         <p class="comment">Inserisci il numero del certificato senza il riferimento all'anno "/20XX".
-                        Verrà assegnato dalla Data del Certificato.</p>
+                            Verrà assegnato dalla Data del Certificato.</p>
                         {{ form.dna_cert_id(class="form-control", style="text-align: center;") }}
                         {% if form.dna_cert_id.errors %}
-                            {% for error in form.dna_cert_id.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                                <br>
-                            {% endfor %}
+                        {% for error in form.dna_cert_id.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                        <br>
+                        {% endfor %}
                         {% endif %}
                         <br>
                         <div class="form-group">
                             {{ form.dna_cert_date.label }}
                             {{ form.dna_cert_date(class="form-control") }}
                             {% if form.dna_cert_date.errors %}
-                                {% for error in form.dna_cert_date.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.dna_cert_date.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.veterinarian.label }}
+                            {{ form.veterinarian(class="form-control") }}
+                            {% if form.veterinarian.errors %}
+                            {% for error in form.veterinarian.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
                         <div class="form-group">
                             {{ form.head_id.label }}
-                            {{ form.head_id(class="form-control") }}
+                            {{ form.head_id(class="form-control", style="text-align: center;") }}
                             {% if form.head_id.errors %}
-                                {% for error in form.head_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.head_id.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                         <br>
                         <div class="form-group">
                             {{ form.farmer_id.label }}
-                            {{ form.farmer_id(class="form-control") }}
+                            {{ form.farmer_id(class="form-control", style="text-align: center;") }}
                             {% if form.farmer_id.errors %}
-                                {% for error in form.farmer_id.errors %}
-                                    <span class="text-danger">{{ error }}</span>
-                                    <br>
-                                {% endfor %}
+                            {% for error in form.farmer_id.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
                             {% endif %}
                         </div>
                     </div>
@@ -66,10 +77,10 @@
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}
-                        {% for error in form.note.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                        {% endfor %}
+                    {% for error in form.note.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
                     {% endif %}
                 </div>
                 <br>

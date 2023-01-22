@@ -26,9 +26,8 @@ class Slaughterhouse(db.Model):
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-    head = db.relationship('Head', backref='slaughterhouse')
-    cons_cert = db.relationship('CertificateCons', backref='slaughterhouse')
-    events = db.relationship('EventDB', backref='slaughterhouse')
+    cons_cert = db.relationship('CertificateCons', backref='slaughterhouse', lazy=True)
+    events = db.relationship('EventDB', backref='slaughterhouse', lazy=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
     updated_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -42,7 +41,6 @@ class Slaughterhouse(db.Model):
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
                  affiliation_start_date, affiliation_status, note_certificate, note, affiliation_end_date=None,
                  head=None, cons_cert=None, events=None):
-
         from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.slaughterhouse = slaughterhouse

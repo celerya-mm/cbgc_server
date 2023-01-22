@@ -19,9 +19,10 @@ def list_buyer():
 
 def list_user():
     records = User.query.all()
-    _list = [x.to_dict() for x in records]
-    _list = [d["username"] for d in _list if "username" in d]
-    _list.append("-")
+    _dicts = [x.to_dict() for x in records]
+    _list = ["-"]
+    for d in _dicts:
+        _list.append(f"{str(d['id'])} - {d['username']}")
     return _list
 
 
@@ -106,7 +107,7 @@ class FormBuyerUpdate(FlaskForm):
 
     def validate_user_id(self, field):  # noqa
         """Valida campo farmer_id."""
-        if field.data not in ["", "-", None] and field.data.strip() not in list_user():
+        if field.data not in ["", None] and field.data.strip() not in list_user():
             raise ValidationError("Nessun UTENTE presente corrispondente all'USERNAME inserito.")
 
     def to_dict(self):
@@ -127,29 +128,6 @@ class FormBuyerUpdate(FlaskForm):
             'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
             'affiliation_end_date': date_to_str(self.affiliation_end_date.data),
             'affiliation_status': status_si_no(self.affiliation_status.data),
-
-            'note_certificate': self.note_certificate.data,
-            'note': self.note.data,
-        }
-
-    def to_db(self):
-        """Converte form in dict."""
-        from ..utilitys.functions import address_mount, str_to_date, status_true_false
-        return {
-            'buyer_name': self.buyer_name.data,
-            'buyer_type': self.buyer_type.data,
-
-            'email': self.email.data,
-            'phone': self.phone.data,
-
-            'address': self.address.data,
-            'cap': self.cap.data,
-            'city': self.city.data,
-            'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
-
-            'affiliation_start_date': str_to_date(self.affiliation_start_date.data),
-            'affiliation_end_date': str_to_date(self.affiliation_end_date.data),
-            'affiliation_status': status_true_false(self.affiliation_status.data),
 
             'note_certificate': self.note_certificate.data,
             'note': self.note.data,

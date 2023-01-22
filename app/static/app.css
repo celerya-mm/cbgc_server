@@ -307,7 +307,7 @@ label {
 }
 
 .rounded {
-    border: solid 0.9px #DEDEDE;
+    border: solid 0.7px #DEDEDE !important;
     margin: 2px;
 }
 

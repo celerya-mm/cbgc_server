@@ -7,21 +7,38 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db
 from ..forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
 from ..models.farmers import Farmer
-from ..utilitys.functions import event_create, token_admin_validate, status_true_false, str_to_date, status_si_no
+from ..utilitys.functions import event_create, token_admin_validate, status_true_false, str_to_date, status_si_no, \
+    address_mount
+
+VIEW = "/farmer/view/"
+VIEW_FOR = "farmer_view"
+VIEW_HTML = "farmer/farmer_view.html"
+
+CREATE = "/farmer/create/"
+CREATE_FOR = "farmer_create"
+CREATE_HTML = "farmer/farmer_create.html"
+
+HISTORY = "/farmer/view/history/<_id>"
+HISTORY_FOR = "farmer_view_history"
+HISTORY_HTML = "farmer/farmer_view_history.html"
+
+UPDATE = "/farmer/update/<_id>"
+UPDATE_FOR = "farmer_update"
+UPDATE_HTML = "farmer/farmer_update.html"
 
 
 @token_admin_validate
-@app.route("/farmer/view/", methods=["GET", "POST"])
+@app.route(VIEW, methods=["GET", "POST"])
 def farmer_view():
     """Visualizzo informazioni Allevatori."""
     # Estraggo la lista degli allevatori
     _list = Farmer.query.all()
     _list = [r.to_dict() for r in _list]
-    return render_template("farmer/farmer_view.html", form=_list)
+    return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
 @token_admin_validate
-@app.route("/farmer/create/", methods=["GET", "POST"])
+@app.route(CREATE, methods=["GET", "POST"])
 def farmer_create():
     """Creazione Allevatore Consorzio."""
     form = FormFarmerCreate()
@@ -58,13 +75,13 @@ def farmer_create():
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
-            return render_template("farmer/farmer_create.html", form=form)
+            return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
     else:
-        return render_template("farmer/farmer_create.html", form=form)
+        return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 
 
 @token_admin_validate
-@app.route("/farmer/view/history/<_id>", methods=["GET", "POST"])
+@app.route(HISTORY, methods=["GET", "POST"])
 def farmer_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     # Interrogo il DB
@@ -80,28 +97,31 @@ def farmer_view_history(_id):
     heads = farmer.heads
     heads = [head.to_dict() for head in heads]
 
-    return render_template("farmer/farmer_view_history.html", form=_farmer, history_list=history_list,
-                           heads=heads, h_len=len_history)
+    return render_template(HISTORY_HTML, form=_farmer, history_list=history_list, h_len=len_history, view=VIEW_FOR,
+                           update=UPDATE_FOR, heads=heads)
 
 
 @token_admin_validate
-@app.route("/farmer/update/<_id>", methods=["GET", "POST"])
+@app.route(UPDATE, methods=["GET", "POST"])
 def farmer_update(_id):
     """Aggiorna dati Allevatore."""
     form = FormFarmerUpdate()
     if form.validate_on_submit():
         # recupero i dati e li converto in dict
         new_data = json.loads(json.dumps(request.form))
-        new_data = new_data.to_db()
+        new_data.pop('csrf_token', None)
         # print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
         farmer = Farmer.query.get(_id)
         previous_data = farmer.to_dict()
         # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
+        new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+        new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
+
         new_data["created_at"] = farmer.created_at
         new_data["updated_at"] = datetime.now()
-        # print("FARM_NEW_DATA:", json.dumps(new_data, indent=2))
+        print("NEW_DATA:", new_data)
         try:
             db.session.query(Farmer).filter_by(id=_id).update(new_data)
             db.session.commit()
@@ -109,7 +129,11 @@ def farmer_update(_id):
         except IntegrityError as err:
             db.session.rollback()
             flash(f"ERRORE: {str(err.orig)}")
-            return render_template("farmer/farmer_update.html", form=form, id=_id)
+            _info = {
+                'created_at': farmer.created_at,
+                'updated_at': farmer.updated_at,
+            }
+            return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 
         _event = {
             "username": session["username"],
@@ -118,10 +142,10 @@ def farmer_update(_id):
         }
         # print("EVENT:", json.dumps(_event, indent=2))
         if event_create(_event, farmer_id=_id):
-            return redirect(url_for('farmer/view/history', _id=_id))
+            return redirect(url_for(HISTORY_FOR, _id=_id))
         else:
             flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
-            return redirect(url_for('farmer/view/history', _id=_id))
+            return redirect(url_for(HISTORY_FOR, _id=_id))
     else:
         # recupero i dati del record
         farmer = Farmer.query.get(_id)
@@ -153,4 +177,4 @@ def farmer_update(_id):
         }
         # print("FARMER_:", form)
         # print("FARMER_FORM:", json.dumps(form.to_dict(form), indent=2))
-        return render_template("farmer/farmer_update.html", form=form, id=_id, info=_info)
+        return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

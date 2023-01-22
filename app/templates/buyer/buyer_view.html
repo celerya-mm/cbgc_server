@@ -7,12 +7,12 @@
             <div class="shadow rounded">
                 <h2 class="card-title" style="padding: 20px;">
                     <a class="btn btn-update" type="button" title="Crea nuovo Acquirente"
-                       href="{{ url_for('buyer_create') }}">
+                       href="{{ url_for(create) }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco ACQUIRENTI Consorzio:</h2>
                 <div>
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="padding: 10px">
                         <table id="data" class="table table-striped" style="width:100%">
                             <thead>
                             <tr style="background-color: #2B4692; vertical-align: center;">
@@ -34,7 +34,7 @@
                                 </td>
                                 <td class="text-center" style="width: 20px; padding:2px;">
                                     <a class="btn-table" type="button" title="Visualizza Acquirente"
-                                       href="{{ url_for('buyer_view_history', _id=row.id) }}">
+                                       href="{{ url_for(history, _id=row.id) }}">
                                         <img class="icon-table"
                                              src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
                                              alt=""/>
@@ -62,7 +62,7 @@
                                 </td>
                                 <td class="text-center" style="width: 20px; padding:2px;">
                                     <a class="btn-table" type="button" title="Modifica Acquirente"
-                                       href="{{ url_for('buyer_update', _id=row.id) }}">
+                                       href="{{ url_for(update, _id=row.id) }}">
                                         <img class="icon-table"
                                              src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
                                              alt=""/>
@@ -101,6 +101,8 @@
             }
         });
     });
+
+
 
 
 

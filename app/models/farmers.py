@@ -30,10 +30,10 @@ class Farmer(db.Model):
     stable_productive_orientation = db.Column(db.String(25), index=False, unique=False, nullable=True)
     stable_breeding_methods = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-    heads = db.relationship('Head', backref='farmer')
-    dna_certs = db.relationship('CertificateDna', backref='farmer')
-    cons_certs = db.relationship('CertificateCons', backref='farmer')
-    events = db.relationship('EventDB', backref='farmer')
+    heads = db.relationship('Head', backref='farmer', lazy=True)
+    dna_certs = db.relationship('CertificateDna', backref='farmer', lazy=True)
+    cons_certs = db.relationship('CertificateCons', backref='farmer', lazy=True)
+    events = db.relationship('EventDB', backref='farmer', lazy=True)
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -51,7 +51,6 @@ class Farmer(db.Model):
                  stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
                  affiliation_start_date=None, affiliation_end_date=None, affiliation_status=None,
                  heads=None, dna_certs=None, cons_certs=None, events=None, note_certificate=None, note=None):
-
         from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.farmer_name = farmer_name

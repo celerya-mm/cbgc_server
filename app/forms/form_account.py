@@ -1,22 +1,25 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, validators
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from ..models.accounts import Administrator, User
+from ..utilitys.functions_accounts import psw_verify, psw_contain_usr
 
 
 def list_admin():
     records = Administrator.query.all()
     _list = [x.to_dict() for x in records]
-    _list = [d["username"] for d in _list if "username" in d]
-    return _list
+    _user = [d["username"] for d in _list if "username" in d]
+    _email = [d["email"] for d in _list if "email" in d]
+    return _user, _email
 
 
 def list_user():
     records = User.query.all()
     _list = [x.to_dict() for x in records]
-    _list = [d["username"] for d in _list if "username" in d]
-    return _list
+    _user = [d["username"] for d in _list if "username" in d]
+    _email = [d["email"] for d in _list if "email" in d]
+    return _user, _email
 
 
 class FormAdminSignup(FlaskForm):
@@ -28,16 +31,16 @@ class FormAdminSignup(FlaskForm):
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
     new_password_2 = PasswordField('Conferma Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
-        EqualTo('new_password_1',
-                message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
+        EqualTo('new_password_1', message='Le password non corrispondono.')
+    ])
 
-    name = StringField('Nome', validators=[Length(min=3, max=25)])
-    last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
+    name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
+    last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
-    email = EmailField('email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)], default="+39 ")
+    email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
+    phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-    note = StringField('Note', validators=[Length(max=255)])
+    note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("SIGNUP")
 
@@ -47,14 +50,29 @@ class FormAdminSignup(FlaskForm):
     def __str__(self):
         return f'<ADMINISTRATOR SIGNUP with username: {self.username}>'
 
-    def validate_password(self):
-        """Valida la nuova password."""
-        if self.new_password_1.data != self.new_password_2.data:
-            raise validators.ValidationError('Passwords do not match')
-
     def validate_username(self, field):  # noqa
-        if field.data in list_admin():
-            raise ValidationError("E' già presente un AMMINISTRATORE con lo stesso username.")
+        """Verifica presenza username nella tabella del DB."""
+        if field.data in list_admin()[0]:
+            raise ValidationError("Username già utilizzato in tabella amministratori.")
+        if field.data in list_user()[0]:
+            raise ValidationError("Username già utilizzato in tabella utenti.")
+
+    def validate_email(self, field):  # noqa
+        """Verifica presenza email nella tabella del DB."""
+        if field.data in list_admin()[1]:
+            raise ValidationError("Email già utilizzata in tabella amministratori.")
+        if field.data in list_user()[1]:
+            raise ValidationError("Email già utilizzata in tabella utenti.")
+
+    def validate_new_password_1(self, field):  # noqa
+        """Valida la nuova password."""
+        message = psw_verify(field.data)
+        if message:
+            raise validators.ValidationError(message)
+
+        message = psw_contain_usr(field.data, self.username.data)
+        if message:
+            raise validators.ValidationError(message)
 
 
 class FormUserSignup(FlaskForm):
@@ -68,13 +86,13 @@ class FormUserSignup(FlaskForm):
         EqualTo('new_password_1',
                 message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
 
-    name = StringField('Nome', validators=[Length(min=3, max=25)])
-    last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
+    name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
+    last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
-    email = EmailField('email', validators=[Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)], default="+39 ")
+    email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
+    phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-    note = StringField('Note', validators=[Length(max=255)])
+    note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("SIGNUP")
 
@@ -84,25 +102,40 @@ class FormUserSignup(FlaskForm):
     def __str__(self):
         return f'<USER SIGNUP with username: {self.username}>'
 
-    def validate_password(self):
-        """Valida la nuova password."""
-        if self.new_password_1.data != self.new_password_2.data:
-            raise validators.ValidationError('Passwords do not match')
-
     def validate_username(self, field):  # noqa
-        if field.data in list_user():
-            raise ValidationError("E' già presente un UTENTE con lo stesso username.")
+        """Verifica presenza username nella tabella del DB."""
+        if field.data in list_admin()[0]:
+            raise ValidationError("Username già utilizzato in tabella amministratori.")
+        if field.data in list_user()[0]:
+            raise ValidationError("Username già utilizzato in tabella utenti.")
+
+    def validate_email(self, field):  # noqa
+        """Verifica presenza email nella tabella del DB."""
+        if field.data in list_admin()[1]:
+            raise ValidationError("Email già utilizzata in tabella amministratori.")
+        if field.data in list_user()[1]:
+            raise ValidationError("Email già utilizzata in tabella utenti.")
+
+    def validate_new_password_1(self, field):  # noqa
+        """Valida la nuova password."""
+        message = psw_verify(field.data)
+        if message:
+            raise validators.ValidationError(message)
+
+        message = psw_contain_usr(field.data, self.username.data)
+        if message:
+            raise validators.ValidationError(message)
 
 
 class FormAccountUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
 
-    name = StringField('Nome', validators=[Length(min=3, max=25)])
-    last_name = StringField('Cognome', validators=[Length(min=3, max=25)])
+    name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
+    last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
     email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-    phone = StringField('Telefono', validators=[Length(min=7, max=25)])
+    phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()])
 
     note = StringField('Note', validators=[Length(max=255)])
 
@@ -115,18 +148,6 @@ class FormAccountUpdate(FlaskForm):
         return f'<UPDATE - username: {self.username}>'
 
     def to_dict(self):
-        """Converte form in dict."""
-        return {
-            'username': self.username.data,
-            'name': self.name.data,
-            'last_name': self.last_name.data,
-            'full_name': F"{self.name.data} {self.last_name.data}",
-            'email': self.email.data,
-            'phone': self.phone.data,
-            'note': self.note.data,
-        }
-
-    def to_db(self):
         """Converte form in dict."""
         return {
             'username': self.username.data,
