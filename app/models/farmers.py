@@ -33,6 +33,7 @@ class Farmer(db.Model):
     heads = db.relationship('Head', backref='farmer', lazy=True)
     dna_certs = db.relationship('CertificateDna', backref='farmer', lazy=True)
     cons_certs = db.relationship('CertificateCons', backref='farmer', lazy=True)
+    
     events = db.relationship('EventDB', backref='farmer', lazy=True)
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -55,22 +56,22 @@ class Farmer(db.Model):
 
         self.farmer_name = farmer_name
 
-        self.email = email
-        self.phone = phone
+        self.email = email or None
+        self.phone = phone or None
 
-        self.address = address
-        self.cap = cap
-        self.city = city
+        self.address = address or None
+        self.cap = cap or None
+        self.city = city or None
         self.full_address = address_mount(address, cap, city)
 
         self.affiliation_start_date = str_to_date(affiliation_start_date)
         self.affiliation_end_date = str_to_date(affiliation_end_date)
         self.affiliation_status = status_true_false(affiliation_status)
 
-        self.stable_code = stable_code
-        self.stable_type = stable_type
-        self.stable_productive_orientation = stable_productive_orientation
-        self.stable_breeding_methods = stable_breeding_methods
+        self.stable_code = stable_code or None
+        self.stable_type = stable_type or None
+        self.stable_productive_orientation = stable_productive_orientation or None
+        self.stable_breeding_methods = stable_breeding_methods or None
 
         self.heads = heads or []
         self.dna_certs = dna_certs or []
@@ -78,8 +79,8 @@ class Farmer(db.Model):
 
         self.events = events or []
 
-        self.note_certificate = note_certificate
-        self.note = note
+        self.note_certificate = note_certificate or None
+        self.note = note or None
 
         self.created_at = datetime.now()
         self.updated_at = datetime.now()

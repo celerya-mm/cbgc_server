@@ -5,15 +5,15 @@
     {{ form.csrf_token }}
     <div class="container text-center mt-2">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Torna indietro"
+            <a class="btn btn-update" type="button" title="Vai a lista records"
                href="{{ url_for(view) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"
                      alt=""/>
             </a>
             Dati ALLEVATORE [ {{ form.id }} ]:
             <a class="btn btn-update" type="button" title="Modifica utente"
                href="{{ url_for(update, _id=form.id) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
             </a>
         </h5>
         <h5>
@@ -41,14 +41,16 @@
     </div>
 
     <div class="container text-center mt-2">
-        <div class="form-group">
+        <div class="form-group rounded"
+             style="background-color: #DEDEDE; padding: 10px;">
             <!--            <h6> Ragione Sociale </h6>-->
             <br>
             <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                 {{ form.farmer_name }}
             </p>
         </div>
-        <div class="row no-gutters justify-content-center">
+        <div class="row no-gutters justify-content-center rounded"
+             style="background-color: #DEDEDE; padding: 10px;">
 
             <div class="col-md-6 order-first">
                 <div class="form-group">
@@ -58,7 +60,15 @@
                     </p>
                 </div>
                 <div class="form-group">
-                    <h6> Email </h6>
+                    <h6>
+                        {% if form.email %}
+                        <a class="tab-link" title="Google Maps" style=""
+                           href="mailto:{{ form.email }}">
+                            <img src="{{ url_for('static', filename='icons/at.svg') }}" alt="">
+                        </a>
+                        {% endif %}
+                        email
+                    </h6>
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                         {{ form.email }}
                     </p>
@@ -103,20 +113,29 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
-            <h6> Indirizzo </h6>
+        <div class="form-group rounded"
+             style="background-color: #DEDEDE; padding: 10px;">
+            <h6>
+                <a class="tab-link" title="Google Maps" style=""
+                   href="https://www.google.com/maps/place/{{ form.maps }}">
+                    <img src="{{ url_for('static', filename='icons/location.svg') }}" alt="">
+                </a>
+                Indirizzo
+            </h6>
             <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                 {{ form.full_address }}
             </p>
         </div>
-        <div class="form-group">
+        <div class="form-group rounded"
+             style="background-color: #DEDEDE; padding: 10px;">
             <h6> Note Certificato </h6>
             <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
             <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                 {{ form.note_certificate }}
             </p>
         </div>
-        <div class="form-group">
+        <div class="form-group rounded"
+             style="background-color: #DEDEDE; padding: 10px;">
             <h6> Note </h6>
             <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                 {{ form.note }}
@@ -127,18 +146,202 @@
 
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
     <div class="accordion" id="accordion">
+        <!--        Tabella Certificati consorzio-->
         <div class="accordion-item">
             <h2 class="accordion-header" id="1">
                 <button class="accordion-button" type="button"
                         data-bs-toggle="collapse"
-                        data-bs-target="#collapseOne"
+                        data-bs-target="#collapse1"
                         aria-expanded="true"
-                        aria-controls="collapseOne">
+                        aria-controls="collapse1">
+                    Certificati del Consorzio [ {{ len_cons }} ]
+                </button>
+            </h2>
+            <div id="collapse1" class="accordion-collapse collapse"
+                 aria-labelledby="heading1"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive" style="padding: 10px">
+                    <table id="cert_cons" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="c1" data-defaultsort="desc">ID</th>
+                            <th class="title" id="c2">Nr.</th>
+                            <th class="title" id="c4">Anno</th>
+                            <th class="title" id="c5">Data</th>
+                            <th class="title" id="c6">Coccarda</th>
+                            <th class="title" id="c7">Tipo</th>
+                            <th class="title" id="c8">Quantità</th>
+                            <th class="title" id="c9">Resto</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in cons_list %}
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="btn-table" type="button" title="Visualizza Acquirente"
+                                   href="{{ url_for(cons_history, _id=row.id) }}">
+                                    {{ row.id|e }}
+                                </a>
+                            </td>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_nr|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_year|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.cockade_nr|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_type|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_quantity|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_rest|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--        Tabella Capi Allevati-->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="2">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse2"
+                        aria-expanded="true"
+                        aria-controls="collapse2">
+                    Capi Allevati [ {{ len_heads }} ]
+                </button>
+            </h2>
+            <div id="collapse2" class="accordion-collapse collapse"
+                 aria-labelledby="heading2"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive" style="padding: 10px">
+                    <table id="head" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="p1" data-defaultsort="asc">ID</th>
+                            <th class="title" id="p3">Auricolare</th>
+                            <th class="title" id="p5">Nato</th>
+                            <th class="title" id="p6">Castrato</th>
+                            <th class="title" id="p7">Conf.</th>
+                            <th class="title" id="p8">Venduto</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in head_list %}
+                        <tr style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(head_history, _id=row.id) }}">
+                                    {{ row.id|e }}
+                                </a>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.headset|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.birth_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.castration_date|e }}
+                            </td>
+                            <td class="secondary hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {% if row.castration_compliance == True %}
+                                <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
+                                {% endif %}
+                                {{ row.castration_compliance|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_date|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--        Tabella DNA-->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="3">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse3"
+                        aria-expanded="true"
+                        aria-controls="collapse3">
+                    Certificato DNA [ {{ len_dna }} ]
+                </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse"
+                 aria-labelledby="heading3"
+                 data-bs-parent="#accordion">
+                <div class="table-responsive" style="padding: 10px">
+                    <table id="dna" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #2B4692; vertical-align: center;">
+                            <th class="title" id="d1">ID</th>
+                            <th class="title text-center" id="d3">Nr.</th>
+                            <th class="title text-center" id="d4">Data</th>
+                            <th class="title text-center" id="d5">Anno</th>
+                            <th class="title text-center" id="d6">Allevatore</th>
+                            <th class="title text-center" id="d7">Vet.</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in dna_list %}
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="text-center" style="width: 20px; padding:2px;">
+                                <a class="tab-link" type="button" title="Visualizza"
+                                   href="{{ url_for(dna_history, _id=row.id, _nr=row.dna_cert_nr) }}">
+                                    {{ row.id|e }}
+                                </a>
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.dna_cert_nr|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.dna_cert_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.dna_cert_year|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.farmer_id|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.veterinarian|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--        Tabella Modifiche-->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="4">
+                <button class="accordion-button" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse4"
+                        aria-expanded="true"
+                        aria-controls="collapse4">
                     Elenco Modifiche al Record [ {{ h_len }} ]
                 </button>
             </h2>
-            <div id="collapseOne" class="accordion-collapse collapse"
-                 aria-labelledby="headingOne"
+            <div id="collapse4" class="accordion-collapse collapse"
+                 aria-labelledby="heading4"
                  data-bs-parent="#accordion">
                 <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
@@ -153,7 +356,10 @@
                         {% for row in history_list %}
                         <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(event_history, _id=row.id) }}">
+                                    {{ row.id|e }}
+                                </a>
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.event|e }}
@@ -194,6 +400,66 @@
             }
         });
     });
+
+    $(document).ready(function () {
+        $('#cert_cons').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#dna').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#head').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+
+
+
+
+
+
 
 
 

@@ -5,21 +5,22 @@
     {{ form.csrf_token }}
     <div class="container text-center mt-2">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Torna alla lista dei certificati DNA"
+            <a class="btn btn-update" type="button" title="Vai a lista records"
                href="{{ url_for(view, _id=form.id) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}"
                      alt=""/>
             </a>
             Dati Certificato DNA [ {{ _id }} ]:
             <a class="btn btn-update" type="button" title="Modifica Certificato DNA"
                href="{{ url_for(update, _id=_id) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
             </a>
         </h5>
     </div>
 
     <div class="container text-center mt-2">
-        <div class="row no-gutters justify-content-center">
+        <div class="row no-gutters justify-content-center rounded"
+             style="background-color: #DEDEDE; padding: 10px;">
             <div class="col-md-6 order-first">
                 <div class="form-group">
                     <h6> Nr. certificato </h6>
@@ -101,7 +102,10 @@
                         {% for row in history_list %}
                         <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(event_history, _id=row.id) }}">
+                                    {{ row.id|e }}
+                                </a>
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.event|e }}
@@ -143,6 +147,11 @@
             }
         });
     });
+
+
+
+
+
 
 
 

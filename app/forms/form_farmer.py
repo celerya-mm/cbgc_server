@@ -33,7 +33,7 @@ class FormFarmerCreate(FlaskForm):
     affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
     affiliation_status = SelectField('Stato Affiliazione', choices=["SI", "NO"], default="SI")
 
-    stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25)])
+    stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
     stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"], default="Allevamento")
     stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
         "Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Carne")
@@ -69,7 +69,7 @@ class FormFarmerUpdate(FlaskForm):
     cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
     city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
 
-    stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25)])
+    stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
     stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"])
     stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
         "Da Latte", "Da Carne", "Da Latte e Da Carne"])

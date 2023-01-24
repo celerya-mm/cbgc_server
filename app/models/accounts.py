@@ -55,7 +55,7 @@ class Administrator(db.Model):
 
         self.events = events or []
 
-        self.note = note
+        self.note = note or None
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
 
@@ -128,7 +128,7 @@ class User(db.Model):
 
         self.events = events or []
 
-        self.note = note
+        self.note = note or None
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
 

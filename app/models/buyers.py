@@ -47,7 +47,7 @@ class Buyer(db.Model):
 
     def __init__(self, buyer_name, buyer_type, email=None, phone=None, address=None, cap=None, city=None,
                  affiliation_start_date=None, affiliation_status=None, affiliation_end_date=None, user_id=None,
-                 heads=None, cons_certs=None, events=None, note_certificate=None, note=None):
+                 cons_certs=None, events=None, note_certificate=None, note=None):
         from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.buyer_name = buyer_name
@@ -65,15 +65,13 @@ class Buyer(db.Model):
         self.affiliation_end_date = str_to_date(affiliation_end_date)
         self.affiliation_status = status_true_false(affiliation_status)
 
-        self.user_id = user_id
+        self.user_id = user_id or None
 
-        self.heads = heads or []
         self.cons_certs = cons_certs or []
-
         self.events = events or []
 
-        self.note_certificate = note_certificate
-        self.note = note
+        self.note_certificate = note_certificate or None
+        self.note = note or None
 
         self.created_at = datetime.now()
         self.updated_at = datetime.now()

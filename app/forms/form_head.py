@@ -28,7 +28,7 @@ def list_farmer():
 
 class FormHeadCreate(FlaskForm):
     """Form inserimento dati Capo."""
-    headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=14, max=14)])
+    headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)])
 
     birth_date = DateField('Data Nascita', format='%Y-%m-%d', default=datetime.now())
 
@@ -49,12 +49,14 @@ class FormHeadCreate(FlaskForm):
     def __str__(self):
         return f'<HEAD CREATED - headset: {self.headset.data}>'
 
-    def validate_headset(Self, field):  # noqa
+    def validate_headset(self, field):  # noqa
         """Valida campo headset."""
         if field.data not in ["", "-", None] and field.data.strip() in list_head():
             raise ValidationError("E' già presente un CAPO con lo stesso AURICOLARE.")
+        if len(field.data) != 14:
+            raise ValidationError(f"Il campo AURICOLARE deve avere 14 caratteri, hai inserito: {len(field.data)}")
 
-    def validate_farmer_id(Self, field):  # noqa
+    def validate_farmer_id(self, field):  # noqa
         """Valida campo farmer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_farmer():
             raise ValidationError("Nessun ALLEVATORE presente corrispondente alla Ragione Sociale inserita.")
@@ -62,7 +64,7 @@ class FormHeadCreate(FlaskForm):
 
 class FormHeadUpdate(FlaskForm):
     """Form modifica dati Capo."""
-    headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=14, max=14)])
+    headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)])
 
     birth_date = DateField('Data Nascita', format='%Y-%m-%d')
     castration_date = DateField('Castrazione', format='%Y-%m-%d', validators=[Optional()])
@@ -86,6 +88,11 @@ class FormHeadUpdate(FlaskForm):
         """Valida campo farmer_id."""
         if field.data not in ["", "-", None] and field.data.strip() not in list_farmer():
             raise ValidationError("Nessun ALLEVATORE presente corrispondente alla Ragione Sociale inserita.")
+
+    def validate_headset(self, field):  # noqa
+        """Valida campo headset."""
+        if len(field.data) != 14:
+            raise ValidationError(f"Il campo AURICOLARE deve avere 14 caratteri, hai inserito: {len(field.data)}")
 
     def to_dict(self):
         """Converte form in dict."""

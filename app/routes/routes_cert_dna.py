@@ -34,6 +34,7 @@ def cert_dna_view():
     """Visualizzo informazioni Certificato."""
     # Estraggo la lista degli utenti amministratori
     _list = CertificateDna.query.all()
+    db.session.close()
     _list = [r.to_dict() for r in _list]
     return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
@@ -61,10 +62,12 @@ def cert_dna_create(h_id, f_id, h_set):
         try:
             db.session.add(new_data)
             db.session.commit()
+            db.session.close()
             flash("CERTIFICATO DNA creato correttamente.")
-            return redirect(url_for(HISTORY_FOR))
+            return redirect(url_for(VIEW_FOR))
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id,
                                    head_history=HEAD_HISTORY_FOR)
@@ -79,6 +82,7 @@ def cert_dna_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
     from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
     from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY_FOR
+    from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
     # Estraggo l' ID dell'utente corrente
     session["id_user"] = _id
@@ -99,9 +103,10 @@ def cert_dna_view_history(_id):
     history_list = cert_dna.events
     history_list = [history.to_dict() for history in history_list]
     len_history = len(history_list)
+    db.session.close()
     return render_template(HISTORY_HTML, form=_cert_dna, history_list=history_list, h_len=len_history, view=VIEW_FOR,
                            update=UPDATE_FOR, head=_head, view_head=HEAD_HISTORY_FOR, _id=_id,
-                           farmer=_farmer, view_farmer=FARMER_HISTORY_FOR)
+                           farmer=_farmer, view_farmer=FARMER_HISTORY_FOR, event_history=EVENT_HISTORY)
 
 
 @token_admin_validate
@@ -117,6 +122,7 @@ def cert_dna_update(_id):
         # print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
         _cert = CertificateDna.query.get(_id)
+        db.session.close()
         previous_data = _cert.to_dict()
         # print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
@@ -150,9 +156,11 @@ def cert_dna_update(_id):
         try:
             db.session.query(CertificateDna).filter_by(id=_id).update(new_data)
             db.session.commit()
+            db.session.close()
             flash("CERTIFICATO aggiornato correttamente.")
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             _info = {
                 'created_at': _cert.created_at,
@@ -162,6 +170,7 @@ def cert_dna_update(_id):
 
         _event = {
             "username": session["username"],
+            "table": CertificateDna.__tablename__,
             "Modification": f"Update Certificate DNA whit id: {_id}",
             "Previous_data": previous_data
         }
@@ -181,6 +190,8 @@ def cert_dna_update(_id):
         _head = Head.query.get(_cert.head_id)
         # recupera Allevatore
         _farmer = Farmer.query.get(_cert.farmer_id)
+
+        db.session.close()
 
         form.dna_cert_id.data = _id
         form.dna_cert_date.data = _cert.dna_cert_date

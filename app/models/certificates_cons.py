@@ -10,23 +10,51 @@ def mount_code(_id, year, var=None):
     """Monta il codice del certificato"""
     if _id and year and var:
         code = f"{_id}{var}/{year}"
+    elif _id in ["", None]:
+        code = None
     else:
         code = f"{_id}/{year}"
     return code
 
 
+def year_cert_calc():
+    """L'anno del certificato va dal 01/07 al 30/06 dell'anno successivo."""
+    date = datetime.now()
+    month = date.month
+    year = date.year
+    if month >= 7:
+        return year
+    else:
+        return year - 1
+
+
+def year_cert_calc_update(date):
+    """L'anno del certificato va dal 01/07 al 30/06 dell'anno successivo."""
+    if isinstance(date, str):
+        date = datetime.strptime(date, "%Y-%m-%d")
+
+    month = date.month
+    year = date.year
+    if month >= 7:
+        return year
+    else:
+        return year - 1
+
+
 class CertificateCons(db.Model):
     # Table
     __tablename__ = 'certificates_cons'
+
     # Columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
     certificate_id = db.Column(db.Integer, index=False, unique=False, nullable=False)
     certificate_var = db.Column(db.String(10), index=False, unique=False, nullable=True)
     certificate_date = db.Column(db.DateTime, index=False, nullable=False)
-    certificate_year = db.Column(db.Integer, index=False, nullable=False)
+    certificate_year = db.Column(db.Integer, index=False, nullable=False, default=year_cert_calc())
 
-    certificate_nr = db.Column(db.String(50), primary_key=True, index=False, unique=True, nullable=False)
+    certificate_nr = db.Column(db.String(50), index=False, unique=True, nullable=False)
+    emitted = db.Column(db.Boolean, index=False, nullable=True)
 
     certificate_pdf = db.Column(db.LargeBinary, index=False, nullable=True)
 
@@ -34,15 +62,13 @@ class CertificateCons(db.Model):
     cockade_var = db.Column(db.String(10), index=False, unique=False, nullable=True)
     cockade_nr = db.Column(db.String(20), index=False, unique=True, nullable=True)
 
-    sale_type = db.Column(db.String(50), index=False, unique=True, nullable=True)
+    sale_type = db.Column(db.String(50), index=False, unique=False, nullable=True)
     sale_quantity = db.Column(db.Float, index=False, nullable=True)
     sale_rest = db.Column(db.Float, index=False, nullable=True)
 
     invoice_nr = db.Column(db.String(20), index=False, unique=False, nullable=True)
     invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
     invoice_status = db.Column(db.String(20), index=False, unique=False, nullable=True)
-
-    emitted = db.Column(db.Boolean, index=False, nullable=True)
 
     head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False)
     buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id'), nullable=True)
@@ -65,43 +91,45 @@ class CertificateCons(db.Model):
 
     def __init__(self,
                  certificate_var, certificate_date, certificate_id, certificate_pdf=None,
-                 cockade_var=None, cockade_id=None,
-                 sale_type=None, sale_quantity=None, sale_rest=None,
+                 cockade_var=None, cockade_id=None, emitted=None,
+                 sale_type=None, sale_quantity=None,
                  head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  invoice_nr=None, invoice_date=None, invoice_status=None,
                  events=None, note_certificate=None, note=None):
-        from ..utilitys.functions import year_extract, str_to_date
+        from ..utilitys.functions import str_to_date, status_true_false
 
         self.certificate_id = certificate_id
-        self.certificate_var = certificate_var
+        self.certificate_var = certificate_var or None
         self.certificate_date = str_to_date(certificate_date)
 
-        certificate_year = year_extract(certificate_date)
+        certificate_year = year_cert_calc()
         self.certificate_year = certificate_year
 
         self.certificate_nr = mount_code(certificate_id, certificate_year, certificate_var)
+        self.emitted = status_true_false(emitted)
 
         self.cockade_id = cockade_id
-        self.cockade_var = cockade_var
+        self.cockade_var = cockade_var or None
         self.cockade_nr = mount_code(cockade_id, certificate_year, cockade_var)
 
-        self.sale_type = sale_type
-        self.sale_quantity = sale_quantity
-        self.sale_rest = sale_rest
+        self.sale_type = sale_type or None
+        self.sale_quantity = sale_quantity or None
+        self.sale_rest = sale_quantity or None
 
-        self.head_id = head_id
-        self.farmer_id = farmer_id
-        self.buyer_id = buyer_id
-        self.slaughterhouse_id = slaughterhouse_id
+        self.certificate_pdf = certificate_pdf or None
 
-        self.certificate_pdf = certificate_pdf
-        self.invoice_nr = invoice_nr
+        self.invoice_nr = invoice_nr or None
         self.invoice_date = str_to_date(invoice_date)
-        self.invoice_status = invoice_status
+        self.invoice_status = invoice_status or None
 
         self.events = events or []
 
-        self.note_certificate = note_certificate
+        self.head_id = head_id or []
+        self.farmer_id = farmer_id or []
+        self.buyer_id = buyer_id or []
+        self.slaughterhouse_id = slaughterhouse_id or []
+
+        self.note_certificate = note_certificate or None
         self.note = note
 
         self.created_at = datetime.now()
@@ -118,6 +146,8 @@ class CertificateCons(db.Model):
 
             'certificate_date': date_to_str(self.certificate_date),
             'certificate_year': self.certificate_year,
+
+            'emitted': self.emitted,
 
             'cockade_id': self.cockade_id,
             'cockade_var': self.cockade_var,

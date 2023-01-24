@@ -47,6 +47,7 @@ class Head(db.Model):
 
     dna_cert = db.relationship('CertificateDna', backref='head', lazy=True)
     cons_cert = db.relationship('CertificateCons', backref='head', lazy=True)
+
     events = db.relationship('EventDB', backref='head', lazy=True)
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
@@ -86,8 +87,8 @@ class Head(db.Model):
 
         self.events = events or []
 
-        self.note_certificate = note_certificate
-        self.note = note
+        self.note_certificate = note_certificate or None
+        self.note = note or None
 
         self.created_at = datetime.now()
         self.updated_at = datetime.now()

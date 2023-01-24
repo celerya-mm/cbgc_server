@@ -57,9 +57,11 @@ def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=No
 
         db.session.add(new_event)
         db.session.commit()
+        db.session.close()
         print("EVENT_CREATED.")
         return True
     except Exception as err:
+        db.session.close()
         print("ERROR_REGISTR_EVENT:", err)
         return False
 
@@ -183,7 +185,7 @@ def year_extract(date):  # noqa
 
 def str_to_date(_str, _form="%Y-%m-%d"):
     """Converte una stringa in datetime."""
-    if _str is None:
+    if _str in [None, ""]:
         return None
     elif _str not in [None, "None", "nan", ""] and isinstance(_str, str):
         return datetime.strptime(_str, _form)
@@ -193,7 +195,7 @@ def str_to_date(_str, _form="%Y-%m-%d"):
 
 def date_to_str(_date, _form="%Y-%m-%d"):
     """Converte datetime in stringa."""
-    if _date is None:
+    if _date in [None, ""]:
         return None
     elif _date not in [None, "None", "nan", ""] and isinstance(_date, datetime) or isinstance(_date, date):
         return datetime.strftime(_date, _form)
@@ -206,13 +208,13 @@ def not_empty(_v):
     if _v in ["", "-", None]:
         return None
     else:
-        _v = _v.strip()
+        _v = str(_v).strip()
         return _v
 
 
 def status_true_false(_stat):
     """Cambia valori SI, NO in True, False."""
-    if _stat == "NO":
+    if _stat == "NO" or _stat is False:
         return False
     else:
         return True

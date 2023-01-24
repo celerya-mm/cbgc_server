@@ -10,7 +10,7 @@ from ..models.slaughterhouses import Slaughterhouse
 from ..models.heads import Head
 from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 from ..utilitys.functions import (event_create, token_admin_validate, str_to_date, status_si_no, status_true_false,
-                                  address_mount)
+                                  address_mount, not_empty)
 
 VIEW = "/slaughterhouse/view/"
 VIEW_FOR = "slaughterhouse_view"
@@ -35,7 +35,12 @@ def slaughterhouse_view():
     """Visualizzo informazioni Allevatori."""
     # Estraggo la lista degli allevatori
     _list = Slaughterhouse.query.all()
+    db.session.close()
     _list = [r.to_dict() for r in _list]
+    for _dict in _list:
+        _dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
+                        f'{_dict["address"].strip().replace(" ", "+")}' \
+                        f',{_dict["city"].strip().replace(" ", "+")}'
     return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -69,10 +74,12 @@ def slaughterhouse_create():
         try:
             db.session.add(new_slaughterhouse)
             db.session.commit()
+            db.session.close()
             flash("MACELLO creato correttamente.")
-            return redirect(url_for('slaughterhouse/view'))
+            return redirect(url_for(VIEW_FOR))
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
     else:
@@ -83,6 +90,8 @@ def slaughterhouse_create():
 @app.route(HISTORY, methods=["GET", "POST"])
 def slaughterhouse_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
+    from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+
     # Interrogo il DB
     slaughterhouse = Slaughterhouse.query.filter_by(id=_id).first()
     _slaughterhouse = slaughterhouse.to_dict()
@@ -101,9 +110,16 @@ def slaughterhouse_view_history(_id):
         _h = Head.query.get(cert.head_id)
         if _h and _h not in head_list:
             head_list.append(_h.to_dict())
+
+    db.session.close()
+
+    _slaughterhouse["maps"] = f'{_slaughterhouse["cap"].strip().replace(" ", "")},' \
+                              f'{_slaughterhouse["address"].strip().replace(" ", "+")}' \
+                              f',{_slaughterhouse["city"].strip().replace(" ", "+")}'
     return render_template(HISTORY_HTML, form=_slaughterhouse, history_list=history_list, h_len=len_history,
                            view=VIEW_FOR, update=UPDATE_FOR, cons_list=_cons_list, len_cons=len(_cons_list),
-                           head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY)
+                           head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY,
+                           event_history=EVENT_HISTORY)
 
 
 @token_admin_validate
@@ -119,11 +135,18 @@ def slaughterhouse_update(_id):
         # print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
         slaughterhouse = Slaughterhouse.query.get(_id)
+        db.session.close()
         previous_data = slaughterhouse.to_dict()
         # print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
         new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
         new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
+
+        new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
+        new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
+
+        new_data["note"] = not_empty(new_data["note"])
+        new_data["note_certificate"] = not_empty(new_data["note_certificate"])
 
         new_data["created_at"] = slaughterhouse.created_at
         new_data["updated_at"] = datetime.now()
@@ -132,9 +155,11 @@ def slaughterhouse_update(_id):
         try:
             db.session.query(Slaughterhouse).filter_by(id=_id).update(new_data)
             db.session.commit()
+            db.session.close()
             flash("MACELLO aggiornato correttamente.")
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             _info = {
                 'created_at': slaughterhouse.created_at,
@@ -144,6 +169,7 @@ def slaughterhouse_update(_id):
 
         _event = {
             "username": session["username"],
+            "table": Slaughterhouse.__tablename__,
             "Modification": f"Update Slaughterhouse whit id: {_id}",
             "Previous_data": previous_data
         }
@@ -156,6 +182,7 @@ def slaughterhouse_update(_id):
     else:
         # recupero i dati del record
         slaughterhouse = Slaughterhouse.query.get(int(_id))
+        db.session.close()
         # print("SLAUGHT_FIND:", slaughterhouse, type(slaughterhouse))
 
         form.slaughterhouse.data = slaughterhouse.slaughterhouse

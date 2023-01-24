@@ -44,12 +44,12 @@ class CertificateDna(db.Model):
         self.dna_cert_year = year_extract(dna_cert_date)
         self.dna_cert_nr = f"{dna_cert_id}/{self.dna_cert_year}"
 
-        self.veterinarian = veterinarian
+        self.veterinarian = veterinarian or None
 
-        self.head_id = head_id
-        self.farmer_id = farmer_id
+        self.head_id = head_id or None
+        self.farmer_id = farmer_id or None
 
-        self.note = note
+        self.note = note or None
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
 

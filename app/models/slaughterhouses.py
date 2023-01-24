@@ -27,6 +27,7 @@ class Slaughterhouse(db.Model):
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse', lazy=True)
+
     events = db.relationship('EventDB', backref='slaughterhouse', lazy=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -40,30 +41,29 @@ class Slaughterhouse(db.Model):
 
     def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
                  affiliation_start_date, affiliation_status, note_certificate, note, affiliation_end_date=None,
-                 head=None, cons_cert=None, events=None):
+                 cons_cert=None, events=None):
         from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
         self.slaughterhouse = slaughterhouse
         self.slaughterhouse_code = slaughterhouse_code
 
-        self.email = email
-        self.phone = phone
+        self.email = email or None
+        self.phone = phone or None
 
-        self.address = address
-        self.cap = cap
-        self.city = city
+        self.address = address or None
+        self.cap = cap or None
+        self.city = city or None
         self.full_address = address_mount(address, cap, city)
 
         self.affiliation_start_date = str_to_date(affiliation_start_date)
         self.affiliation_end_date = str_to_date(affiliation_end_date)
         self.affiliation_status = status_true_false(affiliation_status)
 
-        self.head = head or []
         self.cons_cert = cons_cert or []
         self.events = events or []
 
-        self.note_certificate = note_certificate
-        self.note = note
+        self.note_certificate = note_certificate or None
+        self.note = note or None
 
         self.created_at = datetime.now()
         self.updated_at = datetime.now()

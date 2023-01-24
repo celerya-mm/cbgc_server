@@ -15,29 +15,22 @@
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
-                            <th class="title text-center" id="h1" data-defaultsort="asc">ID</th>
-                            <th class="title" data-sortable="false" id="h2"></th>
+                            <th class="title text-center" id="h1">ID</th>
                             <th class="title" id="h3">Aff.</th>
                             <th class="title text-start" id="h4">Code</th>
                             <th class="title text-start" id="h5">Rag. Sociale</th>
                             <th class="title text-start" id="h6">Email</th>
                             <th class="title text-start" id="h7">Phone</th>
-                            <th class="title text-start" id="h8">Città</th>
-                            <th class="title" data-sortable="false" id="h9"></th>
+                            <th class="title text-start" id="h8">Indirizzo</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for row in form %}
                         <tr style="border: 0pz; vertical-align: center;">
-                            <td class="primary fw-bold text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
-                            </td>
-                            <td class="text-center" style="width: 20px; padding:2px;">
-                                <a class="btn-table" type="button" title="Visualizza Acquirente"
+                            <td style="width: 20px; padding:2px;">
+                                <a class="tab-link" title="Visualizza" style=""
                                    href="{{ url_for(history, _id=row.id) }}">
-                                    <img class="icon-table"
-                                         src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
-                                         alt=""/>
+                                    {{ row.id|e }}
                                 </a>
                             </td>
                             <td class="secondary text-start hidden" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -55,21 +48,23 @@
                                 {{ row.slaughterhouse|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {% if row.email %}
+                                <a class="tab-link" title="Google Maps" style=""
+                                   href="mailto:{{ row.email }}">
+                                    <img src="{{ url_for('static', filename='icons/at.svg') }}" alt="">
+                                </a>
+                                {% endif %}
                                 {{ row.email|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.phone|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.city|e }}
-                            </td>
-                            <td class="text-center" style="width: 20px; padding:2px;">
-                                <a class="btn-table" type="button" title="Modifica Acquirente"
-                                   href="{{ url_for(update, _id=row.id) }}">
-                                    <img class="icon-table"
-                                         src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
-                                         alt=""/>
+                                <a class="tab-link" title="Google Maps" style=""
+                                   href="https://www.google.com/maps/place/{{ row.maps  }}">
+                                    <img src="{{ url_for('static', filename='icons/location.svg') }}" alt="">
                                 </a>
+                                {{ row.full_address|e }}
                             </td>
                         </tr>
                         {% endfor %}
@@ -103,6 +98,11 @@
             }
         });
     });
+
+
+
+
+
 
 
 

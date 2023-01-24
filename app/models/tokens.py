@@ -29,8 +29,8 @@ class AuthToken(db.Model):
 
     def __init__(self, token, admin_id=None, user_id=None):
         self.token = token
-        self.admin_id = admin_id
-        self.user_id = user_id
+        self.admin_id = admin_id or None
+        self.user_id = user_id or None
         self.created_at = datetime.now()
         self.expires_at = calc_expiration_token()
 

@@ -10,17 +10,17 @@
             </a>
             Bentornatə "{{admin.name}}"
         </h5>
+        <a class="btn-update" type="button" title="Visualizza record"
+           href="{{ url_for(history, _id=admin.id) }}">
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/history_grey.svg') }}" alt=""/>
+        </a>
         <a class="btn-update" type="button" title="Modifica utente"
            href="{{ url_for(update, _id=admin.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_grey.svg') }}" alt=""/>
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
         </a>
         <a class="btn-update" type="button" title="Cambia password utente"
            href="{{ url_for(update_psw, _id=admin.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_grey.svg') }}" alt=""/>
-        </a>
-        <a class="btn-update" type="button" title="Visualizza storia modifiche al record"
-           href="{{ url_for(history, _id=admin.id) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/history_grey.svg') }}" alt=""/>
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_red.svg') }}" alt=""/>
         </a>
     </div>
 
@@ -61,56 +61,43 @@
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
-                            <th class="title" id="h1" data-defaultsort="asc">ID</th>
-                            <th class="title" id="h2" data-sortable="false"></th>
+                            <th class="title" id="h1">ID</th>
                             <th class="title" id="h3">Username</th>
                             <th class="title" id="h4">email</th>
-                            <th class="title" id="h5">Nome</th>
-                            <th class="title" id="h6">Cognome</th>
+                            <th class="title" id="h5">Nome Cognome</th>
                             <th class="title" id="h7" data-sortable="false">Telefono</th>
                             <th class="title" id="h8">Modificato</th>
-                            <th class="title" id="h9" data-sortable="false"></th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for row in form %}
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
-                            </td>
-                            <td style="width: 20px; padding:2px;">
-                                <a class="btn-table" type="button" title="Visualizza utente"
+                                <a class="tab-link" title="Visualizza" style=""
                                    href="{{ url_for(history, _id=row.id) }}">
-                                    <img class="icon-table"
-                                         src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
-                                         alt=""/>
+                                    {{ row.id|e }}
                                 </a>
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.username|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {% if row.email %}
+                                <a class="tab-link" title="Google Maps" style=""
+                                   href="mailto:{{ row.email }}">
+                                    <img src="{{ url_for('static', filename='icons/at.svg') }}" alt="">
+                                </a>
+                                {% endif %}
                                 {{ row.email|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.last_name|e }}
-                            </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.name|e }}
+                                {{ row.full_name|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.phone|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.updated_at|e }}
-                            </td>
-                            <td style="width: 20px; padding:2px;">
-                                <a class="btn-table" type="button" title="Modifica utente"
-                                   href="{{ url_for(update, _id=row.id) }}">
-                                    <img class="icon-table"
-                                         src="{{ url_for('static', filename='icons/pencil_grey.svg') }}"
-                                         alt=""/>
-                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -144,6 +131,17 @@
             }
         });
     });
+
+
+
+
+
+
+
+
+
+
+
 
 
 

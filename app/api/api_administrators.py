@@ -98,7 +98,7 @@ def administrator_signup():
 
 
 @app.route('/api/admin_login/', methods=['POST'])
-def authenticate_administrator():
+def administrator_login():
     """API login utente amministratore."""
     data_received = request.get_json()
     username = data_received['username'].replace(" ", "")

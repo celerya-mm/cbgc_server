@@ -9,9 +9,8 @@ from ..forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
 from ..models.accounts import User
 from ..models.buyers import Buyer
 from ..models.heads import Head
-from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 from ..utilitys.functions import (event_create, status_si_no, status_true_false, str_to_date, token_admin_validate,
-                                  address_mount)
+                                  address_mount, not_empty)
 
 VIEW = "/buyer/view/"
 VIEW_FOR = "buyer_view"
@@ -36,7 +35,12 @@ def buyer_view():
     """Visualizza informazioni Acquirenti."""
     # Estraggo la lista degli allevatori
     _list = Buyer.query.all()
+    db.session.close()
     _list = [r.to_dict() for r in _list]
+    for _dict in _list:
+        _dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
+                        f'{_dict["address"].strip().replace(" ", "+")}' \
+                        f',{_dict["city"].strip().replace(" ", "+")}'
     return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -50,34 +54,32 @@ def buyer_create():
         # print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
 
         user_id = User.query.filter_by(username=form_data["user_id"]).first()
+        db.session.close()
         # print("USER_ID:", user_find.id)
 
         new_farmer = Buyer(
             buyer_name=form_data["buyer_name"].strip(),
             buyer_type=form_data["buyer_type"].strip(),
-
             email=form_data["email"].strip(),
             phone=form_data["phone"].strip(),
-
             address=form_data["address"].strip(),
             cap=form_data["cap"].strip(),
             city=form_data["city"].strip(),
-
             affiliation_start_date=form_data["affiliation_start_date"],
             affiliation_status=status_true_false(form_data["affiliation_status"]),
-
             user_id=user_id.id,
-
             note_certificate=form_data["note_certificate"].strip(),
             note=form_data["note"].strip()
         )
         try:
             db.session.add(new_farmer)
             db.session.commit()
+            db.session.close()
             flash("ACQUIRENTE creato correttamente.")
-            return redirect(url_for(HISTORY_FOR))
+            return redirect(url_for(VIEW_FOR))
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
     else:
@@ -88,33 +90,51 @@ def buyer_create():
 @app.route(HISTORY, methods=["GET", "POST"])
 def buyer_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
+    from ..routes.routes_user import HISTORY_FOR as USER_HISTORY
+    from ..routes.routes_cert_cons import HISTORY_FOR as CONS_HISTORY
+    from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+    from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+
     # Interrogo il DB
     buyer = Buyer.query.get(int(_id))
     _buyer = buyer.to_dict()
 
-    # Estraggo l'utente collegato
-    if buyer.user_id:
-        user = User.query.get(buyer.user_id)
-        _buyer["user_full"] = f"{buyer.user_id} - {user.username}"
-        # print("BUYER_VIEW_DATA:", json.dumps(_buyer, indent=2), "TYPE:", type(_buyer))
+    # Estraggo gli utenti collegati
+    user = buyer.user_id
+    if user:
+        user = User.query.get(user)
+        db.session.close()
+        user.to_dict()
 
-    # Estraggo la storia delle modifiche per l'utente
+    # Estraggo la storia delle modifiche per l'acquirente
     history_list = buyer.events
-    history_list = [history.to_dict() for history in history_list]
-    len_history = len(history_list)
+    if history_list:
+        history_list = [history.to_dict() for history in history_list]
+    else:
+        history_list = []
 
     # estraggo i certificati del consorzio e i capi acquistati
     cons_list = buyer.cons_certs
-    _cons_list = [cert.to_dict() for cert in cons_list]
-
     head_list = []
-    for cert in cons_list:
-        _h = Head.query.get(cert.head_id)
-        if _h and _h not in head_list:
-            head_list.append(_h.to_dict())
+    if cons_list:
+        cons_list = [cert.to_dict() for cert in cons_list]
+        for cert in cons_list:
+            _h = Head.query.get(cert["head_id"])
+            if _h and _h not in head_list:
+                head_list.append(_h)
+        print("LEN:", len(cons_list), "DATA:", cons_list)
+    else:
+        cons_list = []
+    db.session.close()
 
-    return render_template(HISTORY_HTML, form=_buyer, history_list=history_list, h_len=len_history, view=VIEW_FOR,
-                           update=UPDATE_FOR, cons_list=_cons_list, len_cons=len(_cons_list),
+    _buyer["maps"] = f'{_buyer["cap"].strip().replace(" ", "")},' \
+                     f'{_buyer["address"].strip().replace(" ", "+")}' \
+                     f',{_buyer["city"].strip().replace(" ", "+")}'
+
+    return render_template(HISTORY_HTML, form=_buyer, update=UPDATE_FOR, view=VIEW_FOR,
+                           user=user, user_history=USER_HISTORY, event_history=EVENT_HISTORY,
+                           history_list=history_list, h_len=len(history_list),  # his_history=HIS_HISTORY,
+                           cons_list=cons_list, len_cons=len(cons_list), cons_history=CONS_HISTORY,
                            head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY)
 
 
@@ -134,7 +154,14 @@ def buyer_update(_id):
         # print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
         new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+        new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
+        new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
         new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
+
+        new_data["phone"] = not_empty(new_data["phone"])
+        new_data["email"] = not_empty(new_data["email"])
+        new_data["note"] = not_empty(new_data["note"])
+        new_data["note_certificate"] = not_empty(new_data["note_certificate"])
 
         if new_data["user_id"] not in ["", "-", None]:
             new_data["user_id"] = int(new_data["user_id"].split(" - ")[0])
@@ -147,9 +174,11 @@ def buyer_update(_id):
         try:
             db.session.query(Buyer).filter_by(id=_id).update(new_data)
             db.session.commit()
+            db.session.close()
             flash("ACQUIRENTE aggiornato correttamente.")
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             _info = {
                 'created_at': buyer.created_at,
@@ -159,6 +188,7 @@ def buyer_update(_id):
 
         _event = {
             "username": session["username"],
+            "table": Buyer.__tablename__,
             "Modification": f"Update Buyer whit id: {_id}",
             "Previous_data": previous_data
         }
@@ -171,6 +201,7 @@ def buyer_update(_id):
     else:
         # recupero i dati del record
         buyer = Buyer.query.get(int(_id))
+        db.session.close()
         # print("BUYER_FIND:", buyer, type(buyer))
 
         form.buyer_name.data = buyer.buyer_name

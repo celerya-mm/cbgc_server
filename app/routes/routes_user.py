@@ -33,6 +33,7 @@ def user_view():
     """Visualizzo informazioni User."""
     # Estraggo la lista degli utenti amministratori
     _list = User.query.all()
+    db.session.close()
     _list = [r.to_dict() for r in _list]
     return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
@@ -58,10 +59,12 @@ def user_create():
         try:
             db.session.add(new_user)
             db.session.commit()
+            db.session.close()
             flash("UTENTE servizio creato correttamente.")
             return redirect(url_for(VIEW_FOR))
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
     else:
@@ -72,6 +75,9 @@ def user_create():
 @app.route(HISTORY, methods=["GET", "POST"])
 def user_view_history(_id):
     """Visualizzo la storia delle modifiche al record utente Administrator."""
+    from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
+    from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+
     # Estraggo l' ID dell'utente corrente
     session["id_user"] = _id
 
@@ -81,10 +87,23 @@ def user_view_history(_id):
 
     # Estraggo la storia delle modifiche per l'utente
     history_list = user.events
-    history_list = [history.to_dict() for history in history_list]
-    len_history = len(history_list)
-    return render_template(HISTORY_HTML, form=_user, history_list=history_list, h_len=len_history, view=VIEW_FOR,
-                           update=UPDATE_FOR)
+    if history_list:
+        history_list = [history.to_dict() for history in history_list]
+    else:
+        history_list = []
+
+    # Estraggo la lista degli Acquirenti sotto l'utente
+    buyer_list = user.buyers
+    if buyer_list:
+        buyer_list = [buyer.to_dict() for buyer in buyer_list]
+    else:
+        buyer_list = []
+
+    db.session.close()
+
+    return render_template(HISTORY_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR,
+                           history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
+                           buyer_list=buyer_list, b_len=len(buyer_list), buyer_history=BUYER_HISTORY)
 
 
 @token_admin_validate
@@ -109,9 +128,11 @@ def user_update(_id):
         try:
             db.session.query(User).filter_by(id=_id).update(new_data)
             db.session.commit()
+            db.session.close()
             flash("UTENTE aggiornato correttamente.")
         except IntegrityError as err:
             db.session.rollback()
+            db.session.close()
             flash(f"ERRORE: {str(err.orig)}")
             _info = {
                 'created_at': user.created_at,
@@ -121,6 +142,7 @@ def user_update(_id):
 
         _event = {
             "username": session["username"],
+            "table": User.__tablename__,
             "Modification": f"Update account USER whit id: {_id}",
             "Previous_data": previous_data
         }
@@ -133,6 +155,7 @@ def user_update(_id):
     else:
         # recupero i dati
         user = User.query.get(_id)
+        db.session.close()
         # print("USER:", user)
         # print("USER_FIND:", json.dumps(user.to_dict(), indent=2))
 
