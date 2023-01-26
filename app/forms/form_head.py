@@ -28,7 +28,8 @@ def list_farmer():
 
 class FormHeadCreate(FlaskForm):
     """Form inserimento dati Capo."""
-    headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)])
+    headset = StringField(
+        'Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)], default="IT00")
 
     birth_date = DateField('Data Nascita', format='%Y-%m-%d', default=datetime.now())
 
@@ -38,7 +39,6 @@ class FormHeadCreate(FlaskForm):
 
     farmer_id = SelectField("Allevatore", choices=list_farmer(), default="-")
 
-    note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("CREATE")
@@ -73,7 +73,6 @@ class FormHeadUpdate(FlaskForm):
 
     farmer_id = SelectField("Allevatore", choices=list_farmer())
 
-    note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("SAVE")
@@ -114,6 +113,5 @@ class FormHeadUpdate(FlaskForm):
 
             'farmer_id': self.farmer_id.data,
 
-            'note_certificate': self.note_certificate.data,
             'note': self.note.data,
         }

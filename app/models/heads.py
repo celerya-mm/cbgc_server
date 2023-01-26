@@ -50,7 +50,6 @@ class Head(db.Model):
 
     events = db.relationship('EventDB', backref='head', lazy=True)
 
-    note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -87,7 +86,6 @@ class Head(db.Model):
 
         self.events = events or []
 
-        self.note_certificate = note_certificate or None
         self.note = note or None
 
         self.created_at = datetime.now()
@@ -113,7 +111,6 @@ class Head(db.Model):
 
             'farmer_id': self.farmer_id,
 
-            'note_certificate': self.note_certificate,
             'note': self.note,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

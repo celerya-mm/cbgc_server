@@ -33,7 +33,6 @@ class Buyer(db.Model):
     cons_certs = db.relationship('CertificateCons', backref='buyer', lazy=True)
     events = db.relationship('EventDB', backref='buyer', lazy=True)
 
-    note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -70,7 +69,6 @@ class Buyer(db.Model):
         self.cons_certs = cons_certs or []
         self.events = events or []
 
-        self.note_certificate = note_certificate or None
         self.note = note or None
 
         self.created_at = datetime.now()
@@ -96,7 +94,6 @@ class Buyer(db.Model):
             'affiliation_end_date': date_to_str(self.affiliation_end_date),
             'affiliation_status': status_si_no(self.affiliation_status),
 
-            'note_certificate': self.note_certificate,
             'note': self.note,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

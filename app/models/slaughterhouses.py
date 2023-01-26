@@ -23,7 +23,6 @@ class Slaughterhouse(db.Model):
     affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
     affiliation_status = db.Column(db.Boolean, index=True, nullable=True)
 
-    note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     cons_cert = db.relationship('CertificateCons', backref='slaughterhouse', lazy=True)
@@ -62,7 +61,6 @@ class Slaughterhouse(db.Model):
         self.cons_cert = cons_cert or []
         self.events = events or []
 
-        self.note_certificate = note_certificate or None
         self.note = note or None
 
         self.created_at = datetime.now()
@@ -88,7 +86,6 @@ class Slaughterhouse(db.Model):
             'affiliation_end_date': date_to_str(self.affiliation_end_date),
             'affiliation_status': status_si_no(self.affiliation_status),
 
-            'note_certificate': self.note_certificate,
             'note': self.note,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

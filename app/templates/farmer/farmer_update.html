@@ -24,7 +24,7 @@
                 <br>
                 <div class="form-group">
                     {{ form.farmer_name.label }}
-                    {{ form.farmer_name(class="form-control") }}
+                    {{ form.farmer_name(class="form-control emphasis") }}
                     {% if form.farmer_name.errors %}
                     {% for error in form.farmer_name.errors %}
                     <span class="text-danger">{{ error }}</span>
@@ -138,7 +138,7 @@
                         <br>
                         <div class="form-group">
                             {{ form.affiliation_start_date.label }}
-                            {{ form.affiliation_start_date(class="form-control") }}
+                            {{ form.affiliation_start_date(class="form-control emphasis") }}
                             {% if form.affiliation_start_date.errors %}
                             {% for error in form.affiliation_start_date.errors %}
                             <span class="text-danger">{{ error }}</span>
@@ -160,7 +160,7 @@
                         <br>
                         <div class="form-group">
                             {{ form.affiliation_status.label }}
-                            {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
+                            {{ form.affiliation_status(class="form-control emphasis", style="text-align: center;") }}
                             {% if form.affiliation_status.errors %}
                             {% for error in form.affiliation_status.errors %}
                             <span class="text-danger">{{ error }}</span>
@@ -169,18 +169,6 @@
                             {% endif %}
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="form-group">
-                    {{ form.note_certificate.label }}
-                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
-                    {{ form.note_certificate(class="form-control") }}
-                    {% if form.note_certificate.errors %}
-                    {% for error in form.note_certificate.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    <br>
-                    {% endfor %}
-                    {% endif %}
                 </div>
                 <br>
                 <div class="form-group">

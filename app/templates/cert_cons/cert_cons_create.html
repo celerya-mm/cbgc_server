@@ -5,7 +5,7 @@
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
             <a class="btn btn-update" type="button" title="Annulla"
-               href="{{ url_for(view) }}">
+               href="{{ url_for(view, _id=_id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Crea Certificato del Consorzio per il Capo [ {{ h_set }} ]
@@ -16,7 +16,7 @@
                 {{ form.csrf_token }}
                 <div class="row no-gutters justify-content-center rounded"
                      style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-                    <div class="col-md-4 order-1">
+                    <div class="col-md-2 order-first">
                         <div class="form-group">
                             {{ form.certificate_id.label(style="font-size: 1.2rem;") }}
                             {{ form.certificate_id(class="form-control") }}
@@ -28,7 +28,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4 order-2">
+                    <div class="col-md-2 order-second">
                         <div class="form-group">
                             {{ form.certificate_var.label(style="font-size: 1.2rem;") }}
                             {{ form.certificate_var(class="form-control", style="text-align: center;") }}
@@ -40,7 +40,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4 order-3">
+                    <div class="col-md-2 order-third">
                         <div class="form-group">
                             {{ form.certificate_date.label(style="font-size: 1.2rem;") }}
                             {{ form.certificate_date(class="form-control", style="text-align: center;") }}
@@ -52,10 +52,7 @@
                             {% endif %}
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-4 order-4">
+                    <div class="col-md-2 order-fourth">
                         <div class="form-group">
                             {{ form.cockade_id.label(style="font-size: 1.2rem;") }}
                             {{ form.cockade_id(class="form-control") }}
@@ -67,7 +64,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4 order-5">
+                    <div class="col-md-2 order-fifth">
                         <div class="form-group">
                             {{ form.cockade_var.label(style="font-size: 1.2rem;") }}
                             {{ form.cockade_var(class="form-control") }}
@@ -79,7 +76,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4 order-6">
+                    <div class="col-md-2 order-sixyh">
                         <div class="form-group">
                             {{ form.emitted.label(style="font-size: 1.2rem;") }}
                             {{ form.emitted(class="form-control", style="text-align: center;") }}
@@ -92,75 +89,9 @@
                         </div>
                     </div>
                 </div>
-                <br>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-4 order-7">
-                        <div class="form-group">
-                            {{ form.sale_type.label(style="font-size: 1.2rem;") }}
-                            {{ form.sale_type(class="form-control", style="text-align: center;") }}
-                            {% if form.sale_type.errors %}
-                            {% for error in form.sale_type.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-4 order-8">
-                        <div class="form-group">
-                            {{ form.sale_quantity.label(style="font-size: 1.2rem;") }}
-                            {{ form.sale_quantity(class="form-control") }}
-                            {% if form.sale_quantity.errors %}
-                            {% for error in form.sale_quantity.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-4 order-10">
-                        <div class="form-group">
-                            {{ form.invoice_nr.label(style="font-size: 1.2rem;") }}
-                            {{ form.invoice_nr(class="form-control") }}
-                            {% if form.invoice_nr.errors %}
-                            {% for error in form.invoice_nr.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-4 order-11">
-                        <div class="form-group">
-                            {{ form.invoice_date.label(style="font-size: 1.2rem;") }}
-                            {{ form.invoice_date(class="form-control") }}
-                            {% if form.invoice_date.errors %}
-                            {% for error in form.invoice_date.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-4 order-12">
-                        <div class="form-group">
-                            {{ form.invoice_status.label(style="font-size: 1.2rem;")}}
-                            {{ form.invoice_status(class="form-control", style="text-align: center;") }}
-                            {% if form.invoice_status.errors %}
-                            {% for error in form.invoice_status.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-6 order-13">
+                <div class="row no-gutters justify-content-center rounded"
+                     style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                    <div class="col-md-4 order-first">
                         <div class="form-group">
                             {{ form.head_id.label(style="font-size: 1.2rem;") }}
                             {{ form.head_id(class="form-control", style="text-align: center;") }}
@@ -172,7 +103,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6 order-14">
+                    <div class="col-md-8 order-second">
                         <div class="form-group">
                             {{ form.farmer_id.label(style="font-size: 1.2rem;") }}
                             {{ form.farmer_id(class="form-control", style="text-align: center;") }}
@@ -185,9 +116,48 @@
                         </div>
                     </div>
                 </div>
-                <br>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-6 order-15">
+                <div class="row no-gutters justify-content-center rounded"
+                     style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                    <div class="col-md-4 order-first">
+                        <div class="form-group">
+                            {{ form.head_category.label(style="font-size: 1.2rem;") }}
+                            {{ form.head_category(class="form-control", style="text-align: center;") }}
+                            {% if form.head_category.errors %}
+                            {% for error in form.head_category.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 order-second">
+                        <div class="form-group">
+                            {{ form.sale_type.label(style="font-size: 1.2rem;") }}
+                            {{ form.sale_type(class="form-control", style="text-align: center;") }}
+                            {% if form.sale_type.errors %}
+                            {% for error in form.sale_type.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-3 order-third">
+                        <div class="form-group">
+                            {{ form.sale_quantity.label(style="font-size: 1.2rem;") }}
+                            {{ form.sale_quantity(class="form-control") }}
+                            {% if form.sale_quantity.errors %}
+                            {% for error in form.sale_quantity.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters justify-content-center rounded"
+                     style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                    <div class="col-md-8 order-first">
                         <div class="form-group">
                             {{ form.buyer_id.label(style="font-size: 1.2rem;") }}
                             {{ form.buyer_id(class="form-control", style="text-align: center;") }}
@@ -199,7 +169,22 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6 order-16">
+                    <div class="col-md-4 order-second">
+                        <div class="form-group">
+                            {{ form.buyer_type.label(style="font-size: 1.2rem;") }}
+                            {{ form.buyer_type(class="form-control", style="text-align: center;") }}
+                            {% if form.buyer_type.errors %}
+                            {% for error in form.buyer_type.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters justify-content-center rounded"
+                     style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                    <div class="col-md-8 order-first">
                         <div class="form-group">
                             {{ form.slaughterhouse_id.label(style="font-size: 1.2rem;") }}
                             {{ form.slaughterhouse_id(class="form-control", style="text-align: center;") }}
@@ -211,9 +196,60 @@
                             {% endif %}
                         </div>
                     </div>
+                    <div class="col-md-4 order-second">
+                        <div class="form-group">
+                            {{ form.batch_number.label(style="font-size: 1.2rem;") }}
+                            {{ form.batch_number(class="form-control", style="text-align: center;") }}
+                            {% if form.batch_number.errors %}
+                            {% for error in form.batch_number.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <div class="form-group">
+                <div class="row no-gutters justify-content-center rounded"
+                     style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                    <div class="col-md-3 order-first">
+                        <div class="form-group">
+                            {{ form.invoice_nr.label(style="font-size: 1.2rem;") }}
+                            {{ form.invoice_nr(class="form-control") }}
+                            {% if form.invoice_nr.errors %}
+                            {% for error in form.invoice_nr.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-3 order-second">
+                        <div class="form-group">
+                            {{ form.invoice_date.label(style="font-size: 1.2rem;") }}
+                            {{ form.invoice_date(class="form-control") }}
+                            {% if form.invoice_date.errors %}
+                            {% for error in form.invoice_date.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-3 order-third">
+                        <div class="form-group">
+                            {{ form.invoice_status.label(style="font-size: 1.2rem;")}}
+                            {{ form.invoice_status(class="form-control", style="text-align: center;") }}
+                            {% if form.invoice_status.errors %}
+                            {% for error in form.invoice_status.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group rounded"
+                     style="background-color: #DEDEDE; padding: 10px;">
                     {{ form.note_certificate.label(style="font-size: 1.2rem;") }}
                     <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
                     {{ form.note_certificate(class="form-control") }}
@@ -224,7 +260,8 @@
                     {% endfor %}
                     {% endif %}
                 </div>
-                <div class="form-group">
+                <div class="form-group rounded"
+                     style="background-color: #DEDEDE; padding: 10px;">
                     {{ form.note.label(style="font-size: 1.2rem;") }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}

@@ -78,7 +78,11 @@ class FormAdminSignup(FlaskForm):
 class FormUserSignup(FlaskForm):
     """Form dati signup account Utente."""
     username = StringField(
-        'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default="")
+        'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
+    )
+
+    syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
+
     new_password_1 = PasswordField('Nuova Password', validators=[
         DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
     new_password_2 = PasswordField('Conferma Password', validators=[
@@ -131,6 +135,8 @@ class FormAccountUpdate(FlaskForm):
     """Form di modifica dati account escluso password ed e-mail"""
     username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
 
+    syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
+
     name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
     last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
 
@@ -152,6 +158,7 @@ class FormAccountUpdate(FlaskForm):
         return {
             'username': self.username.data,
             'name': self.name.data,
+            'syd_user': self.syd_user.data,
             'last_name': self.last_name.data,
             'full_name': F"{self.name.data} {self.last_name.data}",
             'email': self.email.data,

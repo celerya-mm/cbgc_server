@@ -19,7 +19,7 @@
                     <div class="form-group">
                         {{ form.username.label }}
                         <p class="comment">Lo username non deve contenere spazi.</p>
-                        {{ form.username(class="form-control") }}
+                        {{ form.username(class="form-control emphasis") }}
                         {% if form.username.errors %}
                         {% for error in form.username.errors %}
                         <span class="text-danger">{{ error }}</span>
@@ -54,7 +54,7 @@
                     <br>
                     <div class="form-group">
                         {{ form.email.label }}
-                        {{ form.email(class="form-control") }}
+                        {{ form.email(class="form-control emphasis") }}
                         {% if form.email.errors %}
                         {% for error in form.email.errors %}
                         <span class="text-danger">{{ error }}</span>

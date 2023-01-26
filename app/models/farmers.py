@@ -33,10 +33,9 @@ class Farmer(db.Model):
     heads = db.relationship('Head', backref='farmer', lazy=True)
     dna_certs = db.relationship('CertificateDna', backref='farmer', lazy=True)
     cons_certs = db.relationship('CertificateCons', backref='farmer', lazy=True)
-    
+
     events = db.relationship('EventDB', backref='farmer', lazy=True)
 
-    note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
@@ -79,7 +78,6 @@ class Farmer(db.Model):
 
         self.events = events or []
 
-        self.note_certificate = note_certificate or None
         self.note = note or None
 
         self.created_at = datetime.now()
@@ -110,7 +108,6 @@ class Farmer(db.Model):
             'stable_productive_orientation': self.stable_productive_orientation,
             'stable_breeding_methods': self.stable_breeding_methods,
 
-            'note_certificate': self.note_certificate,
             'note': self.note,
 
             'created_at': date_to_str(self.created_at, "%Y-%m-%d %H:%M:%S.%f"),

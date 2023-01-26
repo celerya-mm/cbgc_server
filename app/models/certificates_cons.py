@@ -66,6 +66,10 @@ class CertificateCons(db.Model):
     sale_quantity = db.Column(db.Float, index=False, nullable=True)
     sale_rest = db.Column(db.Float, index=False, nullable=True)
 
+    head_category = db.Column(db.String(10), index=False, unique=False, nullable=True)
+    head_age = db.Column(db.Integer, index=False, unique=False, nullable=True)
+    batch_number = db.Column(db.String(50), index=False, unique=False, nullable=True)
+
     invoice_nr = db.Column(db.String(20), index=False, unique=False, nullable=True)
     invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
     invoice_status = db.Column(db.String(20), index=False, unique=False, nullable=True)
@@ -92,7 +96,7 @@ class CertificateCons(db.Model):
     def __init__(self,
                  certificate_var, certificate_date, certificate_id, certificate_pdf=None,
                  cockade_var=None, cockade_id=None, emitted=None,
-                 sale_type=None, sale_quantity=None,
+                 sale_type=None, sale_quantity=None, batch_number=None, head_category=None, head_age=None,
                  head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  invoice_nr=None, invoice_date=None, invoice_status=None,
                  events=None, note_certificate=None, note=None):
@@ -115,6 +119,10 @@ class CertificateCons(db.Model):
         self.sale_type = sale_type or None
         self.sale_quantity = sale_quantity or None
         self.sale_rest = sale_quantity or None
+
+        self.head_category = head_category or None
+        self.head_age = head_age or None
+        self.batch_number = batch_number or None
 
         self.certificate_pdf = certificate_pdf or None
 
@@ -156,6 +164,10 @@ class CertificateCons(db.Model):
             'sale_type': self.sale_type,
             'sale_quantity': self.sale_quantity,
             'sale_rest': self.sale_rest,
+
+            'head_category': self.head_category,
+            'head_age': self.head_age,
+            'batch_number': self.batch_number,
 
             'invoice_nr': self.invoice_nr,
             'invoice_date': date_to_str(self.invoice_date),

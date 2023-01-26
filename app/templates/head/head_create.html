@@ -82,30 +82,7 @@
                             {% endfor %}
                             {% endif %}
                         </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.farmer_id.label }}
-                            {{ form.farmer_id(class="form-control", style="text-align: center;") }}
-                            {% if form.farmer_id.errors %}
-                            {% for error in form.farmer_id.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
                     </div>
-                </div>
-                <br>
-                <div class="form-group">
-                    {{ form.note_certificate.label }}
-                    <p class="comment">Queste note compariranno nella stampa del certificato. Usale con cautela.</p>
-                    {{ form.note_certificate(class="form-control") }}
-                    {% if form.note_certificate.errors %}
-                    {% for error in form.note_certificate.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    <br>
-                    {% endfor %}
-                    {% endif %}
                 </div>
                 <br>
                 <div class="form-group">
@@ -118,7 +95,7 @@
                     {% endfor %}
                     {% endif %}
                 </div>
-                <hr>
+                <br>
                 <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
                     <img class="icon-simple" src="{{ url_for('static', filename='icons/save.svg') }}"
                          alt=""/>

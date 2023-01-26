@@ -40,7 +40,6 @@ class FormFarmerCreate(FlaskForm):
     stable_breeding_methods = SelectField("Modalità Allevamento", choices=[
         "Estensivo", "Intensivo", "Transumante", "Brado"], default="Estensivo")
 
-    note_certificate = StringField('Note Certificato', validators=[Length(max=255), Optional()])
     note = StringField('Note', validators=[Length(max=255), Optional()])
 
     submit = SubmitField("CREATE")
@@ -80,7 +79,6 @@ class FormFarmerUpdate(FlaskForm):
     affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
     affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
 
-    note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
     note = StringField('Note', validators=[Length(max=255)])
 
     submit = SubmitField("SAVE")
@@ -120,6 +118,5 @@ class FormFarmerUpdate(FlaskForm):
             'affiliation_end_date': date_to_str(self.affiliation_end_date),
             'affiliation_status': status_si_no(self.affiliation_status.data),
 
-            'note_certificate': self.note_certificate.data,
             'note': self.note.data,
         }

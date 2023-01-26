@@ -91,11 +91,6 @@ body {
     margin: auto;
 }
 
-checkbox {
-    width: 24px;
-    height: 24px;
-}
-
 .comment {
     font-family: 'Jost', sans-serif;
     font-size: 0.6rem;
@@ -133,6 +128,26 @@ checkbox {
 .delete {
     background-color: transparent;
     border-style: hidden;
+}
+
+.dropdown-menu {
+    background-color: #2B4692 !important;
+}
+
+.dropdown-item {
+    text-color: white;
+    color: white;
+}
+
+.dropdown-item.active {
+    background-color: #2B4692 !important;
+}
+
+.emphasis {
+    background: #2B4692;
+    color: white;
+    text-color: white;
+    font-weight: bold;
 }
 
 .footer-text,

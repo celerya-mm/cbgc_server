@@ -10,13 +10,41 @@
                 <img class="icon-simple" style="width: 30px; height: 30px;"
                      src="{{ url_for('static', filename='icons/list_blue.svg') }}" alt=""/>
             </a>
-            Dati CERTIFICATO CONSORZIO [ {{ form.id }} ] - Emesso: {{ form.emitted }}
-            <a class="btn btn-update" type="button" title="Modifica Capo" style="width: 28px; height: 28px;"
+            Dati CERTIFICATO CONSORZIO [ {{ form.id }} ]
+            <a class="btn btn-update" type="button" title="Modifica Certificato" style="width: 28px; height: 28px;"
                href="{{ url_for(update, _id=form.id) }}">
                 <img class="icon-simple" style="width: 28px; height: 28px;"
                      src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
             </a>
         </h5>
+        <h6>
+            Emesso:
+            {% if form.emitted == True or form.emitted == "SI" %}
+            <img class="icon-simple" style="width: 28px; height: 28px;"
+                 src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
+            {% else %}
+            <img class="icon-simple" style="width: 28px; height: 28px;"
+                 src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
+            {% endif %}
+
+            {% if form.emitted == False or form.emitted == "NO" %}
+            <a class="btn btn-update" type="button" title="Genera Certificato" style="width: 28px; height: 28px;"
+               href="{{ url_for(generate, _id=form.id) }}">
+                <img class="icon-simple" style="width: 28px; height: 28px;"
+                     src="{{ url_for('static', filename='icons/print_blue.svg') }}" alt=""/>
+            </a>
+            <img class="icon-simple" style="width: 28px; height: 28px;"
+                 src="{{ url_for('static', filename='icons/visibility_grey.svg') }}" alt=""/>
+            {% else %}
+            <img class="icon-simple" style="width: 28px; height: 28px;"
+                 src="{{ url_for('static', filename='icons/print_grey.svg') }}" alt=""/>
+            <a class="btn btn-update" type="button" title="Visualizza Certificato" style="width: 28px; height: 28px;"
+               href="{{ url_for(update, _id=form.id) }}">
+                <img class="icon-simple" style="width: 28px; height: 28px;"
+                     src="{{ url_for('static', filename='icons/visibility.svg') }}" alt=""/>
+            </a>
+            {% endif %}
+        </h6>
     </div>
     <div class="container text-center mt-2 justify-content-center">
         <div class="row no-gutters justify-content-center rounded"
@@ -55,7 +83,57 @@
             </div>
         </div>
         <div class="row no-gutters justify-content-center rounded" style="background-color: #DEDEDE">
-            <div class="col-md-6 order-5">
+            <div class="col-md-2 order-first">
+                <div class="form-group">
+                    Categoria
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.head_category }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2 order-second">
+                <div class="form-group">
+                    Età
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.head_age }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2 order-third">
+                <div class="form-group">
+                    Lotto
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.batch_number }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2 order-fourth">
+                <div class="form-group">
+                    <h6> Tipo Vendita </h6>
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.sale_type }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2 order-fifth">
+                <div class="form-group">
+                    <h6> Quantità (kg) </h6>
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.sale_quantity }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2 order-sixth">
+                <div class="form-group">
+                    <h6> Rimanenza </h6>
+                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
+                        {{ form.sale_rest }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row no-gutters justify-content-center rounded" style="background-color: #DEDEDE">
+            <div class="col-md-6 order-first">
                 <div class="form-group">
                     <a title="Vai al capo" href="{{ url_for(head_history, _id=h_id) }}">
                         Capo
@@ -65,7 +143,7 @@
                     </p>
                 </div>
             </div>
-            <div class="col-md-6 order-6">
+            <div class="col-md-6 order-second">
                 <div class="form-group">
                     <a title="Vai all' Allevatore" href="{{ url_for(farmer_history, _id=f_id) }}">
                         Allevatore
@@ -102,32 +180,6 @@
                     {% endif %}
                     <p class="form-control" style="font-weight: bold; color: #5B5A5B">
                         {{ form.slaughterhouse_id }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="row no-gutters justify-content-center rounded" style="background-color: #DEDEDE">
-            <div class="col-md-4 order-8">
-                <div class="form-group">
-                    <h6> Tipo Vendita </h6>
-                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
-                        {{ form.sale_type }}
-                    </p>
-                </div>
-            </div>
-            <div class="col-md-4 order-9">
-                <div class="form-group">
-                    <h6> Quantità (kg) </h6>
-                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
-                        {{ form.sale_quantity }}
-                    </p>
-                </div>
-            </div>
-            <div class="col-md-4 order-10">
-                <div class="form-group">
-                    <h6> Rimanenza </h6>
-                    <p class="form-control" style="font-weight: bold; color: #5B5A5B">
-                        {{ form.sale_rest }}
                     </p>
                 </div>
             </div>
@@ -250,6 +302,37 @@
             }
         });
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

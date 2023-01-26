@@ -33,98 +33,130 @@
 <body>
 <div style="paddin: 0px; margin: 0px">
     <nav class="navbar navbar-expand-lg navbar-dark navbar-bg-white"
-         style="padding-left: 10px; padding-rigth: 10px;">
-        <a class="navbar-brand" title="Home" href="{{ url_for('admin_view') }}">
-            <img src="{{ url_for('static', filename='Logo.png') }}" alt="" width="56" height="50"/>
-        </a>
+         style="padding-left: 20px; padding-rigth: 20px;">
+        <div class="container-fluid">
+            <a class="navbar-brand" title="Home" href="{{ url_for('head_view') }}">
+                <img src="{{ url_for('static', filename='Logo.png') }}" alt="" width="56" height="50"/>
+            </a>
 
-        <button class="navbar-toggler" style="color: white;" type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon" style="color: white"></span>
-        </button>
+            <button class="navbar-toggler" style="color: white;" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon" style="color: white"></span>
+            </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="navbar-nav ml-auto">
-                <a class="nav-item nav-link {% if request.path == '/cert_cons/view/' %} active {% endif %}"
-                   title="Certificati Consorzio" href="{{ url_for('cert_cons_view') }}">
-                    {% if request.path == '/cert_cons/view/' %}
-                    <img src="{{ url_for('static', filename='icons/certificate_active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/certificate_white.svg') }}" alt="">
-                    {% endif %}
-                    Certif.
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/head/view/' %} active {% endif %}"
-                   title="Capi" href="{{ url_for('head_view') }}">
-                    {% if request.path == '/head/view/' %}
-                    <img src="{{ url_for('static', filename='icons/head-active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/head.svg') }}" alt="">
-                    {% endif %}
-                    Capi
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/farmer/view/' %} active {% endif %}"
-                   title="Allevatori" href="{{ url_for('farmer_view') }}">
-                    {% if request.path == '/farmer/view/' %}
-                    <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/agriculture.svg') }}" alt="">
-                    {% endif %}
-                    Allev.
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/buyer/view/' %} active {% endif %}"
-                   title="Acquirenti" href="{{ url_for('buyer_view') }}">
-                    {% if request.path == '/buyer/view/' %}
-                    <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
-                    {% endif %}
-                    Acquir.
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/slaughterhouse/view/' %} active {% endif %}"
-                   title="Macelli" href="{{ url_for('slaughterhouse_view') }}">
-                    {% if request.path == '/slaughterhouse/view/' %}
-                    <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
-                    {% endif %}
-                    Macelli
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/cert_dna/view/' %} active {% endif %}"
-                   title="Certificati DNA" href="{{ url_for('cert_dna_view') }}">
-                    {% if request.path == '/cert_dna/view/' %}
-                    <img src="{{ url_for('static', filename='icons/dna-blue-light.png') }}"
-                         style="height: 24px; width: 24px;" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/dna-white.png') }}"
-                         style="height: 24px; width: 24px;" alt="">
-                    {% endif %}
-                    DNA
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/admin/view/' %} active {% endif %}"
-                   title="Amministratori" href="{{ url_for('admin_view') }}">
-                    {% if request.path == '/admin/view/' %}
-                    <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/admin.svg') }}" alt="">
-                    {% endif %}
-                    <!--                    Ammin.-->
-                </a>
-                <a class="nav-item nav-link {% if request.path == '/user/view/' %} active {% endif %}"
-                   title="Utenti" href="{{ url_for('user_view') }}">
-                    {% if request.path == '/user/view/' %}
-                    <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}" alt="">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
-                    {% endif %}
-                    <!--                    Utenti-->
-                </a>
-                <a class="nav-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
-                    <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}" alt="">
-                    <!--                    LogOut-->
-                </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/cert_cons/view/' %} active {% endif %}"
+                           title="Certificati Consorzio" href="{{ url_for('cert_cons_view') }}">
+                            {% if request.path == '/cert_cons/view/' %}
+                            <img src="{{ url_for('static', filename='icons/certificate_active.svg') }}" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/certificate_white.svg') }}" alt="">
+                            {% endif %}
+                            Certif.
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/head/view/' %} active {% endif %}"
+                           title="Capi" href="{{ url_for('head_view') }}">
+                            {% if request.path == '/head/view/' %}
+                            <img src="{{ url_for('static', filename='icons/head-active.svg') }}" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/head.svg') }}" alt="">
+                            {% endif %}
+                            Capi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/farmer/view/' %} active {% endif %}"
+                           title="Allevatori" href="{{ url_for('farmer_view') }}">
+                            {% if request.path == '/farmer/view/' %}
+                            <img src="{{ url_for('static', filename='icons/agriculture-active.svg') }}" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/agriculture.svg') }}" alt="">
+                            {% endif %}
+                            Allev.
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/buyer/view/' %} active {% endif %}"
+                           title="Acquirenti" href="{{ url_for('buyer_view') }}">
+                            {% if request.path == '/buyer/view/' %}
+                            <img src="{{ url_for('static', filename='icons/store-active.svg') }}" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/store.svg') }}" alt="">
+                            {% endif %}
+                            Acquir.
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/slaughterhouse/view/' %} active {% endif %}"
+                           title="Macelli" href="{{ url_for('slaughterhouse_view') }}">
+                            {% if request.path == '/slaughterhouse/view/' %}
+                            <img src="{{ url_for('static', filename='icons/building-active.svg') }}" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/building.svg') }}" alt="">
+                            {% endif %}
+                            Macelli
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-item nav-link {% if request.path == '/cert_dna/view/' %} active {% endif %}"
+                           title="Certificati DNA" href="{{ url_for('cert_dna_view') }}">
+                            {% if request.path == '/cert_dna/view/' %}
+                            <img src="{{ url_for('static', filename='icons/dna-blue-light.png') }}"
+                                 style="height: 24px; width: 24px;" alt="">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='icons/dna-white.png') }}"
+                                 style="height: 24px; width: 24px;" alt="">
+                            {% endif %}
+                            DNA
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown" style="background-color: #2B4692 !important;">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <!--                    Ammin.-->
+                            <li>
+                                <a class="dropdown-item nav-link {% if request.path == '/admin/view/' %} active {% endif %}"
+                                   title="Amministratori" href="{{ url_for('admin_view') }}">
+                                    {% if request.path == '/admin/view/' %}
+                                    <img src="{{ url_for('static', filename='icons/admin-active.svg') }}" alt="">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='icons/admin.svg') }}" alt="">
+                                    {% endif %}
+                                    Ammin.
+                                </a>
+                            </li>
+                            <!--                    Utenti-->
+                            <li>
+                                <a class="dropdown-item nav-link {% if request.path == '/user/view/' %} active {% endif %}"
+                                   title="Utenti" href="{{ url_for('user_view') }}">
+                                    {% if request.path == '/user/view/' %}
+                                    <img src="{{ url_for('static', filename='icons/person-fill-active.svg') }}"
+                                         alt="">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='icons/person-fill.svg') }}" alt="">
+                                    {% endif %}
+                                    Utenti
+                                </a>
+                            </li>
+                            <!--                    LogOut-->
+                            <li>
+                                <a class="dropdown-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
+                                    <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}"
+                                         alt="">
+                                    LogOut
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>

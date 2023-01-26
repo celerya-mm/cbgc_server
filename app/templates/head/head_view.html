@@ -23,6 +23,7 @@
                             <th class="title" id="h6">Conf.</th>
                             <th class="title" id="h7">Venduto</th>
                             <th class="title" id="h8">Macellato</th>
+                            <th class="title" id="h9">Certificato</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -60,6 +61,13 @@
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.slaughter_date|e }}
                             </td>
+
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {% for k, v in row.cons_cert %}
+                                {{ k[certificate_nr].v|e }}
+                                {% endfor %}
+                            </td>
+
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -92,6 +100,15 @@
             }
         });
     });
+
+
+
+
+
+
+
+
+
 
 
 
