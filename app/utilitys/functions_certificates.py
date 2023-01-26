@@ -10,10 +10,16 @@ from docxtpl import DocxTemplate
 # imposta path doc file's models
 path = os.path.dirname(os.path.realpath(__file__))
 folders_models = os.path.join(path, "certificates_model")
+
 # imposta path work
 folder_work = os.path.join(path, "certificates_work")
 if not os.path.exists(folder_work):
 	os.makedirs(folder_work)
+
+# imposta path temp file
+folder_temp = os.path.join(path, "temp_pdf")
+if not os.path.exists(folder_temp):
+	os.makedirs(folder_temp)
 
 
 def generate_qr_code(_str):
@@ -119,3 +125,18 @@ def create_byte_certificate(data, _file, _str):
 			return False
 	else:
 		return False
+
+
+def byte_to_pdf(byte, f_name):
+	"""Ricrea il pdf da una stringa in byte."""
+	# for file in folder_temp:
+	for filename in os.listdir(folder_temp):
+		file_path = os.path.join(folder_temp, filename)
+		os.remove(file_path)
+
+	path_file = os.path.join(folder_temp, f_name.replace("/", "_") + ".pdf")
+	print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
+	# document = cert.certificate_pdf, 'utf-8')
+	with open(path_file, "wb") as f:
+		f.write(byte)
+	return path_file

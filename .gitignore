@@ -115,6 +115,10 @@ venv.bak/
 migrations
 migrations/
 to_do.md
+certificates_model/
+certificates_work/
+temp_pdf
+temp_pdf/
 
 # Spyder project settings
 .spyderproject

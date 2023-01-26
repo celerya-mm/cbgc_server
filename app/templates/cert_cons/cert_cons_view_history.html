@@ -28,18 +28,22 @@
             {% endif %}
 
             {% if form.emitted == False or form.emitted == "NO" %}
+            <!--            Button crea/stampa certificato-->
             <a class="btn btn-update" type="button" title="Genera Certificato" style="width: 28px; height: 28px;"
                href="{{ url_for(generate, _id=form.id) }}">
                 <img class="icon-simple" style="width: 28px; height: 28px;"
                      src="{{ url_for('static', filename='icons/print_blue.svg') }}" alt=""/>
             </a>
+            <!--            Button view certificato disable-->
             <img class="icon-simple" style="width: 28px; height: 28px;"
                  src="{{ url_for('static', filename='icons/visibility_grey.svg') }}" alt=""/>
             {% else %}
+            <!--            Button crea/stampa certificato disable-->
             <img class="icon-simple" style="width: 28px; height: 28px;"
                  src="{{ url_for('static', filename='icons/print_grey.svg') }}" alt=""/>
+            <!--            Button view certificato-->
             <a class="btn btn-update" type="button" title="Visualizza Certificato" style="width: 28px; height: 28px;"
-               href="{{ url_for(update, _id=form.id) }}">
+               href="{{ url_for(download, _id=form.id) }}">
                 <img class="icon-simple" style="width: 28px; height: 28px;"
                      src="{{ url_for('static', filename='icons/visibility.svg') }}" alt=""/>
             </a>
@@ -225,7 +229,7 @@
         </div>
     </div>
 </form>
-
+<!--Viste records relazionati-->
 <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
     <div class="accordion" id="head_accordion">
         <!--        Tabella Modifiche-->
@@ -302,133 +306,6 @@
             }
         });
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

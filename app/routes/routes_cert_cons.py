@@ -1,7 +1,6 @@
 import json
 
-from flask import current_app as app, flash, redirect, render_template, url_for, request
-from sqlalchemy.dialects.postgresql import psycopg2
+from flask import current_app as app, flash, redirect, render_template, url_for, request, send_file
 from sqlalchemy.exc import IntegrityError
 
 from ..app import db, session
@@ -13,7 +12,7 @@ from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
 from ..utilitys.functions import (event_create, not_empty, token_admin_validate, str_to_date, calc_age,
                                   status_true_false, status_si_no, date_to_str)
-from ..utilitys.functions_certificates import create_byte_certificate, generate_qr_code
+from ..utilitys.functions_certificates import create_byte_certificate, generate_qr_code, byte_to_pdf
 
 VIEW = "/cert_cons/view/"
 VIEW_FOR = "cert_cons_view"
@@ -33,6 +32,11 @@ UPDATE_HTML = "cert_cons/cert_cons_update.html"
 
 GENERATE = "/cert_cons/generate/<_id>"
 GENERATE_FOR = "cert_cons_generate"
+
+DOWNLOAD = "/cert_cons/download/<_id>"
+DOWNLOAD_FOR = "cert_cons_download"
+
+MODAL_HTML = "/cert_cons/modal_pdf.html"
 
 
 @app.route(VIEW, methods=["GET", "POST"])
@@ -164,7 +168,7 @@ def cert_cons_view_history(_id):
 
 	# print("CERT_DATA:", json.dumps(cert.to_dict(), indent=2))
 	return render_template(HISTORY_HTML, form=_cert, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,
-	                       update=UPDATE_FOR, event_history=EVENT_HISTORY, generate=GENERATE_FOR,
+	                       update=UPDATE_FOR, event_history=EVENT_HISTORY, generate=GENERATE_FOR, download=DOWNLOAD_FOR,
 	                       head_history=HEAD_HISTORY, h_id=cert.head_id,
 	                       farmer_history=FARMER_HISTORY, f_id=cert.farmer_id,
 	                       buyer_history=BUYER_HISTORY, b_id=cert.buyer_id,
@@ -343,7 +347,6 @@ def cert_cons_update(_id):
 def cert_cons_generate(_id):
 	"""Stampa il certificato in .pdf e carica come byte nel DB."""
 	cert = CertificateCons.query.get(int(_id))
-
 	# genero QR-Code
 	str_qr = f"109-CERT-{cert.certificate_nr}"
 	if generate_qr_code(str_qr):
@@ -433,4 +436,15 @@ def cert_cons_generate(_id):
 		flash(f"ERRORE CREAZIONE PDF.")
 		db.session.close()
 		flash(f"FINITO.")
+		return redirect(url_for(HISTORY_FOR, _id=_id))
+
+
+@app.route(DOWNLOAD, methods=["GET", "POST"])
+@token_admin_validate
+def cert_cons_download(_id):
+	cert = CertificateCons.query.get(int(_id))
+	if cert.certificate_pdf and len(cert.certificate_pdf) > 10:
+		_pdf = byte_to_pdf(cert.certificate_pdf, cert.certificate_nr)
+		return send_file(_pdf, as_attachment=True)
+	else:
 		return redirect(url_for(HISTORY_FOR, _id=_id))
