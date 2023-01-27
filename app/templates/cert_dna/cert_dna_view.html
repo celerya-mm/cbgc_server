@@ -39,10 +39,16 @@
                                 {{ row.dna_cert_year|e }}
                             </td>
                             <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.head_id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(head, _id=row.head_id) }}">
+                                    {{ row.head_id|e }}
+                                </a>
                             </td>
                             <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.farmer_id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(farmer, _id=row.farmer_id) }}">
+                                    {{ row.farmer_id|e }}
+                                </a>
                             </td>
                             <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.veterinarian|e }}
@@ -79,6 +85,7 @@
             }
         });
     });
+
 
 
 

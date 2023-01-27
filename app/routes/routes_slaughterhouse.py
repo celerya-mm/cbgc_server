@@ -9,6 +9,8 @@ from ..forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterh
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
 from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+from ..routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY
 from ..utilitys.functions import (event_create, token_admin_validate, str_to_date, status_si_no, status_true_false,
                                   address_mount, not_empty)
 
@@ -114,10 +116,12 @@ def slaughterhouse_view_history(_id):
 	_slaughterhouse["maps"] = f'{_slaughterhouse["cap"].strip().replace(" ", "")},' \
 	                          f'{_slaughterhouse["address"].strip().replace(" ", "+")}' \
 	                          f',{_slaughterhouse["city"].strip().replace(" ", "+")}'
-	return render_template(HISTORY_HTML, form=_slaughterhouse, history_list=history_list, h_len=len_history,
-	                       view=VIEW_FOR, update=UPDATE_FOR, cons_list=_cons_list, len_cons=len(_cons_list),
-	                       head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY,
-	                       event_history=EVENT_HISTORY)
+	return render_template(
+		HISTORY_HTML, form=_slaughterhouse, history_list=history_list, h_len=len_history,
+		view=VIEW_FOR, update=UPDATE_FOR, cons_list=_cons_list, len_cons=len(_cons_list),
+		head_list=head_list, len_heads=len(head_list), head=HEAD_HISTORY,
+		cert_cons=CERT_HISTORY, farmer=FARMER_HISTORY, event_history=EVENT_HISTORY
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])

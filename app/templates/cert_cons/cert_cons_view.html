@@ -7,6 +7,27 @@
             <div class="col-md-12 shadow rounded">
                 <h2 class="card-title" style="padding: 20px;">
                     Elenco CERTIFICATI Consorzio:</h2>
+                <!-- VISUALIZZO I GRAFICI -->
+                <div class="row no-gutters justify-content-center">
+                    <!-- GRAFICO PER ANNI -->
+                    <div class="col-md-4 order-first">
+                        <div class="card chart-container">
+                            <canvas id="chart_years"></canvas>
+                        </div>
+                    </div>
+                    <!-- GRAFICO PER ALLEVATORI -->
+                    <div class="col-md-4 order-second">
+                        <div class="card chart-container">
+                            <canvas id="chart_farmers"></canvas>
+                        </div>
+                    </div>
+                    <!-- GRAFICO PER ACQUIRENTI -->
+                    <div class="col-md-4 order-third">
+                        <div class="card chart-container">
+                            <canvas id="chart_buyers"></canvas>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
@@ -105,16 +126,103 @@
         });
     });
 
+    // Impostazioni grafico ANNI
+    let years_labels = JSON.parse({{ years_labels | tojson }})
+    console.log("LABELS: ", years_labels)
+
+    let years_values = JSON.parse({{ years_values | tojson }})
+    // console.log("VALUES: ", years_values)
+
+    const data = {
+        labels: years_labels,
+        datasets: [{
+            label: "Certificati (5 anni)",
+            data: years_values,
+            fill: false,
+            backgroundColor: "#ED6666", //red
+            borderColor: "#ED6666",
+            borderWidth: 1,
+            borderRadius: 2,
+        }]
+    };
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx = document.getElementById('chart_years').getContext('2d');
+    const myChart = new Chart(ctx, config);
 
 
+    // Impostazioni grafico ALLEVATORI
+    let farmers_labels = JSON.parse({{ farmers_labels | tojson }})
+    console.log("LABELS: ", farmers_labels)
+
+    let farmers_values = JSON.parse({{ farmers_values | tojson }})
+    // console.log("VALUES: ", farmers_values)
+
+    const data1 = {
+        labels: farmers_labels,
+        datasets: [{
+            label: "per Allevatore",
+            data: farmers_values,
+            fill: false,
+            backgroundColor: "#2B4692", //blue
+            borderColor: "#2B4692",
+            borderWidth: 1,
+            borderRadius: 2,
+        }]
+    };
+    const config1 = {
+        type: 'bar',
+        data: data1,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx1 = document.getElementById('chart_farmers').getContext('2d');
+    const myChart1 = new Chart(ctx1, config1);
 
 
+    // Impostazioni grafico ACQUIRENTI
+    let buyers_labels = JSON.parse({{ buyers_labels | tojson }})
+    console.log("LABELS: ", buyers_labels)
 
+    let buyers_values = JSON.parse({{ buyers_values | tojson }})
+    // console.log("VALUES: ", buyers_values)
 
-
-
-
-
+    const data2 = {
+        labels: buyers_labels,
+        datasets: [{
+            label: "per Acquirente",
+            data: buyers_values,
+            fill: false,
+            backgroundColor: "#5B5A5B", //grey
+            borderColor: "#5B5A5B",
+            borderWidth: 1,
+            borderRadius: 2,
+        }]
+    };
+    const config2 = {
+        type: 'bar',
+        data: data2,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx2 = document.getElementById('chart_buyers').getContext('2d');
+    const myChart2 = new Chart(ctx2, config2);
 
 
 

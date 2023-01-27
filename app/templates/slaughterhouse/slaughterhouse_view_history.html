@@ -142,13 +142,17 @@
                             <th class="title" id="c7">Tipo</th>
                             <th class="title" id="c8">Quantità</th>
                             <th class="title" id="c9">Resto</th>
+                            <th class="title" id="c10">Capo</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for row in cons_list %}
                         <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(farmer, _id=row.id) }}">
+                                    {{ row.id|e }}
+                                </a>
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.certificate_nr|e }}
@@ -170,6 +174,12 @@
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.sale_rest|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(head, _id=row.head_id) }}">
+                                    {{ row.head_id|e }}
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -197,7 +207,6 @@
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="p1" data-defaultsort="asc">ID</th>
-                            <th class="title" id="p2" data-sortable="false"></th>
                             <th class="title" id="p3">Auricolare</th>
                             <th class="title" id="p4">Allevatore</th>
                             <th class="title" id="p5">Nato</th>
@@ -210,21 +219,19 @@
                         {% for row in head_list %}
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.id|e }}
-                            </td>
-                            <td style="width: 20px; padding:2px;">
-                                <a class="btn-table" type="button" title="Visualizza Capo"
-                                   href="{{ url_for(head_history, _id=row.id) }}">
-                                    <img class="icon-table"
-                                         src="{{ url_for('static', filename='icons/visibility_grey.svg') }}"
-                                         alt=""/>
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(head, _id=row.id) }}">
+                                    {{ row.id|e }}
                                 </a>
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.headset|e }}
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.farmer_id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(farmer, _id=row.farmer_id) }}">
+                                    {{ row.farmer_id|e }}
+                                </a>
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.birth_date|e }}
@@ -358,6 +365,10 @@
             }
         });
     });
+
+
+
+
 
 
 

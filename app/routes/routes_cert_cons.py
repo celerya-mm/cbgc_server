@@ -11,7 +11,7 @@ from ..models.farmers import Farmer
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
 from ..utilitys.functions import (event_create, not_empty, token_admin_validate, str_to_date, calc_age,
-                                  status_true_false, status_si_no, date_to_str)
+                                  status_true_false, status_si_no, date_to_str, dict_group_by)
 from ..utilitys.functions_certificates import create_byte_certificate, generate_qr_code, byte_to_pdf
 
 VIEW = "/cert_cons/view/"
@@ -36,8 +36,6 @@ GENERATE_FOR = "cert_cons_generate"
 DOWNLOAD = "/cert_cons/download/<_id>"
 DOWNLOAD_FOR = "cert_cons_download"
 
-MODAL_HTML = "/cert_cons/modal_pdf.html"
-
 
 @app.route(VIEW, methods=["GET", "POST"])
 @token_admin_validate
@@ -50,8 +48,28 @@ def cert_cons_view():
 
 	_list = CertificateCons.query.all()
 	_list = [r.to_dict() for r in _list]
+
+	# raggruppa per anno del certificato
+	group_year = dict_group_by(_list, "certificate_year", year=True)
+	years_labels = [sub["certificate_year"] for sub in group_year]
+	years_values = [sub['number'] for sub in group_year]
+
+	# raggruppa per allevatore
+	group_farmer = dict_group_by(_list, "farmer_id")
+	farmers_labels = [sub["farmer_id"] for sub in group_farmer]
+	farmers_values = [sub['number'] for sub in group_farmer]
+
+	# raggruppa per acquirente
+	group_buyer = dict_group_by(_list, "buyer_id")
+	buyers_labels = [sub["buyer_id"] for sub in group_buyer]
+	buyers_values = [sub["number"] for sub in group_buyer]
+
 	return render_template(VIEW_HTML, form=_list, history=HISTORY_FOR, h_hist=HEAD_HISTORY, f_hist=FARMER_HISTORY,
-	                       b_hist=BUYER_HISTORY, s_hist=SLAUG_HISTORY)
+	                       b_hist=BUYER_HISTORY, s_hist=SLAUG_HISTORY,
+	                       years_labels=json.dumps(years_labels), years_values=json.dumps(years_values),
+	                       farmers_labels=json.dumps(farmers_labels), farmers_values=json.dumps(farmers_values),
+	                       buyers_labels=json.dumps(buyers_labels), buyers_values=json.dumps(buyers_values)
+	                       )
 
 
 @app.route(CREATE, methods=["GET", "POST"])
@@ -250,7 +268,6 @@ def cert_cons_update(_id):
 			db.session.close()
 			flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
 
-
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
@@ -273,7 +290,6 @@ def cert_cons_update(_id):
 		if event_create(_event, cert_cons_id=int(_id)):
 			return redirect(url_for(HISTORY_FOR, _id=int(_id)))
 		else:
-			# flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record

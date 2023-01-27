@@ -102,7 +102,6 @@ def buyer_view_history(_id):
 	user = buyer.user_id
 	if user:
 		user = User.query.get(user)
-		db.session.close()
 		user.to_dict()
 
 	# Estraggo la storia delle modifiche per l'acquirente

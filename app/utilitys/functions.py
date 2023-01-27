@@ -1,9 +1,10 @@
 import json
 from datetime import datetime, date
 from functools import wraps
-from dateutil.relativedelta import relativedelta
 
+import pandas as pd
 import requests
+from dateutil.relativedelta import relativedelta
 from flask import flash, url_for, redirect
 from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
@@ -252,3 +253,31 @@ def calc_age(birth, slaught):  # noqa
 		months = difference.months
 	print("MESI:", months)
 	return months
+
+
+def dict_group_by(_dict, group_d, group_f=None, year=False):  # group_d deve essere l'anno se year=True
+	"""Raggruppa un DF per la richiesta passata (group)."""
+	# crea DF
+	df = pd.DataFrame.from_records(_dict)
+	# print("LENN_DF:", len(df))
+	if year:
+		# filtra DF al massimo 5 anni indietro
+		current_year = datetime.now().year
+		past_year = current_year - 5
+		# print(current_year, past_year)
+		df = df.loc[df[group_d] >= past_year]
+	# print("LEN_DF_FILTERED:", len(df))
+
+	if group_f:  #
+		# raggruppa il DF
+		df = df.groupby([group_d, group_f]).size().reset_index()
+		df.rename(columns={0: 'number'}, inplace=True)
+		# print(df[:10])
+		dct = df.to_dict("records")
+	else:
+		# raggruppa il DF
+		df = df.groupby(by=group_d).size().reset_index()
+		df.rename(columns={0: 'number'}, inplace=True)
+		# print(df[:10])
+		dct = df.to_dict("records")
+	return dct

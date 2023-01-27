@@ -164,6 +164,7 @@
                             <th class="title" id="c7">Tipo</th>
                             <th class="title" id="c8">Quantità</th>
                             <th class="title" id="c9">Resto</th>
+                            <th class="title" id="c10">Capo</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -195,6 +196,12 @@
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.sale_rest|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(head_history, _id=row.head_id) }}">
+                                    {{ row.head_id|e }}
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -286,7 +293,6 @@
                             <th class="title text-center" id="d3">Nr.</th>
                             <th class="title text-center" id="d4">Data</th>
                             <th class="title text-center" id="d5">Anno</th>
-                            <th class="title text-center" id="d6">Allevatore</th>
                             <th class="title text-center" id="d7">Vet.</th>
                         </tr>
                         </thead>
@@ -307,9 +313,6 @@
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.dna_cert_year|e }}
-                            </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.farmer_id|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.veterinarian|e }}
@@ -446,6 +449,8 @@
             }
         });
     });
+
+
 
 
 

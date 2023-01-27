@@ -9,6 +9,8 @@ from ..forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate, list_hea
 from ..models.certificates_dna import CertificateDna
 from ..models.farmers import Farmer
 from ..models.heads import Head
+from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 from ..utilitys.functions import event_create, token_admin_validate, year_extract
 
 VIEW = "/cert_dna/view/"
@@ -36,7 +38,10 @@ def cert_dna_view():
 	_list = CertificateDna.query.all()
 	db.session.close()
 	_list = [r.to_dict() for r in _list]
-	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
+	return render_template(
+		VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR,
+		farmer=FARMER_HISTORY, head=HEAD_HISTORY
+	)
 
 
 @app.route(CREATE, methods=["GET", "POST"])

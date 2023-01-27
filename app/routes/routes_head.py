@@ -10,7 +10,9 @@ from ..models.buyers import Buyer
 from ..models.farmers import Farmer
 from ..models.heads import Head, verify_castration
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import event_create, not_empty, token_admin_validate, str_to_date, year_extract
+from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+from ..utilitys.functions import (event_create, not_empty, token_admin_validate, str_to_date, year_extract,
+                                  dict_group_by)
 
 VIEW = "/head/view/"
 VIEW_FOR = "head_view"
@@ -34,9 +36,38 @@ UPDATE_HTML = "head/head_update.html"
 def head_view():
 	"""Visualizzo informazioni Capi."""
 	_list = Head.query.all()
-	db.session.close()
 	_list = [r.to_dict() for r in _list]
-	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
+
+	# raggruppa per anno di nascita
+	group_birth = dict_group_by(_list, "birth_year", year=True)
+	birth_labels = [sub["birth_year"] for sub in group_birth]
+	birth_values = [sub['number'] for sub in group_birth]
+
+	# raggruppa per anno di nascita e conformità castrazione
+	group_conf = dict_group_by(_list, group_d="birth_year", group_f="castration_compliance", year=True)
+	conf_labels = [sub["birth_year"] for sub in group_conf if sub["castration_compliance"] is False]
+	conf_values = [sub['number'] for sub in group_conf if sub["castration_compliance"] is True]
+	not_conf_values = [sub['number'] for sub in group_conf if sub["castration_compliance"] is False]
+
+	# raggruppa per anno vendita
+	group_sale = dict_group_by(_list, "sale_year", year=True)
+	sale_labels = [sub["sale_year"] for sub in group_sale]
+	sale_values = [sub['number'] for sub in group_sale]
+
+	# raggruppa per allevatori
+	group_farmer = dict_group_by(_list, "farmer_id")
+	farmer_labels = [sub["farmer_id"] for sub in group_farmer]
+	farmer_values = [sub['number'] for sub in group_farmer]
+
+	db.session.close()
+	return render_template(
+		VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR, farmer=FARMER_HISTORY,
+		birth_labels=json.dumps(birth_labels), birth_values=json.dumps(birth_values),
+		conf_labels=json.dumps(conf_labels), conf_values=json.dumps(conf_values),
+		not_conf_values=json.dumps(not_conf_values),
+		sale_labels=json.dumps(sale_labels), sale_values=json.dumps(sale_values),
+		farmer_labels=json.dumps(farmer_labels), farmer_values=json.dumps(farmer_values)
+	)
 
 
 @app.route(CREATE, methods=["GET", "POST"])
@@ -129,14 +160,15 @@ def head_view_history(_id):
 	# print("LISTA_BUYERS:", json.dumps(buyer_list, indent=2))
 	# print("LISTA_SLAUGHTERHOUSES:", json.dumps(slaug_list, indent=2))
 
-	return render_template(HISTORY_HTML, form=_head, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,
-	                       update=UPDATE_FOR, _id_farm=head.farmer_id, farm_history=FARMER_HISTORY,
-	                       dna_list=dna_list, len_dna=len(dna_list), dna_history=DNA_HISTORY, dna_create=DNA_CREATE_FOR,
-	                       cons_list=_cons_list, len_cons=len(_cons_list), cons_history=CERT_HISTORY,
-	                       cons_create=CONS_CREATE_FOR,
-	                       buyer_list=buyer_list, len_buyers=len(buyer_list), buyer_history=BUYER_HISTORY,
-	                       slaug_list=slaug_list, len_slaug=len(slaug_list), slaug_history=SLAUG_HISTORY,
-	                       event_history=EVENT_HISTORY)
+	return render_template(
+		HISTORY_HTML, form=_head, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,
+		update=UPDATE_FOR, _id_farm=head.farmer_id, farm_history=FARMER_HISTORY,
+		dna_list=dna_list, len_dna=len(dna_list), dna_history=DNA_HISTORY, dna_create=DNA_CREATE_FOR,
+		cons_list=_cons_list, len_cons=len(_cons_list), cons_history=CERT_HISTORY, cons_create=CONS_CREATE_FOR,
+		buyer_list=buyer_list, len_buyers=len(buyer_list), buyer_history=BUYER_HISTORY,
+		slaug_list=slaug_list, len_slaug=len(slaug_list), slaug_history=SLAUG_HISTORY,
+		event_history=EVENT_HISTORY
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])

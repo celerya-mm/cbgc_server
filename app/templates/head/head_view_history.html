@@ -216,7 +216,10 @@
                                 {{ row.sale_rest|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.buyer_id|e }}
+                                <a class="tab-link" type="button" title="Visualizza Acquirente"
+                                   href="{{ url_for(buyer_history, _id=row.buyer_id) }}">
+                                    {{ row.buyer_id|e }}
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -465,6 +468,7 @@
             }
         });
     });
+
 
 
 

@@ -7,8 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db, session
 from ..forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
 from ..models.farmers import Farmer
-from ..utilitys.functions import event_create, token_admin_validate, status_true_false, str_to_date, status_si_no, \
-	address_mount, not_empty
+from ..utilitys.functions import (event_create, token_admin_validate, status_true_false, str_to_date, status_si_no,
+                                  address_mount, not_empty)
 
 VIEW = "/farmer/view/"
 VIEW_FOR = "farmer_view"
@@ -35,10 +35,12 @@ def farmer_view():
 	_list = Farmer.query.all()
 	db.session.close()
 	_list = [r.to_dict() for r in _list]
+
 	for _dict in _list:
 		_dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
 		                f'{_dict["address"].strip().replace(" ", "+")}' \
 		                f',{_dict["city"].strip().replace(" ", "+")}'
+
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -121,11 +123,13 @@ def farmer_view_history(_id):
 	                  f'{_farmer["address"].strip().replace(" ", "+")}' \
 	                  f',{_farmer["city"].strip().replace(" ", "+")}'
 
-	return render_template(HISTORY_HTML, form=_farmer, view=VIEW_FOR, update=UPDATE_FOR,
-	                       history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
-	                       cons_list=cons_list, len_cons=len(cons_list), cons_history=CONS_HISTORY,
-	                       head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY,
-	                       dna_list=dna_list, len_dna=len(dna_list), dna_history=DNA_HISTORY)
+	return render_template(
+		HISTORY_HTML, form=_farmer, view=VIEW_FOR, update=UPDATE_FOR,
+		history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
+		cons_list=cons_list, len_cons=len(cons_list), cons_history=CONS_HISTORY,
+		head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY,
+		dna_list=dna_list, len_dna=len(dna_list), dna_history=DNA_HISTORY
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])

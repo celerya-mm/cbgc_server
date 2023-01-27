@@ -11,6 +11,65 @@
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
                     Elenco CAPI Consorzio:</h2>
+                <!-- VISUALIZZO I GRAFICI -->
+                <div class="accordion" id="head_accordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="1">
+                            <button class="accordion-button" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse1"
+                                    aria-expanded="true"
+                                    aria-controls="collapse1">
+                                Grafici nascite e conformità
+                            </button>
+                        </h2>
+                        <div id="collapse1" class="accordion-collapse collapse"
+                             aria-labelledby="heading1"
+                             data-bs-parent="#accordion">
+                            <div class="row no-gutters justify-content-center">
+                                <!-- GRAFICO PER ANNO NASCITA -->
+                                <div class="col-md-4 order-first">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_birth"></canvas>
+                                    </div>
+                                </div>
+                                <!-- GRAFICO PER conformità castrazione -->
+                                <div class="col-md-4 order-second">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_conf"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="2">
+                            <button class="accordion-button" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse2"
+                                    aria-expanded="true"
+                                    aria-controls="collapse2">
+                                Grafici Venduti e per Allevatore
+                            </button>
+                        </h2>
+                        <div id="collapse2" class="accordion-collapse collapse">
+                            <div class="row no-gutters justify-content-center">
+                                <!-- GRAFICO PER ANNO VENDITA -->
+                                <div class="col-md-4 order-first">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_sale"></canvas>
+                                    </div>
+                                </div>
+                                <!-- GRAFICO PER ALLEVATORI -->
+                                <div class="col-md-4 order-second">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_farmers"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
@@ -23,7 +82,6 @@
                             <th class="title" id="h6">Conf.</th>
                             <th class="title" id="h7">Venduto</th>
                             <th class="title" id="h8">Macellato</th>
-                            <th class="title" id="h9">Certificato</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -39,7 +97,10 @@
                                 {{ row.headset|e }}
                             </td>
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.farmer_id|e }}
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(farmer, _id=row.farmer_id) }}">
+                                    {{ row.farmer_id|e }}
+                                </a>
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.birth_date|e }}
@@ -61,13 +122,6 @@
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.slaughter_date|e }}
                             </td>
-
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {% for k, v in row.cons_cert %}
-                                {{ k[certificate_nr].v|e }}
-                                {% endfor %}
-                            </td>
-
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -101,19 +155,130 @@
         });
     });
 
+    // Impostazioni grafico ANNO NASCITA
+    let birth_labels = JSON.parse({{ birth_labels | tojson }})
+    // console.log("LABELS: ", birth_labels)
+    let birth_values = JSON.parse({{ birth_values | tojson }})
+    // console.log("VALUES: ", birth_values)
+    const data = {
+        labels: birth_labels,
+        datasets: [
+        {
+            label: "Capi nati (5 anni)",
+            data: birth_values,
+            fill: false,
+            backgroundColor: "#ED6666", //red
+            borderRadius: 2,
+        }]
+    };
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx = document.getElementById('chart_birth').getContext('2d');
+    const myChart = new Chart(ctx, config);
 
 
+    // Impostazioni grafico ANNO VENDITA
+    let sale_labels = JSON.parse({{ sale_labels | tojson }})
+    console.log("LABELS: ", sale_labels)
+    let sale_values = JSON.parse({{ sale_values | tojson }})
+    // console.log("VALUES: ", sale_values)
+    const data1 = {
+        labels: sale_labels,
+        datasets: [{
+            label: "Capi venduti (5 anni)",
+            data: sale_values,
+            fill: false,
+            backgroundColor: "#2B4692", //blue
+            borderRadius: 2,
+        }]
+    };
+    const config1 = {
+        type: 'bar',
+        data: data1,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx1 = document.getElementById('chart_sale').getContext('2d');
+    const myChart1 = new Chart(ctx1, config1);
 
 
+    // Impostazioni grafico ALLEVATORI
+    let farmer_labels = JSON.parse({{ farmer_labels | tojson }})
+    console.log("LABELS: ", farmer_labels)
+    let farmer_values = JSON.parse({{ farmer_values | tojson }})
+    // console.log("VALUES: ", farmer_values)
+    const data2 = {
+        labels: farmer_labels,
+        datasets: [{
+            label: "Capi totali per Allevatore",
+            data: farmer_values,
+            fill: false,
+            backgroundColor: "#5B5A5B", //grey
+            borderRadius: 2,
+        }]
+    };
+    const config2 = {
+        type: 'bar',
+        data: data2,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx2 = document.getElementById('chart_farmers').getContext('2d');
+    const myChart2 = new Chart(ctx2, config2);
 
+// Impostazioni grafico Conformità CASTRAZIONE
+    let conf_labels = JSON.parse({{ conf_labels | tojson }})
+    // console.log("LABELS: ", conf_labels)
+    let conf_values = JSON.parse({{ conf_values | tojson }})
+    // console.log("VALUES: ", conf_values)
+    let not_conf_values = JSON.parse({{ not_conf_values | tojson }})
+    // console.log("VALUES: ", not_conf_values)
 
-
-
-
-
-
-
-
+    const data3 = {
+        labels: conf_labels,
+        datasets: [
+        {
+            label: "Conforme castrazione",
+            data: conf_values,
+            fill: false,
+            backgroundColor: "#2ACC7B", //green
+            borderRadius: 2,
+        },{
+            label: "NON Conforme",
+            data: not_conf_values,
+            fill: false,
+            backgroundColor: "#ED6666", //red
+            borderRadius: 2,
+        }]
+    };
+    const config3 = {
+        type: 'bar',
+        data: data3,
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    };
+    const ctx3 = document.getElementById('chart_conf').getContext('2d');
+    const myChart3= new Chart(ctx3, config3);
 
 
 
