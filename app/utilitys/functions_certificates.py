@@ -1,7 +1,6 @@
 import base64
 import os
 import shutil
-from datetime import datetime
 
 import qrcode
 from docx import Document  # noqa
@@ -67,8 +66,11 @@ def doc_to_pdf(target):
 			CreateBookmarks=1,  # 0=No bookmarks, 1=Heading bookmarks only, 2=bookmarks match word bookmarks
 			DocStructureTags=False
 		)
+		print("CONVERTED")
 		doc.Close()
+		print("CLOSE")
 		doc.Quit()
+		print("QUIT")
 		os.remove(target)
 		print("SUCCESSFULLY CONVERTED")
 		return outFile
@@ -95,7 +97,6 @@ def create_byte_certificate(data, _file, _str):
 			run = para.add_run()
 			# insert the image
 			_jpg = os.path.join(folder_work, _str.replace("/", "_") + ".jpg")
-			# print("IMG:", _file)
 			run.add_picture(_jpg, width=Inches(1.1), height=Inches(1.1))
 			os.remove(_jpg)
 
@@ -105,7 +106,6 @@ def create_byte_certificate(data, _file, _str):
 	# inserisce dati nel certificato
 	tpl = DocxTemplate(target)  # leggi il template word
 	tpl.render(data)
-	# print("PATH_WORD_FILE:", path_word)
 	# save the modified docx file
 	tpl.save(target)
 
@@ -115,9 +115,9 @@ def create_byte_certificate(data, _file, _str):
 		# convert pdf to byte
 		with open(_pdf, "rb") as f:
 			enc_string = str(base64.b64encode(f.read()), 'utf-8')
-			print(enc_string[100], type(enc_string))
+			# print(enc_string[100], type(enc_string))
 			enc_string = base64.b64decode(enc_string)
-			print(enc_string[100], type(enc_string))
+		# print(enc_string[100], type(enc_string))
 		if enc_string:
 			os.remove(_pdf)
 			return enc_string

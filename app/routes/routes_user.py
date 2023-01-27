@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db, session
 from ..forms.form_account import FormAccountUpdate, FormUserSignup
 from ..models.accounts import User
-from ..utilitys.functions import event_create, token_admin_validate
+from ..utilitys.functions import token_admin_validate
 from ..utilitys.functions_accounts import psw_hash
 
 VIEW = "/user/view/"
@@ -33,8 +33,9 @@ def user_view():
 	"""Visualizzo informazioni User."""
 	# Estraggo la lista degli utenti amministratori
 	_list = User.query.all()
-	db.session.close()
 	_list = [r.to_dict() for r in _list]
+
+	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -100,16 +101,19 @@ def user_view_history(_id):
 		buyer_list = []
 
 	db.session.close()
-
-	return render_template(HISTORY_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR,
-	                       history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
-	                       buyer_list=buyer_list, b_len=len(buyer_list), buyer_history=BUYER_HISTORY)
+	return render_template(
+		HISTORY_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR,
+		history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
+		buyer_list=buyer_list, b_len=len(buyer_list), buyer_history=BUYER_HISTORY
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])
 @token_admin_validate
 def user_update(_id):
 	"""Aggiorna dati Utente."""
+	from ..routes.routes_event import event_create
+
 	form = FormAccountUpdate()
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
@@ -118,17 +122,17 @@ def user_update(_id):
 
 		user = User.query.get(_id)
 		previous_data = user.to_dict()
+		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_name"] = f'{new_data["name"]} {new_data["last_name"]}'
 
 		new_data["created_at"] = user.created_at
 		new_data["updated_at"] = datetime.now()
-		print("NEW_DATA:", new_data)
+		# print("NEW_DATA:", new_data)
 		try:
 			db.session.query(User).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -147,15 +151,15 @@ def user_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
-		if event_create(_event, user_id=_id):
+		_event = event_create(_event, user_id=_id)
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati
 		user = User.query.get(_id)
-		db.session.close()
 		# print("USER:", user)
 		# print("USER_FIND:", json.dumps(user.to_dict(), indent=2))
 
@@ -171,4 +175,6 @@ def user_update(_id):
 			'updated_at': user.updated_at,
 		}
 		# print("USER_UPDATE:", json.dumps(form.to_dict(form), indent=2))
+
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

@@ -10,7 +10,7 @@
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow-left-circle.svg') }}"
                      alt=""/>
             </a>
-            Evento modifica record [ {{ id_related }} ] tabella [ {{ type_related }} ]:
+            Record [ {{ id_related }} ] tabella [ {{ type_related }} ]:
             <a class="btn btn-update" type="button" title="Ripristina record"
                href="{{ url_for(restore, _id=form.id, id_record=id_related, form=form, table=table,
                view_for=view_related) }}">
@@ -130,7 +130,7 @@
                         {% for row in history_list %}
                         <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                <a class="tab-link" title="Visualizza" style=""
+                                <a class="btn-table" type="button" title="Visualizza Record"
                                    href="{{ url_for(view, _id=row.id) }}">
                                     {{ row.id|e }}
                                 </a>
@@ -173,20 +173,6 @@
             }
         });
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

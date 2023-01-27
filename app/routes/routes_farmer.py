@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db, session
 from ..forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
 from ..models.farmers import Farmer
-from ..utilitys.functions import (event_create, token_admin_validate, status_true_false, str_to_date, status_si_no,
+from ..utilitys.functions import (token_admin_validate, status_true_false, str_to_date, status_si_no,
                                   address_mount, not_empty)
 
 VIEW = "/farmer/view/"
@@ -33,7 +33,6 @@ def farmer_view():
 	"""Visualizzo informazioni Allevatori."""
 	# Estraggo la lista degli allevatori
 	_list = Farmer.query.all()
-	db.session.close()
 	_list = [r.to_dict() for r in _list]
 
 	for _dict in _list:
@@ -41,6 +40,7 @@ def farmer_view():
 		                f'{_dict["address"].strip().replace(" ", "+")}' \
 		                f',{_dict["city"].strip().replace(" ", "+")}'
 
+	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -117,12 +117,11 @@ def farmer_view_history(_id):
 	dna_list = farmer.dna_certs
 	dna_list = [dna.to_dict() for dna in dna_list]
 
-	db.session.close()
-
 	_farmer["maps"] = f'{_farmer["cap"].strip().replace(" ", "")},' \
 	                  f'{_farmer["address"].strip().replace(" ", "+")}' \
 	                  f',{_farmer["city"].strip().replace(" ", "+")}'
 
+	db.session.close()
 	return render_template(
 		HISTORY_HTML, form=_farmer, view=VIEW_FOR, update=UPDATE_FOR,
 		history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
@@ -136,6 +135,8 @@ def farmer_view_history(_id):
 @token_admin_validate
 def farmer_update(_id):
 	"""Aggiorna dati Allevatore."""
+	from ..routes.routes_event import event_create
+
 	form = FormFarmerUpdate()
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
@@ -144,8 +145,8 @@ def farmer_update(_id):
 		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
 		farmer = Farmer.query.get(_id)
-		db.session.close()
 		previous_data = farmer.to_dict()
+		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
@@ -166,7 +167,6 @@ def farmer_update(_id):
 		try:
 			db.session.query(Farmer).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("ALLEVATORE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -185,15 +185,16 @@ def farmer_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
-		if event_create(_event, farmer_id=_id):
+
+		_event = event_create(_event, farmer_id=_id)
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record
 		farmer = Farmer.query.get(_id)
-		db.session.close()
 
 		form.farmer_name.data = farmer.farmer_name
 		form.email.data = farmer.email
@@ -221,4 +222,5 @@ def farmer_update(_id):
 		}
 		# print("FARMER_:", form)
 		# print("FARMER_FORM:", json.dumps(form.to_dict(form), indent=2))
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

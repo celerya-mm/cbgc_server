@@ -102,8 +102,8 @@
                         </thead>
                         <tbody>
                         {% for row in buyer_list %}
-                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
-                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                        <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="btn-table" type="button" title="Visualizza Record"
                                 <a class="tab-link" title="Visualizza" style=""
                                    href="{{ url_for(buyer_history, _id=row.id) }}">
                                     {{ row.id|e }}

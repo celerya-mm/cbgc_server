@@ -24,6 +24,41 @@ RESTORE = "/event/restore/<_id>/<id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_restore"
 
 
+@token_admin_validate
+def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=None,
+                 slaughterhouse_id=None, head_id=None, cert_cons_id=None, cert_dna_id=None):
+	"""Registro evento DB."""
+	try:
+		new_event = EventDB(
+			event=event,
+			admin_id=admin_id,
+			user_id=user_id,
+			farmer_id=farmer_id,
+			buyer_id=buyer_id,
+			slaughterhouse_id=slaughterhouse_id,
+			head_id=head_id,
+			cert_cons_id=cert_cons_id,
+			cert_dna_id=cert_dna_id
+		)
+
+		db.session.add(new_event)
+		db.session.commit()
+		db.session.close()
+		print("EVENT_CREATED.")
+		return True
+	except IntegrityError as err:
+		db.session.close()
+		print("INTEGRITY_ERROR_EVENT:", str(err))
+		if "duplicate key value violates unique constraint" in str(err):
+			return True
+		else:
+			return str(err)
+	except Exception as err:
+		db.session.close()
+		print("ERROR_REGISTR_EVENT:", str(err))
+		return str(err)
+
+
 @app.route(HISTORY, methods=["GET", "POST"])
 @token_admin_validate
 def event_view_history(_id):
@@ -112,25 +147,27 @@ def event_view_history(_id):
 
 	# Estraggo la storia delle modifiche del record di origine
 	history_list = EventDB.query.filter(getattr(EventDB, field) == int(id_related), EventDB.id != int(_id)).all()
-	db.session.close()
 	history_list = [history.to_dict() for history in history_list]
 	# print("HISTORY:", json.dumps(history_list, indent=2), "TYPE:", type(_event))
 	# print("DATA:", json.dumps(_event, indent=2), "TYPE:", type(_event))
 
 	_event = json.loads(json.dumps(_event))
-	return render_template(HISTORY_HTML, form=_event, restore=RESTORE_FOR,
-	                       history_list=history_list, h_len=len(history_list), view=HISTORY_FOR, table=table,
-	                       id_related=id_related, view_related=view_related, type_related=type_related)
+
+	db.session.close()
+	return render_template(
+		HISTORY_HTML, form=_event, restore=RESTORE_FOR, table=table,
+		history_list=history_list, h_len=len(history_list), view=HISTORY_FOR,
+		id_related=id_related, view_related=view_related, type_related=type_related
+	)
 
 
 @app.route(RESTORE, methods=["GET", "POST"])
 @token_admin_validate
 def event_restore(_id, id_record, table, view_for):
-	print("TABLE:", table, "VIEW_FOR:", view_for)
 	try:
 		models = [Administrator, User, Farmer, Buyer, Slaughterhouse, Head, CertificateDna, CertificateCons]
 		model = next((m for m in models if m.__tablename__ == table), None)
-		print("TABLE_DB:", model, "ID:", id_record)
+		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:
 			data = EventDB.query.get(_id)
 			data = data.to_dict()
@@ -150,7 +187,7 @@ def event_restore(_id, id_record, table, view_for):
 
 			data = data.copy()
 
-			print("UPDATE_DATA:", json.dumps(data, indent=2), "TYPE:", type(data))
+			# print("UPDATE_DATA:", json.dumps(data, indent=2), "TYPE:", type(data))
 			try:
 				record = model.query.get(id_record)
 				print("DATA_FROM_DB:", json.dumps(record.to_dict(), indent=2), "TYPE:", type(data))
@@ -161,10 +198,11 @@ def event_restore(_id, id_record, table, view_for):
 				flash(f"Record ripristinato correttamente alla situazione precedente il: {updated_at}.")
 			except IntegrityError as err:
 				db.session.rollback()
+				db.session.close()
 				flash(f"ERRORE: {str(err.orig)}")
 
 		return redirect(url_for(view_for, _id=id_record))
 	except Exception as err:
+		db.session.close()
 		flash(f"ERROR: {err}")
-		flash("ERRORE passaggio dati.")
 		return redirect(url_for(view_for, _id=id_record))

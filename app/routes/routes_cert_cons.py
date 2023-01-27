@@ -10,7 +10,7 @@ from ..models.certificates_cons import CertificateCons, mount_code, year_cert_ca
 from ..models.farmers import Farmer
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import (event_create, not_empty, token_admin_validate, str_to_date, calc_age,
+from ..utilitys.functions import (not_empty, token_admin_validate, str_to_date, calc_age,
                                   status_true_false, status_si_no, date_to_str, dict_group_by)
 from ..utilitys.functions_certificates import create_byte_certificate, generate_qr_code, byte_to_pdf
 
@@ -64,12 +64,13 @@ def cert_cons_view():
 	buyers_labels = [sub["buyer_id"] for sub in group_buyer]
 	buyers_values = [sub["number"] for sub in group_buyer]
 
-	return render_template(VIEW_HTML, form=_list, history=HISTORY_FOR, h_hist=HEAD_HISTORY, f_hist=FARMER_HISTORY,
-	                       b_hist=BUYER_HISTORY, s_hist=SLAUG_HISTORY,
-	                       years_labels=json.dumps(years_labels), years_values=json.dumps(years_values),
-	                       farmers_labels=json.dumps(farmers_labels), farmers_values=json.dumps(farmers_values),
-	                       buyers_labels=json.dumps(buyers_labels), buyers_values=json.dumps(buyers_values)
-	                       )
+	return render_template(
+		VIEW_HTML, form=_list, history=HISTORY_FOR, h_hist=HEAD_HISTORY, f_hist=FARMER_HISTORY,
+		b_hist=BUYER_HISTORY, s_hist=SLAUG_HISTORY,
+		years_labels=json.dumps(years_labels), years_values=json.dumps(years_values),
+		farmers_labels=json.dumps(farmers_labels), farmers_values=json.dumps(farmers_values),
+		buyers_labels=json.dumps(buyers_labels), buyers_values=json.dumps(buyers_values)
+	)
 
 
 @app.route(CREATE, methods=["GET", "POST"])
@@ -77,6 +78,7 @@ def cert_cons_view():
 def cert_cons_create(h_id, f_id, h_set):
 	"""Creazione Certificato Consorzio."""
 	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+
 	form = FormCertConsCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
@@ -185,18 +187,22 @@ def cert_cons_view_history(_id):
 	db.session.close()
 
 	# print("CERT_DATA:", json.dumps(cert.to_dict(), indent=2))
-	return render_template(HISTORY_HTML, form=_cert, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,
-	                       update=UPDATE_FOR, event_history=EVENT_HISTORY, generate=GENERATE_FOR, download=DOWNLOAD_FOR,
-	                       head_history=HEAD_HISTORY, h_id=cert.head_id,
-	                       farmer_history=FARMER_HISTORY, f_id=cert.farmer_id,
-	                       buyer_history=BUYER_HISTORY, b_id=cert.buyer_id,
-	                       slaug_history=SLAUG_HISTORY, s_id=cert.slaughterhouse_id)
+	return render_template(
+		HISTORY_HTML, form=_cert, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,
+		update=UPDATE_FOR, event_history=EVENT_HISTORY, generate=GENERATE_FOR, download=DOWNLOAD_FOR,
+		head_history=HEAD_HISTORY, h_id=cert.head_id,
+		farmer_history=FARMER_HISTORY, f_id=cert.farmer_id,
+		buyer_history=BUYER_HISTORY, b_id=cert.buyer_id,
+		slaug_history=SLAUG_HISTORY, s_id=cert.slaughterhouse_id
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])
 @token_admin_validate
 def cert_cons_update(_id):
 	"""Aggiorna dati Capo."""
+	from ..routes.routes_event import event_create
+
 	form = FormCertConsUpdate()
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
@@ -204,8 +210,8 @@ def cert_cons_update(_id):
 		# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		cert = CertificateCons.query.get(int(_id))
-		db.session.close()
 		previous_data = cert.to_dict()
+		previous_data.pop("updated_at")
 		# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["certificate_nr"] = mount_code(
@@ -287,9 +293,11 @@ def cert_cons_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
-		if event_create(_event, cert_cons_id=int(_id)):
+		_event = event_create(_event, cert_cons_id=int(_id))
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=int(_id)))
 		else:
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record
@@ -362,11 +370,15 @@ def cert_cons_update(_id):
 @token_admin_validate
 def cert_cons_generate(_id):
 	"""Stampa il certificato in .pdf e carica come byte nel DB."""
+	from ..routes.routes_event import event_create
+
 	cert = CertificateCons.query.get(int(_id))
 	# genero QR-Code
 	str_qr = f"109-CERT-{cert.certificate_nr}"
 	if generate_qr_code(str_qr):
 		previous_data = cert.to_dict()  # salvo dati per creare evento record.
+		previous_data.pop("updated_at")
+
 		cert.emitted = True
 
 		if cert.head_age in ["", None]:
@@ -437,21 +449,19 @@ def cert_cons_generate(_id):
 				"Previous_data": previous_data
 			}
 			# print("EVENT:", json.dumps(_event, indent=2))
-			if event_create(_event, cert_cons_id=_id):
-				db.session.close()
-				return redirect(url_for(HISTORY_FOR, _id=_id))
+			_event = event_create(_event, cert_cons_id=int(_id))
+			if _event is True:
+				return redirect(url_for(HISTORY_FOR, _id=int(_id)))
 			else:
-				db.session.close()
-				return redirect(url_for(HISTORY_FOR, _id=_id))
+				flash(_event)
+				return redirect(url_for(HISTORY_FOR, _id=int(_id)))
 		else:
 			flash(f"ERRORE CREAZIONE PDF.")
 			db.session.close()
-			flash(f"FINITO.")
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		flash(f"ERRORE CREAZIONE PDF.")
 		db.session.close()
-		flash(f"FINITO.")
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 
 
@@ -459,7 +469,7 @@ def cert_cons_generate(_id):
 @token_admin_validate
 def cert_cons_download(_id):
 	cert = CertificateCons.query.get(int(_id))
-	if cert.certificate_pdf and len(cert.certificate_pdf) > 10:
+	if cert.certificate_pdf and len(cert.certificate_pdf) > 100:
 		_pdf = byte_to_pdf(cert.certificate_pdf, cert.certificate_nr)
 		return send_file(_pdf, as_attachment=True)
 	else:

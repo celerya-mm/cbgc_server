@@ -9,8 +9,8 @@ from ..forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
 from ..models.accounts import User
 from ..models.buyers import Buyer
 from ..models.heads import Head
-from ..utilitys.functions import (event_create, status_si_no, status_true_false, str_to_date, token_admin_validate,
-                                  address_mount, not_empty)
+from ..utilitys.functions import (status_si_no, status_true_false, str_to_date, token_admin_validate, address_mount,
+                                  not_empty)
 
 VIEW = "/buyer/view/"
 VIEW_FOR = "buyer_view"
@@ -35,12 +35,13 @@ def buyer_view():
 	"""Visualizza informazioni Acquirenti."""
 	# Estraggo la lista degli allevatori
 	_list = Buyer.query.all()
-	db.session.close()
 	_list = [r.to_dict() for r in _list]
 	for _dict in _list:
 		_dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
 		                f'{_dict["address"].strip().replace(" ", "+")}' \
 		                f',{_dict["city"].strip().replace(" ", "+")}'
+
+	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -54,7 +55,6 @@ def buyer_create():
 		# print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
 
 		user_id = User.query.filter_by(username=form_data["user_id"]).first()
-		db.session.close()
 		# print("USER_ID:", user_find.id)
 
 		new_farmer = Buyer(
@@ -70,6 +70,7 @@ def buyer_create():
 			user_id=user_id.id,
 			note=form_data["note"].strip()
 		)
+
 		try:
 			db.session.add(new_farmer)
 			db.session.commit()
@@ -120,26 +121,30 @@ def buyer_view_history(_id):
 			_h = Head.query.get(cert["head_id"])
 			if _h and _h not in head_list:
 				head_list.append(_h)
-		print("LEN:", len(cons_list), "DATA:", cons_list)
+	# print("LEN:", len(cons_list), "DATA:", cons_list)
 	else:
 		cons_list = []
-	db.session.close()
 
 	_buyer["maps"] = f'{_buyer["cap"].strip().replace(" ", "")},' \
 	                 f'{_buyer["address"].strip().replace(" ", "+")}' \
 	                 f',{_buyer["city"].strip().replace(" ", "+")}'
 
-	return render_template(HISTORY_HTML, form=_buyer, update=UPDATE_FOR, view=VIEW_FOR,
-	                       user=user, user_history=USER_HISTORY, event_history=EVENT_HISTORY,
-	                       history_list=history_list, h_len=len(history_list),  # his_history=HIS_HISTORY,
-	                       cons_list=cons_list, len_cons=len(cons_list), cons_history=CONS_HISTORY,
-	                       head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY)
+	db.session.close()
+	return render_template(
+		HISTORY_HTML, form=_buyer, update=UPDATE_FOR, view=VIEW_FOR,
+		user=user, user_history=USER_HISTORY, event_history=EVENT_HISTORY,
+		history_list=history_list, h_len=len(history_list),
+		cons_list=cons_list, len_cons=len(cons_list), cons_history=CONS_HISTORY,
+		head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])
 @token_admin_validate
 def buyer_update(_id):
 	"""Aggiorna dati Acquirente."""
+	from ..routes.routes_event import event_create
+
 	form = FormBuyerUpdate()
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
@@ -148,7 +153,9 @@ def buyer_update(_id):
 		# print("BUYER_UPDATE_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		buyer = Buyer.query.get(_id)
+
 		previous_data = buyer.to_dict()
+		previous_data.pop("updated_at")
 		# print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
@@ -167,11 +174,10 @@ def buyer_update(_id):
 
 		new_data["created_at"] = buyer.created_at
 		new_data["updated_at"] = datetime.now()
-		print("NEW_DATA:", new_data)
+		# print("NEW_DATA:", new_data)
 		try:
 			db.session.query(Buyer).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("ACQUIRENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -190,15 +196,15 @@ def buyer_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("BUYER_EVENT:", json.dumps(_event, indent=2))
-		if event_create(_event, buyer_id=_id):
+		_event = event_create(_event, buyer_id=_id)
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record
 		buyer = Buyer.query.get(int(_id))
-		db.session.close()
 		# print("BUYER_FIND:", buyer, type(buyer))
 
 		form.buyer_name.data = buyer.buyer_name
@@ -223,4 +229,5 @@ def buyer_update(_id):
 		}
 		# print("BUYER_:", form)
 		# print("BUYER_FORM:", json.dumps(form.to_dict(form), indent=2))
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

@@ -8,7 +8,7 @@ from ..app import db, session
 from ..forms.form_account import FormAccountUpdate, FormAdminSignup
 from ..forms.forms import FormPswChange
 from ..models.accounts import Administrator
-from ..utilitys.functions import event_create, token_admin_validate, not_empty
+from ..utilitys.functions import token_admin_validate, not_empty
 from ..utilitys.functions_accounts import psw_hash
 
 VIEW = "/admin/view/"
@@ -36,20 +36,16 @@ UPDATE_PSW_HTML = "admin/admin_update_password.html"
 @token_admin_validate
 def admin_view():
 	"""Visualizzo informazioni Utente Amministratore."""
-	if "username" in session.keys():
-		# Estraggo l'utente amministratore corrente
-		admin = Administrator.query.filter_by(username=session["username"]).first()
-		_admin = admin.to_dict()
-		session["admin"] = _admin
+	# Estraggo l'utente amministratore corrente
+	admin = Administrator.query.filter_by(username=session["username"]).first()
+	_admin = admin.to_dict()
+	session["admin"] = _admin
 
-		# Estraggo la lista degli utenti amministratori
-		_list = Administrator.query.all()
-		_list = [r.to_dict() for r in _list]
-		return render_template(VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR,
-		                       update_psw=UPDATE_PSW_FOR, history=HISTORY_FOR)
-	else:
-		flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
-		return redirect(url_for('logout'))
+	# Estraggo la lista degli utenti amministratori
+	_list = Administrator.query.all()
+	_list = [r.to_dict() for r in _list]
+	return render_template(VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR,
+	                       update_psw=UPDATE_PSW_FOR, history=HISTORY_FOR)
 
 
 @app.route(CREATE, methods=["GET", "POST"])
@@ -100,8 +96,8 @@ def admin_view_history(_id):
 	history_list = admin.events
 	history_list = [history.to_dict() for history in history_list]
 	len_history = len(history_list)
-	db.session.close()
 
+	db.session.close()
 	return render_template(HISTORY_HTML, form=_admin, history_list=history_list, h_len=len_history, view=VIEW_FOR,
 	                       update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR, event_history=EVENT_HISTORY)
 
@@ -110,6 +106,8 @@ def admin_view_history(_id):
 @token_admin_validate
 def admin_update(_id):
 	"""Aggiorna Utente Amministratore."""
+	from ..routes.routes_event import event_create
+
 	form = FormAccountUpdate()
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
@@ -119,6 +117,7 @@ def admin_update(_id):
 		administrator = Administrator.query.get(_id)
 		db.session.close()
 		previous_data = administrator.to_dict()
+		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_name"] = f'{new_data["name"]} {new_data["last_name"]}'
@@ -127,14 +126,14 @@ def admin_update(_id):
 
 		new_data["note"] = not_empty(new_data["note"])
 
-		print("NEW_DATA:", new_data)
+		# print("NEW_DATA:", new_data)
 		try:
 			db.session.query(Administrator).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
+			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
 			_info = {
 				'created_at': administrator.created_at,
@@ -148,16 +147,16 @@ def admin_update(_id):
 			"Modification": f"Update account Administrator whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		if event_create(_event, admin_id=_id):
+		_event = event_create(_event, admin_id=_id)
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			flash("ERRORE creazione evento. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
 	else:
 		# recupero i dati
 		admin = Administrator.query.get(_id)
-		db.session.close()
 		# print("ADMIN:", admin)
 		# print("ADMIN_FIND:", json.dumps(admin.to_dict(), indent=2))
 
@@ -173,6 +172,8 @@ def admin_update(_id):
 			'updated_at': admin.updated_at,
 		}
 		# print("ADMIN_UPDATE:", json.dumps(form.to_dict(form), indent=2))
+
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 
 
@@ -180,6 +181,8 @@ def admin_update(_id):
 @token_admin_validate
 def admin_update_password(_id):
 	"""Aggiorna password Utente Amministratore."""
+	from ..routes.routes_event import event_create
+
 	form = FormPswChange()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
@@ -191,7 +194,6 @@ def admin_update_password(_id):
 		# print("NEW:", new_password)
 
 		administrator = Administrator.query.get(_id)
-		db.session.close()
 
 		if new_password == administrator.password:
 			flash("The 'New Password' inserted is equal to 'Registered Password'.")
@@ -204,16 +206,16 @@ def admin_update_password(_id):
 			administrator.updated_at = datetime.now()
 
 			db.session.commit()
-			db.session.close()
 			flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
 			_event = {
 				"username": session["username"],
 				"Modification": "Password changed"
 			}
-			if event_create(_event, admin_id=_id):
+			_event = event_create(_event, admin_id=_id)
+			if _event is True:
 				return redirect(url_for('logout'))
 			else:
-				flash("ERRORE creazione evento DB. Ma la password è stata modificata correttamente.")
+				flash(_event)
 				return redirect(url_for('logout'))
 	else:
 		return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)

@@ -8,10 +8,7 @@ from ..app import db, session
 from ..forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterhouseUpdate
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
-from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-from ..routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY
-from ..utilitys.functions import (event_create, token_admin_validate, str_to_date, status_si_no, status_true_false,
+from ..utilitys.functions import (token_admin_validate, str_to_date, status_si_no, status_true_false,
                                   address_mount, not_empty)
 
 VIEW = "/slaughterhouse/view/"
@@ -37,12 +34,13 @@ def slaughterhouse_view():
 	"""Visualizzo informazioni Allevatori."""
 	# Estraggo la lista degli allevatori
 	_list = Slaughterhouse.query.all()
-	db.session.close()
 	_list = [r.to_dict() for r in _list]
 	for _dict in _list:
 		_dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
 		                f'{_dict["address"].strip().replace(" ", "+")}' \
 		                f',{_dict["city"].strip().replace(" ", "+")}'
+
+	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
@@ -58,19 +56,16 @@ def slaughterhouse_create():
 		new_slaughterhouse = Slaughterhouse(
 			slaughterhouse=form_data["slaughterhouse"].strip(),
 			slaughterhouse_code=form_data["slaughterhouse_code"].strip(),
-
 			email=form_data["email"].strip(),
 			phone=form_data["phone"].strip(),
-
 			address=form_data["address"].strip(),
 			cap=form_data["cap"].strip(),
 			city=form_data["city"].strip(),
-
 			affiliation_start_date=form_data["affiliation_start_date"],
 			affiliation_status=form_data["affiliation_status"],
-
 			note=form_data["note"]
 		)
+
 		try:
 			db.session.add(new_slaughterhouse)
 			db.session.commit()
@@ -90,6 +85,9 @@ def slaughterhouse_create():
 @token_admin_validate
 def slaughterhouse_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
+	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from ..routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY
 	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	# Interrogo il DB
@@ -111,11 +109,11 @@ def slaughterhouse_view_history(_id):
 		if _h and _h not in head_list:
 			head_list.append(_h.to_dict())
 
-	db.session.close()
-
 	_slaughterhouse["maps"] = f'{_slaughterhouse["cap"].strip().replace(" ", "")},' \
 	                          f'{_slaughterhouse["address"].strip().replace(" ", "+")}' \
 	                          f',{_slaughterhouse["city"].strip().replace(" ", "+")}'
+
+	db.session.close()
 	return render_template(
 		HISTORY_HTML, form=_slaughterhouse, history_list=history_list, h_len=len_history,
 		view=VIEW_FOR, update=UPDATE_FOR, cons_list=_cons_list, len_cons=len(_cons_list),
@@ -128,6 +126,8 @@ def slaughterhouse_view_history(_id):
 @token_admin_validate
 def slaughterhouse_update(_id):
 	"""Aggiorna dati Allevatore."""
+	from ..routes.routes_event import event_create
+
 	form = FormSlaughterhouseUpdate()
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
@@ -137,8 +137,8 @@ def slaughterhouse_update(_id):
 		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
 		slaughterhouse = Slaughterhouse.query.get(_id)
-		db.session.close()
 		previous_data = slaughterhouse.to_dict()
+		previous_data.pop("updated_at")
 		# print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
@@ -156,7 +156,6 @@ def slaughterhouse_update(_id):
 		try:
 			db.session.query(Slaughterhouse).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("MACELLO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -174,16 +173,17 @@ def slaughterhouse_update(_id):
 			"Modification": f"Update Slaughterhouse whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		print("NEW_DATA:", new_data)
-		if event_create(_event, slaughterhouse_id=_id):
+		# print("NEW_DATA:", new_data)
+
+		_event = event_create(_event, slaughterhouse_id=_id)
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record
 		slaughterhouse = Slaughterhouse.query.get(int(_id))
-		db.session.close()
 		# print("SLAUGHT_FIND:", slaughterhouse, type(slaughterhouse))
 
 		form.slaughterhouse.data = slaughterhouse.slaughterhouse
@@ -208,4 +208,6 @@ def slaughterhouse_update(_id):
 		}
 		# print("SLAUGHT_:", form)
 		# print("SLAUGHT_FORM:", json.dumps(form.to_dict(form), indent=2))
+
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

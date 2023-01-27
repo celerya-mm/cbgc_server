@@ -9,9 +9,7 @@ from ..forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate, list_hea
 from ..models.certificates_dna import CertificateDna
 from ..models.farmers import Farmer
 from ..models.heads import Head
-from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-from ..utilitys.functions import event_create, token_admin_validate, year_extract
+from ..utilitys.functions import token_admin_validate, year_extract
 
 VIEW = "/cert_dna/view/"
 VIEW_FOR = "cert_dna_view"
@@ -34,10 +32,14 @@ UPDATE_HTML = "cert_dna/cert_dna_update.html"
 @token_admin_validate
 def cert_dna_view():
 	"""Visualizzo informazioni Certificato."""
+	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+
 	# Estraggo la lista degli utenti amministratori
 	_list = CertificateDna.query.all()
-	db.session.close()
 	_list = [r.to_dict() for r in _list]
+
+	db.session.close()
 	return render_template(
 		VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR,
 		farmer=FARMER_HISTORY, head=HEAD_HISTORY
@@ -48,7 +50,7 @@ def cert_dna_view():
 @token_admin_validate
 def cert_dna_create(h_id, f_id, h_set):
 	"""Creazione Certificato DNA."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
+	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 
 	form = FormCertDnaCreate()
 	if form.validate_on_submit():
@@ -74,20 +76,19 @@ def cert_dna_create(h_id, f_id, h_set):
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
-			return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id,
-			                       head_history=HEAD_HISTORY_FOR)
+			return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY)
 	else:
 		h_set = f"{int(h_id)} - {h_set}"
-		return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY_FOR)
+		return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY)
 
 
 @app.route(HISTORY, methods=["GET", "POST"])
 @token_admin_validate
 def cert_dna_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY_FOR
 	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
 	# Estraggo l' ID dell'utente corrente
 	session["id_user"] = _id
@@ -108,16 +109,21 @@ def cert_dna_view_history(_id):
 	history_list = cert_dna.events
 	history_list = [history.to_dict() for history in history_list]
 	len_history = len(history_list)
+
 	db.session.close()
-	return render_template(HISTORY_HTML, form=_cert_dna, history_list=history_list, h_len=len_history, view=VIEW_FOR,
-	                       update=UPDATE_FOR, head=_head, view_head=HEAD_HISTORY_FOR, _id=_id,
-	                       farmer=_farmer, view_farmer=FARMER_HISTORY_FOR, event_history=EVENT_HISTORY)
+	return render_template(
+		HISTORY_HTML, form=_cert_dna, history_list=history_list, h_len=len_history, view=VIEW_FOR, update=UPDATE_FOR,
+		head=_head, view_head=HEAD_HISTORY, _id=_id, farmer=_farmer, view_farmer=FARMER_HISTORY,
+		event_history=EVENT_HISTORY
+	)
 
 
 @app.route(UPDATE, methods=["GET", "POST"])
 @token_admin_validate
 def cert_dna_update(_id):
 	"""Aggiorna dati Utente."""
+	from ..routes.routes_event import event_create
+
 	form = FormCertDnaUpdate()
 	if form.validate_on_submit():
 		from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
@@ -127,8 +133,8 @@ def cert_dna_update(_id):
 		# print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		_cert = CertificateDna.query.get(_id)
-		db.session.close()
 		previous_data = _cert.to_dict()
+		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		if new_data["head_id"] not in list_head():
@@ -137,6 +143,7 @@ def cert_dna_update(_id):
 				'created_at': _cert.created_at,
 				'updated_at': _cert.updated_at,
 			}
+			db.session.close()
 			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, h_id=_id)
 		else:
 			new_data["head_id"] = new_data["head_id"].split(" - ")[0]
@@ -147,6 +154,7 @@ def cert_dna_update(_id):
 				'created_at': _cert.created_at,
 				'updated_at': _cert.updated_at,
 			}
+			db.session.close()
 			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, h_id=_id)
 		else:
 			new_data["farmer_id"] = new_data["farmer_id"].split(" - ")[0]
@@ -161,7 +169,6 @@ def cert_dna_update(_id):
 		try:
 			db.session.query(CertificateDna).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("CERTIFICATO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -180,10 +187,12 @@ def cert_dna_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
-		if event_create(_event, cert_dna_id=_id):
+
+		_event = event_create(_event, cert_dna_id=_id)
+		if _event is True:
 			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))
 		else:
-			flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))
 	else:
 		# recupero i dati
@@ -195,8 +204,6 @@ def cert_dna_update(_id):
 		_head = Head.query.get(_cert.head_id)
 		# recupera Allevatore
 		_farmer = Farmer.query.get(_cert.farmer_id)
-
-		db.session.close()
 
 		form.dna_cert_id.data = _id
 		form.dna_cert_date.data = _cert.dna_cert_date
@@ -212,4 +219,6 @@ def cert_dna_update(_id):
 			'updated_at': _cert.updated_at,
 		}
 		# print("DNA_UPDATE:", json.dumps(form.to_dict(), indent=2))
+
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

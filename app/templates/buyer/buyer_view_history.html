@@ -158,7 +158,7 @@
                         {% for row in cons_list %}
                         <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                <a class="btn-table" type="button" title="Visualizza Acquirente"
+                                <a class="btn-table" type="button" title="Visualizza Record"
                                    href="{{ url_for(cons_history, _id=row.id) }}">
                                     {{ row.id|e }}
                                 </a>
@@ -222,7 +222,7 @@
                         {% for row in head_list %}
                         <tr style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                <a class="tab-link" title="Visualizza" style=""
+                                <a class="btn-table" type="button" title="Visualizza Record"
                                    href="{{ url_for(head_history, _id=row.id) }}">
                                     {{ row.id|e }}
                                 </a>
@@ -284,8 +284,8 @@
                         </thead>
                         <tbody>
                         <tr style="border: 0pz; vertical-align: center;">
-                            <td style="width: 20px; padding:2px;">
-                                <a class="tab-link" title="Visualizza" style=""
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="btn-table" type="button" title="Visualizza Record"
                                    href="{{ url_for(user_history, _id=user.id) }}">
                                     {{ user.id|e }}
                                 </a>
@@ -342,7 +342,7 @@
                         {% for row in history_list %}
                         <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
                             <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                <a class="tab-link" title="Visualizza" style=""
+                                <a class="btn-table" type="button" title="Visualizza Record"
                                    href="{{ url_for(event_history, _id=row.id) }}">
                                     {{ row.id|e }}
                                 </a>
@@ -423,6 +423,7 @@
             }
         });
     });
+
 
 
 

@@ -10,8 +10,7 @@ from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-from ..app import db, session
-from ..models.events_db import EventDB
+from ..app import session
 from ..models.tokens import AuthToken
 from ..var_ambient import variables as var
 
@@ -41,33 +40,6 @@ def json_loads_replace_none(dict_obj):
 	return new_dict
 
 
-def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=None,
-                 slaughterhouse_id=None, head_id=None, cert_cons_id=None, cert_dna_id=None):
-	"""Registro evento DB."""
-	try:
-		new_event = EventDB(
-			event=event,
-			admin_id=admin_id,
-			user_id=user_id,
-			farmer_id=farmer_id,
-			buyer_id=buyer_id,
-			slaughterhouse_id=slaughterhouse_id,
-			head_id=head_id,
-			cert_cons_id=cert_cons_id,
-			cert_dna_id=cert_dna_id
-		)
-
-		db.session.add(new_event)
-		db.session.commit()
-		db.session.close()
-		print("EVENT_CREATED.")
-		return True
-	except Exception as err:
-		db.session.close()
-		print("ERROR_REGISTR_EVENT:", err)
-		return False
-
-
 def token_user_validate(_token):
 	"""Valido il token ricevuto."""
 	authenticated = AuthToken.query.filter_by(token=_token).first()
@@ -88,18 +60,12 @@ def token_admin_validate(func):
 			authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
 			if authenticated is None:
 				print("AUTHORIZATION_CHECK_FAIL_1")
-				flash(f"There is no authenticated log-in with your username. "
-				      f"Please log-in again with an administrator account.")
 				return redirect(url_for('logout'))
 			elif authenticated.expires_at < datetime.now():
 				print("AUTHORIZATION_CHECK_FAIL_2")
-				flash("Your authenticated log-in is expired. "
-				      "Please log-in again with an administrator account.")
 				return redirect(url_for('logout'))
 			elif authenticated.admin_id in ["", None]:
 				print("AUTHORIZATION_CHECK_FAIL_3")
-				flash(f"Your account {authenticated.admin_id} does not allow this operation. "
-				      f"Please log-in with an administrator account.")
 				return redirect(url_for('logout'))
 			else:
 				print("AUTHORIZATION_CHECK_PASS")
@@ -107,7 +73,6 @@ def token_admin_validate(func):
 				return func(*args, **kwargs)
 		else:
 			print("AUTHORIZATION_CHECK_FAIL_4")
-			flash(f"Token autenticazione non presente, devi eseguire la Log-In.")
 			return redirect(url_for('logout'))
 
 	return wrap

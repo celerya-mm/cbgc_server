@@ -10,9 +10,7 @@ from ..models.buyers import Buyer
 from ..models.farmers import Farmer
 from ..models.heads import Head, verify_castration
 from ..models.slaughterhouses import Slaughterhouse
-from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-from ..utilitys.functions import (event_create, not_empty, token_admin_validate, str_to_date, year_extract,
-                                  dict_group_by)
+from ..utilitys.functions import (not_empty, token_admin_validate, str_to_date, year_extract, dict_group_by)
 
 VIEW = "/head/view/"
 VIEW_FOR = "head_view"
@@ -35,6 +33,8 @@ UPDATE_HTML = "head/head_update.html"
 @token_admin_validate
 def head_view():
 	"""Visualizzo informazioni Capi."""
+	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+
 	_list = Head.query.all()
 	_list = [r.to_dict() for r in _list]
 
@@ -81,15 +81,11 @@ def head_create():
 
 		new_head = Head(
 			headset=form_data["headset"],
-
 			birth_date=not_empty(form_data["birth_date"]),
 			castration_date=not_empty(form_data["castration_date"]),
-
 			slaughter_date=not_empty(form_data["slaughter_date"]),
 			sale_date=not_empty(form_data["sale_date"]),
-
 			farmer_id=not_empty(form_data["farmer_id"]),
-
 			note=form_data["note"].strip()
 		)
 		# print("HEAD_NEW_DATA", json.dumps(new_head.to_dict(), indent=2))
@@ -155,11 +151,9 @@ def head_view_history(_id):
 		if _s and _s not in slaug_list:
 			slaug_list.append(_s.to_dict())
 
-	db.session.close()
-
 	# print("LISTA_BUYERS:", json.dumps(buyer_list, indent=2))
 	# print("LISTA_SLAUGHTERHOUSES:", json.dumps(slaug_list, indent=2))
-
+	db.session.close()
 	return render_template(
 		HISTORY_HTML, form=_head, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,
 		update=UPDATE_FOR, _id_farm=head.farmer_id, farm_history=FARMER_HISTORY,
@@ -176,6 +170,7 @@ def head_view_history(_id):
 def head_update(_id):
 	"""Aggiorna dati Capo."""
 	from ..routes.routes_cert_dna import CREATE_FOR as DNA_CREATE_FOR
+	from ..routes.routes_event import event_create
 
 	form = FormHeadUpdate()
 	if form.validate_on_submit():
@@ -184,8 +179,8 @@ def head_update(_id):
 		# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		head = Head.query.get(_id)
-		db.session.close()
 		previous_data = head.to_dict()
+		previous_data.pop("updated_at")
 		# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["castration_date"] = not_empty(new_data["castration_date"])
@@ -207,11 +202,10 @@ def head_update(_id):
 		new_data["created_at"] = head.created_at
 		new_data["updated_at"] = datetime.now()
 
-		print("NEW_DATA:", new_data)
+		# print("NEW_DATA:", new_data)
 		try:
 			db.session.query(Head).filter_by(id=_id).update(new_data)
 			db.session.commit()
-			db.session.close()
 			flash("CAPO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -231,10 +225,12 @@ def head_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
-		if event_create(_event, head_id=_id):
+
+		_event = event_create(_event, head_id=_id)
+		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			flash("ERRORE creazione evento DB. Ma il record è stato modificato correttamente.")
+			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record
@@ -257,7 +253,9 @@ def head_update(_id):
 			'created_at': head.created_at,
 			'updated_at': head.updated_at,
 		}
-		print("HEAD_:", form)
-		print("HEAD_FORM:", json.dumps(form.to_dict(), indent=2))
+		# print("HEAD_:", form)
+		# print("HEAD_FORM:", json.dumps(form.to_dict(), indent=2))
+
+		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, f_id=head.farmer_id,
 		                       dna_create=DNA_CREATE_FOR)
