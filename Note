@@ -11,3 +11,18 @@ Verifica DB:
 
 Downgrade: flask db downgrade
 Storia: flask db history
+
+
+# Lanciare docker-compose
+# verificare che sia installato docker-compose
+docker-compose -v # --version
+
+# Montare l'immagine
+docker-compose build --progress=tty
+docker-compose -f docker-compose.yml up -d
+
+# visualizzare immagini, per copiare IMAGE ID da lanciare
+docker images
+
+# run container
+docker-compose run -ti "IMAGE ID" bash

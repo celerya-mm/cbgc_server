@@ -5,7 +5,7 @@ from functools import wraps
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
-from flask import flash, url_for, redirect
+from flask import flash, url_for, redirect, session
 from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning

@@ -267,7 +267,7 @@ def cert_cons_update(_id):
 
 		new_data["created_at"] = cert.created_at
 
-		print("CERT_NEW_DATA:", new_data)
+		# print("CERT_NEW_DATA:", new_data)
 		try:
 			db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
 			db.session.commit()
@@ -360,8 +360,8 @@ def cert_cons_update(_id):
 			'created_at': cert.created_at,
 			'updated_at': cert.updated_at,
 		}
-		print("CERT_:", form)
-		print("CERT_FORM:", form.to_dict())
+		# print("CERT_:", form)
+		# print("CERT_FORM:", form.to_dict())
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR,
 		                       prev_cert=prev_cert)
 

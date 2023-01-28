@@ -1,10 +1,10 @@
 import json
 from datetime import datetime
 
-from flask import current_app as app, flash, redirect, render_template, session, url_for
+from flask import current_app as app, flash, redirect, render_template, url_for
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db
+from ..app import db, session
 from ..models.events_db import EventDB
 
 from ..models.accounts import Administrator, User
@@ -48,10 +48,10 @@ def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=No
 		return True
 	except IntegrityError as err:
 		db.session.close()
-		print("INTEGRITY_ERROR_EVENT:", str(err))
 		if "duplicate key value violates unique constraint" in str(err):
 			return True
 		else:
+			print("INTEGRITY_ERROR_EVENT:", str(err))
 			return str(err)
 	except Exception as err:
 		db.session.close()

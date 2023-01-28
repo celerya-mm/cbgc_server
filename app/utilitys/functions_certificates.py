@@ -1,6 +1,8 @@
 import base64
 import os
+import platform
 import shutil
+from subprocess import call
 
 import qrcode
 from docx import Document  # noqa
@@ -46,38 +48,54 @@ def generate_qr_code(_str):
 
 def doc_to_pdf(target):
 	"""Converte file Word in pdf."""
-	try:
-		from comtypes import client
-		word = client.CreateObject('Word.Application')
-	except ImportError:
-		from comtypes import client
-		word = None
+	_platform = str(platform.platform())
+	print("PIATTAFORMA:", _platform)
 
-	doc = word.Documents.Open(target)
-	outFile = os.path.join(target.replace("docx", "pdf"))
-	print("PDF_PATH:", outFile)
-	print("")
-	try:
-		doc.ExportAsFixedFormat(
-			OutputFileName=outFile,
-			ExportFormat=17,  # 17 = PDF output, 18=XPS output
-			OpenAfterExport=False,
-			OptimizeFor=0,  # 0=Print (higher res), 1=Screen (lower res)
-			CreateBookmarks=1,  # 0=No bookmarks, 1=Heading bookmarks only, 2=bookmarks match word bookmarks
-			DocStructureTags=False
-		)
-		print("CONVERTED")
-		doc.Close()
-		print("CLOSE")
-		doc.Quit()
-		print("QUIT")
-		os.remove(target)
-		print("SUCCESSFULLY CONVERTED")
-		return outFile
-	except Exception as err:
-		os.remove(target)
-		print("SUCCESS_CONVERT:", err)
-		return outFile
+	if "Windows" in _platform:
+		try:
+			from comtypes import client
+			word = client.CreateObject('Word.Application')
+		except ImportError:
+			from comtypes import client
+			word = None
+
+		doc = word.Documents.Open(target)
+		outFile = target.replace("docx", "pdf")
+		# print("PDF_PATH:", outFile)
+		# print("")
+		try:
+			doc.ExportAsFixedFormat(
+				OutputFileName=outFile,
+				ExportFormat=17,  # 17 = PDF output, 18=XPS output
+				OpenAfterExport=False,
+				OptimizeFor=0,  # 0=Print (higher res), 1=Screen (lower res)
+				CreateBookmarks=1,  # 0=No bookmarks, 1=Heading bookmarks only, 2=bookmarks match word bookmarks
+				DocStructureTags=False
+			)
+			doc.Close()
+			os.remove(target)
+			print("SUCCESSFULLY_CONVERTED")
+			return outFile
+		except Exception as err:
+			os.remove(target)
+			print("ERROR_CONVERT:", err)
+			return outFile
+	elif "Linux" in _platform:
+		try:
+			outPath = target.replace("docx", "pdf").split("/")
+			outPath = os.path.join(folder_temp, outPath[len(outPath) - 1])
+			print("OUT_NAME:", outPath)
+			call(["libreoffice", "--headless", "--convert-to", "pdf", target, "--outdir", folder_temp])
+			print("SUCCESSFULLY_CONVERTED")
+			os.remove(target)
+			print("OUT_FILE:", outPath)
+			return outPath
+		except Exception as err:
+			print("ERROR_CONVERT:", err)
+			return False
+	else:
+		print("PIATTAFORMA_NON_SUPPORTATA:", _platform)
+		return False
 
 
 def create_byte_certificate(data, _file, _str):
@@ -111,7 +129,7 @@ def create_byte_certificate(data, _file, _str):
 
 	# convert docx to pdf
 	_pdf = doc_to_pdf(target)
-	if _pdf:
+	if _pdf is not False:
 		# convert pdf to byte
 		with open(_pdf, "rb") as f:
 			enc_string = str(base64.b64encode(f.read()), 'utf-8')
@@ -136,7 +154,7 @@ def byte_to_pdf(byte, f_name):
 		os.remove(file_path)
 
 	path_file = os.path.join(folder_temp, f_name.replace("/", "_") + ".pdf")
-	print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
+	# print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
 	# document = cert.certificate_pdf, 'utf-8')
 	with open(path_file, "wb") as f:
 		f.write(byte)

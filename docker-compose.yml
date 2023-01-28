@@ -1,0 +1,47 @@
+version: "0.1"
+services:
+  app:
+    build: .  ## cartella contenente l'app con il "Dockerfile" sotto stessa radice del "docker-compose.yml"
+    # restart: always
+    container_name: csbg-test
+    networks:
+      - frontend
+    expose:
+      - 5000
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:5000/flask-health-check || exit 1" ]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+  #    command: /home/app/venv/bin/gunicorn -w 4 -t 60 --log-config app/utilitys/gunicorn/gunicorn_logging.conf -b 0.0.0.0:5000 run:app
+
+  nginx:
+    build: ./nginx  ## cartella contenente l'app con il "Dockerfile" sotto stessa radice del "docker-compose.yml"
+    container_name: reverse_proxy
+    networks:
+      - proxy
+    #    restart: always
+    volumes:
+      - ./nginx/conf.d/default.conf:/tmp/default.conf
+    environment:
+      - APP_BASE_URL=app:5000
+      - NGINX_HOST= 127.0.0.1 # cbgc-test.celerya.com
+      - NGINX_port_http=8080
+      - NGINX_port_https=4433
+    ports:
+      - "8080:8080"
+      - "4433:4433"
+    depends_on:
+      - app
+      # healthcheck:
+      # test: [ "CMD-SHELL", "curl --silent --fail localhost:5000/health-check; || exit 1;" ]
+      # interval: 20s
+      # timeout: 10s
+      # retries: 3
+  #   command: /app/nginx/start.sh
+
+networks:
+  frontend:
+    driver: bridge
+  proxy:
+    driver: bridge

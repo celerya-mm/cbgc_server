@@ -1,0 +1,24 @@
+# Disabilitare in file requirements.txt i seguenti file:
+pywin32==305
+
+# aggiornare e copiare il file requirements.txt nella cartella docker
+# sostituire file .env rinominando production.env (verificare settaggio accessi)
+# copiare l'intero progetto nella macchina sul quale si vuole installare e che ha Docker installato.
+
+# Una volta impostato il "dockerfile" lanciare il seguente comando dal prompt:
+# Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
+docker build --rm -t cbgc:latest .
+
+# Verificare l'immagine creata
+docker image ls
+
+# Lanciare il docker usando l'immagine appena creata
+docker run -d -p 5000:5000 --name cbgc-service cbgc:latest
+
+
+
+# Rimuovere immagini non utilizzate
+docker image ls -f dangling=true
+docker image prune -f --filter "dangling=true"
+
+docker container prune
