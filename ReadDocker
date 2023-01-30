@@ -1,13 +1,17 @@
 # Disabilitare in file requirements.txt i seguenti file:
 pywin32==305
 
-# aggiornare e copiare il file requirements.txt nella cartella docker
 # sostituire file .env rinominando production.env (verificare settaggio accessi)
 # copiare l'intero progetto nella macchina sul quale si vuole installare e che ha Docker installato.
 
 # Una volta impostato il "dockerfile" lanciare il seguente comando dal prompt:
+
 # Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
-docker build --rm -t cbgc:latest .
+# docker classico
+docker build --force-rm --progres:tty -t cbgc:latest .
+
+# docker-compose (da file docker-compose.yml)
+docker-compose build --progres:tty
 
 # Verificare l'immagine creata
 docker image ls

@@ -1,4 +1,5 @@
 import json
+import platform
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request, send_file
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +13,7 @@ from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
 from ..utilitys.functions import (not_empty, token_admin_validate, str_to_date, calc_age,
                                   status_true_false, status_si_no, date_to_str, dict_group_by)
-from ..utilitys.functions_certificates import create_byte_certificate, generate_qr_code, byte_to_pdf
+from ..utilitys.functions_certificates import generate_qr_code, byte_to_pdf, create_pdf_certificate
 
 VIEW = "/cert_cons/view/"
 VIEW_FOR = "cert_cons_view"
@@ -391,6 +392,7 @@ def cert_cons_generate(_id):
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
 		try:
+			# recupera dati records relazionati
 			head = Head.query.get(cert.head_id)
 			farmer = Farmer.query.get(cert.farmer_id)
 			buyer = Buyer.query.get(cert.buyer_id)
@@ -404,7 +406,8 @@ def cert_cons_generate(_id):
 			note = ""
 		else:
 			note = cert.note_certificate
-		data = {
+
+		data_certificate = {
 			"certificate_nr": cert.certificate_nr,
 			"certificate_date": date_to_str(cert.certificate_date, '%d-%m-%Y'),
 			"head_category": cert.head_category,
@@ -419,16 +422,10 @@ def cert_cons_generate(_id):
 		}
 
 		# print("BUYER_TYPE:", buyer.buyer_type)
-		if buyer.buyer_type == "Ristorante":
-			name = "certificato_ristoranti.docx"
-			pdf_byte = create_byte_certificate(data, name, str_qr)
-		else:
-			name = "certificato_macellerie.docx"
-			pdf_byte = create_byte_certificate(data, name, str_qr)
-
-		if pdf_byte is not None and len(pdf_byte) > 10:
+		pdf_str = create_pdf_certificate(buyer.buyer_type, data_certificate, str_qr)
+		if pdf_str is not False and len(pdf_str) > 10:
 			# assegno stringa in byte
-			cert.certificate_pdf = pdf_byte
+			cert.certificate_pdf = pdf_str
 			cert.emitted = True
 			try:
 				# db.session.query(CertificateCons).filter_by(id=cert.id).update(cert)

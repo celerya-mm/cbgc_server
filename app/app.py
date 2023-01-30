@@ -3,7 +3,7 @@ import secrets
 from flask import Flask, session  # noqa
 from flask_migrate import Migrate
 from flask_misaka import Misaka
-# from flask_session import Session
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
@@ -18,7 +18,7 @@ app.secret_key = secret
 Misaka(app)
 
 # imposta sessione browser per server gunicorn
-# Session(app)
+Session(app)
 
 db = SQLAlchemy()
 migrate = Migrate(app, db)

@@ -5,6 +5,8 @@
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/migrations" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />
+      <excludeFolder url="file://$MODULE_DIR$/flask_session" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.11 (cbgc_server)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

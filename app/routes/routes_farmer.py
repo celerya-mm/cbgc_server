@@ -163,7 +163,7 @@ def farmer_update(_id):
 		new_data["created_at"] = farmer.created_at
 		new_data["updated_at"] = datetime.now()
 
-		print("NEW_DATA:", new_data)
+		# print("NEW_DATA:", new_data)
 		try:
 			db.session.query(Farmer).filter_by(id=_id).update(new_data)
 			db.session.commit()
