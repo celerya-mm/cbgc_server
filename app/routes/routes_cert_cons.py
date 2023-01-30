@@ -1,5 +1,4 @@
 import json
-import platform
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request, send_file
 from sqlalchemy.exc import IntegrityError
@@ -206,99 +205,103 @@ def cert_cons_update(_id):
 
 	form = FormCertConsUpdate()
 	if form.validate_on_submit():
-		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
-		# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
-
-		cert = CertificateCons.query.get(int(_id))
-		previous_data = cert.to_dict()
-		previous_data.pop("updated_at")
-		# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-
-		new_data["certificate_nr"] = mount_code(
-			new_data["certificate_id"], new_data["certificate_year"], new_data["certificate_var"])
-		new_data["certificate_date"] = str_to_date(new_data["certificate_date"])
-
-		new_data["emitted"] = status_true_false(new_data["emitted"])
-
-		new_data["cockade_id"] = not_empty(new_data["cockade_id"])
-		new_data["cockade_nr"] = mount_code(
-			new_data["cockade_id"], new_data["certificate_year"], new_data["cockade_var"])
-
-		new_data["sale_type"] = not_empty(new_data["sale_type"])
-		new_data["sale_quantity"] = not_empty(new_data["sale_quantity"])
-		new_data["sale_rest"] = not_empty(new_data["sale_rest"])
-
-		new_data["head_category"] = not_empty(new_data["head_category"])
-		if new_data["head_age"] in ["", None, 0]:
-			head = Head.query.get(int(cert.head_id))
-			birth = head.birth_date
-			slaug = head.slaughter_date
-			new_data["head_age"] = calc_age(birth, slaug)
-		else:
-			new_data["head_age"] = not_empty(new_data["head_age"])
-
-		new_data["batch_number"] = not_empty(new_data["batch_number"])
-
-		new_data["invoice_nr"] = not_empty(new_data["invoice_nr"])
-		new_data["invoice_date"] = str_to_date(new_data["invoice_date"])
-
-		new_data["note_certificate"] = not_empty(new_data["note_certificate"])
-		new_data["note"] = not_empty(new_data["note"])
-
-		if new_data["head_id"] not in ["", "-", None]:
-			new_data["head_id"] = int(new_data["head_id"].split(" - ")[0])
-		else:
-			new_data["head_id"] = None
-
-		if new_data["buyer_id"] not in ["", "-", None]:
-			new_data["buyer_id"] = int(new_data["buyer_id"].split(" - ")[0])
-		else:
-			new_data["buyer_id"] = None
-
-		if new_data["farmer_id"] not in ["", "-", None]:
-			new_data["farmer_id"] = int(new_data["farmer_id"].split(" - ")[0])
-		else:
-			new_data["farmer_id"] = None
-
-		if new_data["slaughterhouse_id"] not in ["", "-", None]:
-			new_data["slaughterhouse_id"] = int(new_data["slaughterhouse_id"].split(" - ")[0])
-		else:
-			new_data["slaughterhouse_id"] = None
-
-		new_data["created_at"] = cert.created_at
-
-		# print("CERT_NEW_DATA:", new_data)
 		try:
-			db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
-			db.session.commit()
-			db.session.close()
-			flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
+			new_data = json.loads(json.dumps(request.form))
+			new_data.pop('csrf_token', None)
+			# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-		except IntegrityError as err:
-			db.session.rollback()
-			db.session.close()
-			flash(f"ERRORE: {str(err.orig)}")
-			prev_cert = CertificateCons.query.get(int(_id) - 1)
-			_info = {
-				'created_at': cert.created_at,
-				'updated_at': cert.updated_at,
+			cert = CertificateCons.query.get(int(_id))
+			previous_data = cert.to_dict()
+			previous_data.pop("updated_at")
+			# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+
+			new_data["certificate_nr"] = mount_code(
+				new_data["certificate_id"], new_data["certificate_year"], new_data["certificate_var"])
+			new_data["certificate_date"] = str_to_date(new_data["certificate_date"])
+
+			new_data["emitted"] = status_true_false(new_data["emitted"])
+
+			new_data["cockade_id"] = not_empty(new_data["cockade_id"])
+			new_data["cockade_nr"] = mount_code(
+				new_data["cockade_id"], new_data["certificate_year"], new_data["cockade_var"])
+
+			new_data["sale_type"] = not_empty(new_data["sale_type"])
+			new_data["sale_quantity"] = not_empty(new_data["sale_quantity"])
+			new_data["sale_rest"] = not_empty(new_data["sale_rest"])
+
+			new_data["head_category"] = not_empty(new_data["head_category"])
+			if new_data["head_age"] in ["", None, 0]:
+				head = Head.query.get(int(cert.head_id))
+				birth = head.birth_date
+				slaug = head.slaughter_date
+				new_data["head_age"] = calc_age(birth, slaug)
+			else:
+				new_data["head_age"] = not_empty(new_data["head_age"])
+
+			new_data["batch_number"] = not_empty(new_data["batch_number"])
+
+			new_data["invoice_nr"] = not_empty(new_data["invoice_nr"])
+			new_data["invoice_date"] = str_to_date(new_data["invoice_date"])
+
+			new_data["note_certificate"] = not_empty(new_data["note_certificate"])
+			new_data["note"] = not_empty(new_data["note"])
+
+			if new_data["head_id"] not in ["", "-", None]:
+				new_data["head_id"] = int(new_data["head_id"].split(" - ")[0])
+			else:
+				new_data["head_id"] = None
+
+			if new_data["buyer_id"] not in ["", "-", None]:
+				new_data["buyer_id"] = int(new_data["buyer_id"].split(" - ")[0])
+			else:
+				new_data["buyer_id"] = None
+
+			if new_data["farmer_id"] not in ["", "-", None]:
+				new_data["farmer_id"] = int(new_data["farmer_id"].split(" - ")[0])
+			else:
+				new_data["farmer_id"] = None
+
+			if new_data["slaughterhouse_id"] not in ["", "-", None]:
+				new_data["slaughterhouse_id"] = int(new_data["slaughterhouse_id"].split(" - ")[0])
+			else:
+				new_data["slaughterhouse_id"] = None
+
+			new_data["created_at"] = cert.created_at
+
+			# print("CERT_NEW_DATA:", new_data)
+			try:
+				db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
+				db.session.commit()
+				db.session.close()
+				flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
+
+			except IntegrityError as err:
+				db.session.rollback()
+				db.session.close()
+				flash(f"ERRORE: {str(err.orig)}")
+				prev_cert = CertificateCons.query.get(int(_id) - 1)
+				_info = {
+					'created_at': cert.created_at,
+					'updated_at': cert.updated_at,
+				}
+				return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR,
+				                       prev_cert=prev_cert.certificate_nr)
+
+			_event = {
+				"username": session["username"],
+				"table": CertificateCons.__tablename__,
+				"Modification": f"Update Certificate whit id: {_id}",
+				"Previous_data": previous_data
 			}
-			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR,
-			                       prev_cert=prev_cert.certificate_nr)
-
-		_event = {
-			"username": session["username"],
-			"table": CertificateCons.__tablename__,
-			"Modification": f"Update Certificate whit id: {_id}",
-			"Previous_data": previous_data
-		}
-		# print("EVENT:", json.dumps(_event, indent=2))
-		_event = event_create(_event, cert_cons_id=int(_id))
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=int(_id)))
-		else:
-			flash(_event)
+			# print("EVENT:", json.dumps(_event, indent=2))
+			_event = event_create(_event, cert_cons_id=int(_id))
+			if _event is True:
+				return redirect(url_for(HISTORY_FOR, _id=int(_id)))
+			else:
+				flash(_event)
+				return redirect(url_for(HISTORY_FOR, _id=_id))
+		except Exception as err:
+			flash(err)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati del record
@@ -423,7 +426,7 @@ def cert_cons_generate(_id):
 
 		# print("BUYER_TYPE:", buyer.buyer_type)
 		pdf_str = create_pdf_certificate(buyer.buyer_type, data_certificate, str_qr)
-		if pdf_str is not False and len(pdf_str) > 10:
+		if pdf_str is not False and pdf_str is not None and len(pdf_str) > 10:
 			# assegno stringa in byte
 			cert.certificate_pdf = pdf_str
 			cert.emitted = True

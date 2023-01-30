@@ -187,15 +187,15 @@ class FormCertConsUpdate(FlaskForm):
 
 	emitted = SelectField("Emesso", choices=["SI", "NO"])
 
-	cockade_id = IntegerField('ID Coccarda', validators=[Optional()])
-	cockade_var = StringField('Int. ID Cocc.', validators=[Length(max=10), Optional()])
+	cockade_id = IntegerField('ID Cocc.', validators=[Optional()])
+	cockade_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
 
 	sale_type = SelectField(
-		"Tipo Vendita", validators=[DataRequired("Campo obbligatorio!")],
+		"Tipo", validators=[DataRequired("Campo obbligatorio!")],
 		choices=["Capo intero", "Mezzena", "Parti Anatomiche", "Altro", ""]
 	)
-	sale_quantity = FloatField("Quantità (kg)", validators=[Optional()])
-	sale_rest = FloatField("Rimanenti (kg)", validators=[Optional()])
+	sale_quantity = FloatField("kg", validators=[Optional()])
+	sale_rest = FloatField("Rimanenti", validators=[Optional()])
 
 	head_category = SelectField('Categoria', choices=["Bue", "Manzo"], validators=[Length(max=10), Optional()])
 	head_age = IntegerField('Età', validators=[Optional()])

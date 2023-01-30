@@ -7,7 +7,7 @@ load_dotenv()
 class Config:
 	"""Parametri configurazione."""
 	ENV = os.getenv('FLASK_ENV', 'development')
-	FLASK_DEBUG = os.getenv('FLASK_DEBUG', True)
+	FLASK_DEBUG = os.getenv('FLASK_DEBUG', 1)
 	SECRET_KEY = os.getenv('APP_SECRET_KEY', 'dev')
 	BASE_URL = os.getenv('APP_BASE_URL', '127.0.0.1')
 

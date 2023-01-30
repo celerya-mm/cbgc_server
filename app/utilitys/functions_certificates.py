@@ -1,7 +1,18 @@
+"""
+	In ambiente Linux per funzionare c'è bisogno che queste utilities siano installate:
+	apt-get install -y apt-utils --no-install-recommends
+	apt-get install -y dialog
+	apt-get install -y libreoffice --no-install-recommends
+	apt-get install python3-uno
+	apt-get install -y default-jre
+	apt-get install -y unoconv
+"""
+
 import base64
 import os
 import platform
 import shutil
+import subprocess as subp
 from subprocess import call
 
 import qrcode
@@ -133,6 +144,32 @@ def insert_qrcode(target, _str):
 		return False
 
 
+def insert_qrcode_linux(target, _str):
+	"""Inserisce QR-Code dopo marker in file odt."""
+	try:
+		_jpg = os.path.join(folder_work, _str.replace("/", "_") + ".jpg")
+		# print("QRCODE_FIND")
+
+		# Read the file into a string variable
+		with open(target, "r", encoding="ISO-8859-1") as model:
+			content = model.read()
+		# print("CONTENT_READ")
+
+		# Replace the marker with the image content
+		img = f'<p><img src={_jpg} alt="QRCode"></p>'
+		content = content.replace("{{QRCode}}", img)
+		# print("CONTENT_REPLACED")
+
+		# Write the updated content back to the file
+		with open(target, "w") as model:
+			model.write(content)
+		# print("SAVED")
+		return True
+	except Exception as err:
+		print("ERRORE_INSERIMENTO_QRCOD:", err)
+		return False
+
+
 def pdf_to_byte(_pdf):
 	"""Converte pdf in byte string."""
 	with open(_pdf, "rb") as f:
@@ -147,11 +184,35 @@ def pdf_to_byte(_pdf):
 def insert_data(target, data):
 	"""Inserisce dati in file sostituendo i markers."""
 	try:
-		# print("TARGET:", target, "data:", data)
+		print("TARGET:", target, "data:", data)
 		tpl = DocxTemplate(target)  # leggi il template word
 		tpl.render(data)
 		# save the modified docx file
 		tpl.save(target)
+		return True
+	except Exception as err:
+		print("ERRORE_INSERMENTO_DATI_IN_FILE:", err)
+		return False
+
+
+def insert_data_linux(target, data):
+	"""Inserisce dati in file sostituendo i markers."""
+	try:
+		# print("TARGET:", target, "data:", data)
+		# Convert the ODT file to plain text
+		p = subp.run(["unoconv", "-f", "txt", target], capture_output=True, text=True)
+		text = p.stdout
+		print("READED:", str(text))
+		# Loop through the paragraphs and replace markers
+		for marker, replacement in data.items():
+			text = text.replace("{%s}" % str(marker), str(replacement))
+		print("REPLACED:", text)
+		# Save the modified plain text to a temporary file
+		with open("modified.txt", "w") as f:
+			f.write(text)
+		# Convert the modified plain text back to ODT format
+		subp.run(["unoconv", "-f", "odt", "-o", target, "modified.txt"])
+		print("SUBSTITUTED:", target)
 		return True
 	except Exception as err:
 		print("ERRORE_INSERMENTO_DATI_IN_FILE:", err)
@@ -186,15 +247,19 @@ def create_b_certificate_odt(data, _file, _str):
 	source = os.path.join(folders_models_odt, _file)
 	shutil.copy(source, target)
 	# inserisce QR_code
-	if insert_qrcode(target, _str):
-		# inserisce dati nel modello
-		if insert_data(target, data):
-			# convert odt to pdf
-			_pdf = odt_to_pdf(target)
-			# convert pdf to byte
-			if _pdf is not False:
-				return pdf_to_byte(_pdf)
-	else:
+	try:
+		if insert_qrcode_linux(target, _str):
+			# inserisce dati nel modello
+			if insert_data_linux(target, data):
+				# convert odt to pdf
+				_pdf = odt_to_pdf(target)
+				# convert pdf to byte
+				if _pdf is not False:
+					return pdf_to_byte(_pdf)
+		else:
+			return False
+	except Exception as err:
+		print(err)
 		return False
 
 
@@ -214,6 +279,7 @@ def create_pdf_certificate(buyer_type, _data, str_qr):
 			model_name = "certificato_macellerie.docx"
 			pdf_str = create_b_certificate_docx(_data, model_name, str_qr)
 		elif "Linux" in platform.platform():
+			print("PLATFORM:", str(platform.platform()))
 			model_name = "certificato_macellerie.odt"
 			pdf_str = create_b_certificate_odt(_data, model_name, str_qr)
 		else:

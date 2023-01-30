@@ -1,0 +1,12 @@
+Dockerfile
+.git
+.gitignore
+venv
+nginx
+migrations
+flask_session
+docker-compose.yml
+Note
+ReadDocker
+README.md
+run_docker.sh
