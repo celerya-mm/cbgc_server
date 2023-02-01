@@ -27,6 +27,3 @@ docker image ls -f dangling=true
 docker image prune -f --filter "dangling=true"
 
 docker container prune
-
-
-sed -i 's|#!/usr/bin/env python3|#!/usr/bin/python3|' /usr/bin/unoconv

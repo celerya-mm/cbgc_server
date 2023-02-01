@@ -138,9 +138,9 @@ def cert_cons_create(h_id, f_id, h_set):
 		head_slaug = head.slaughter_date
 		db.session.close()
 
-		print("HEAD", h_set, "LAST:", prev_cert)
+		# print("HEAD", h_set, "LAST:", prev_cert)
 		h_set = f"{int(h_id)} - {h_set}"
-		print("HEAD", h_set)
+		# print("HEAD", h_set)
 
 		form.head_id.data = h_set
 		form.farmer_id.data = f_id

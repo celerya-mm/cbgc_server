@@ -114,6 +114,8 @@ env.bak/
 venv.bak/
 migrations
 migrations/
+flask_session/
+flask_session
 to_do.md
 develop.env
 
