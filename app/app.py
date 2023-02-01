@@ -1,7 +1,8 @@
 import os
-import secrets
+import secrets  # noqa
 
 from flask import Flask, session  # noqa
+from flask_mail import Mail, Message
 from flask_migrate import Migrate
 from flask_misaka import Misaka
 from flask_session import Session
@@ -14,8 +15,11 @@ PATH_PROJECT = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__, instance_relative_config=False)
 app.config.from_object(Config)
 
-secret = secrets.token_urlsafe(32)
-app.secret_key = secret
+# secret = secrets.token_urlsafe(32)
+app.secret_key = Config.SECRET_KEY
+
+# imposta invio mail
+mail = Mail(app)
 
 # formattazione avanzata del testo
 Misaka(app)

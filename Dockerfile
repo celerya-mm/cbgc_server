@@ -74,7 +74,7 @@ COPY . .
 #    wsgi:app
 ##       = from run (file .py) import app (file .py)
 
-ENTRYPOINT ["./gunicorn.sh"]
+#ENTRYPOINT ["./gunicorn.sh"]
 
-#ENTRYPOINT ["python3"]
-#CMD ["-m", "flask", "run"]
+ENTRYPOINT ["python3"]
+CMD ["-m", "flask", "run"]

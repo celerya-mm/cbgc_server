@@ -4,11 +4,13 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
+from ..app import db, session, Message, mail, Config
 from ..forms.form_account import FormAccountUpdate, FormUserSignup
+from ..forms.forms import FormPswReset
 from ..models.accounts import User
+from ..models.tokens import calc_exp_token_reset_psw, AuthToken
 from ..utilitys.functions import token_admin_validate
-from ..utilitys.functions_accounts import psw_hash
+from ..utilitys.functions_accounts import psw_hash, __generate_auth_token
 
 VIEW = "/user/view/"
 VIEW_FOR = "user_view"
@@ -25,6 +27,10 @@ HISTORY_HTML = "user/user_view_history.html"
 UPDATE = "/user/update/<_id>"
 UPDATE_FOR = "user_update"
 UPDATE_HTML = "user/user_update.html"
+
+RESET_PSW = "/user/reset_password/<_id>"
+RESET_PSW_FOR = "user_reset_password"
+RESET_PSW_HTML = "user/user_reset_password.html"
 
 
 @app.route(VIEW, methods=["GET", "POST"])
@@ -102,7 +108,7 @@ def user_view_history(_id):
 
 	db.session.close()
 	return render_template(
-		HISTORY_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR,
+		HISTORY_HTML, form=_user, view=VIEW_FOR, update=UPDATE_FOR, reset_psw=RESET_PSW_FOR,
 		history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
 		buyer_list=buyer_list, b_len=len(buyer_list), buyer_history=BUYER_HISTORY
 	)
@@ -178,3 +184,95 @@ def user_update(_id):
 
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
+
+
+@app.route(RESET_PSW, methods=["GET", "POST"])
+def user_reset_password(_id):
+	"""Aggiorna password Utente Servizio."""
+	from ..routes.routes_event import event_create
+
+	form = FormPswReset()
+	if form.validate_on_submit():
+		form_data = json.loads(json.dumps(request.form))
+		# _admin = json.loads(json.dumps(session["admin"]))
+
+		new_password = psw_hash(form_data["new_password_1"].replace(" ", "").strip())
+		# print("NEW:", new_password)
+
+		_user = User.query.get(_id)
+
+		if new_password == _user.password:
+			session.clear()
+			flash("The 'New Password' inserted is equal to 'Registered Password'.")
+			return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
+		else:
+			_user.password = new_password
+			_user.updated_at = datetime.now()
+
+			_user = _user.to_dict()
+
+			db.session.query(User).filter_by(id=_id).update(_user)
+			db.session.commit()
+			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
+			_event = {
+				"executor": session["username"],
+				"username": _user["username"],
+				"Modification": "Password reset"
+			}
+			_event = event_create(_event, user_id=_id)
+			if _event is True:
+				db.session.close()
+				msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
+				return msg
+			else:
+				db.session.close()
+				flash(_event)
+				msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
+				return msg
+	else:
+		return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
+
+
+@app.route('/reset_psw_user/<_id>/')
+def reset_psw_user(_id):
+	# estraggo dati utente
+	_user = User.query.get(_id)
+	_mail = _user.email
+
+	# creo un token con validità 15 min
+	_token = __generate_auth_token()
+	auth_token = AuthToken(
+		user_id=_id,
+		token=_token,
+		expires_at=calc_exp_token_reset_psw()
+	)
+	db.session.add(auth_token)
+	db.session.commit()
+	db.session.close()
+
+	# imposto link
+	_link = f"{Config.LINK_URL}:5000/reset_psw_user_token/{_token}/"
+	print("LINK:", _link)
+
+	try:
+		# imposto e invio la mail con il link per il reset
+		msg = Message('Hello from the other side!', sender="service@celerya.com", recipients=[_mail])
+		msg.body = f"Hey Marco, sending you this email from my Flask app, if it works.\n" \
+		           f"And this is the link for reset your password: \n{_link}\n" \
+		           f"The link expiry in 15  min."
+		mail.send(msg)
+		return "Message sent!"
+	except Exception as err:
+		return f"Message don't sent: {str(err)}"
+
+
+@app.route('/reset_psw_user_token/<_token>/')
+def reset_psw_user_token(_token):
+	_token = db.session.query(AuthToken).filter_by(token=_token).first()
+	if datetime.now() > _token.expires_at:
+		db.session.close()
+		return "Il token è scaduto ripeti la procedura di ripristino password."
+	else:
+		db.session.close()
+		_id = _token.user_id
+		return redirect(url_for(RESET_PSW_FOR, _id=_id))

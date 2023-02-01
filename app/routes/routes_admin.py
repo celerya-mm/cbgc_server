@@ -149,8 +149,10 @@ def admin_update(_id):
 		}
 		_event = event_create(_event, admin_id=_id)
 		if _event is True:
+			db.session.close()
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
+			db.session.close()
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
@@ -213,8 +215,10 @@ def admin_update_password(_id):
 			}
 			_event = event_create(_event, admin_id=_id)
 			if _event is True:
+				db.session.close()
 				return redirect(url_for('logout'))
 			else:
+				db.session.close()
 				flash(_event)
 				return redirect(url_for('logout'))
 	else:

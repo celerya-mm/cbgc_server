@@ -10,10 +10,20 @@ class Config:
 	FLASK_DEBUG = os.getenv('FLASK_DEBUG', 1)
 	SECRET_KEY = os.getenv('APP_SECRET_KEY', 'dev')
 	BASE_URL = os.getenv('APP_BASE_URL', '127.0.0.1')
+	LINK_URL = os.getenv('APP_URL_LINK')
 
 	SESSION_PERMANENT = False
 	SESSION_TYPE = "filesystem"
 
+	# setup smtp server
+	MAIL_SERVER = os.getenv('MAIL_SERVER')
+	MAIL_PORT = os.getenv('MAIL_PORT')
+	MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+	MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+	MAIL_USE_TLS = True
+	MAIL_USE_SSL = False
+
+	# setup DB
 	DATABASE_HOST = os.getenv('DB_HOST')
 	DATABASE_PORT = os.getenv('DB_PORT')
 	DATABASE_NAME = os.getenv('DB_NAME')

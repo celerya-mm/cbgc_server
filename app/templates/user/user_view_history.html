@@ -14,6 +14,14 @@
                href="{{ url_for(update, _id=form.id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
             </a>
+            <a class="btn-update" type="button" title="Resetta password utente"
+               href="{{ url_for(reset_psw, _id=form.id) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/fingerprint_red.svg') }}" alt=""/>
+            </a>
+            <a class="btn-update" type="button" title="Invia richiesta reset psw a utente"
+               href="{{ url_for('reset_psw_user', _id=form.id) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/lock_reset.svg') }}" alt=""/>
+            </a>
         </h5>
     </div>
 
@@ -218,6 +226,11 @@
             }
         });
     });
+
+
+
+
+
 
 
 

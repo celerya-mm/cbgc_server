@@ -38,3 +38,21 @@ class FormPswChange(FlaskForm):
         message = psw_verify(field.data)
         if message:
             raise validators.ValidationError(message)
+
+
+class FormPswReset(FlaskForm):
+    """Form per reset password"""
+    new_password_1 = PasswordField('Nuova Password', validators=[
+        DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
+    new_password_2 = PasswordField('Conferma Password', validators=[
+        DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
+        EqualTo('new_password_1', message='Le password non corrispondono.')
+    ])
+
+    submit = SubmitField("SEND_NEW_PASSWORD")
+
+    def validate_new_password_1(self, field):  # noqa
+        """Valida la nuova password."""
+        message = psw_verify(field.data)
+        if message:
+            raise validators.ValidationError(message)
