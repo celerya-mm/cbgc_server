@@ -81,8 +81,7 @@ body {
 
 .card-title {
     font-family: 'Jost', sans-serif;
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 24px !important;
 }
 
 .chart-container {
@@ -290,6 +289,11 @@ label {
     font-family: 'Inter', sans-serif;
 }
 
+page[size="A4"] {
+  width: 21cm;
+  height: 29.7cm;
+}
+
 .page-link {
     font-size: 0.5rem !important;
 }
@@ -389,5 +393,41 @@ th.sorting_asc,th.sorting_desc{
     .nav-link {
         padding-right: 0px ip !important;
         padding-left: 1rem !important;
+    }
+}
+
+
+.sheet-outer {
+    margin: 0;
+}
+.sheet {
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+    page-break-after: always;
+}
+
+@media screen {
+    .sheet {
+        background: white;
+        box-shadow: 0 .5mm 2mm rgba(0,0,0,.3);
+        margin: 5mm auto;
+    }
+}
+
+.sheet-outer.A4 .sheet {
+    width: 210mm;
+    height: 296mm
+}
+.sheet.padding-5mm { padding: 5mm }
+
+@page {
+    size: A4;
+    margin: 0
+}
+@media print {
+    .sheet-outer.A4, .sheet-outer.A5.landscape {
+        width: 210mm
     }
 }

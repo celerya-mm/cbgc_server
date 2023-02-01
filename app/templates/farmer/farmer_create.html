@@ -19,7 +19,7 @@
                         <br>
                         <div class="form-group">
                             {{ form.farmer_name.label }}
-                            {{ form.farmer_name(class="form-control") }}
+                            {{ form.farmer_name(class="form-control emphasis") }}
                             {% if form.farmer_name.errors %}
                             {% for error in form.farmer_name.errors %}
                             <span class="text-danger">{{ error }}</span>

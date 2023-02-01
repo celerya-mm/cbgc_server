@@ -40,7 +40,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-2 order-third">
+                    <div class="col-md-4 order-third">
                         <div class="form-group">
                             {{ form.certificate_date.label(style="font-size: 1.2rem;") }}
                             {{ form.certificate_date(class="form-control", style="text-align: center;") }}
@@ -70,18 +70,6 @@
                             {{ form.cockade_var(class="form-control") }}
                             {% if form.cockade_var.errors %}
                             {% for error in form.cockade_var.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-2 order-sixyh">
-                        <div class="form-group">
-                            {{ form.emitted.label(style="font-size: 1.2rem;") }}
-                            {{ form.emitted(class="form-control", style="text-align: center;") }}
-                            {% if form.emitted.errors %}
-                            {% for error in form.emitted.errors %}
                             <span class="text-danger">{{ error }}</span>
                             <br>
                             {% endfor %}

@@ -12,7 +12,7 @@ from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
 from ..utilitys.functions import (not_empty, token_admin_validate, str_to_date, calc_age,
                                   status_true_false, status_si_no, date_to_str, dict_group_by)
-from ..utilitys.functions_certificates import generate_qr_code, byte_to_pdf, create_pdf_certificate
+from ..utilitys.functions_certificates import generate_qr_code, byte_to_pdf, html_to_pdf, pdf_to_byte
 
 VIEW = "/cert_cons/view/"
 VIEW_FOR = "cert_cons_view"
@@ -379,7 +379,8 @@ def cert_cons_generate(_id):
 	cert = CertificateCons.query.get(int(_id))
 	# genero QR-Code
 	str_qr = f"109-CERT-{cert.certificate_nr}"
-	if generate_qr_code(str_qr):
+	img_qrc = generate_qr_code(str_qr)
+	if img_qrc:
 		previous_data = cert.to_dict()  # salvo dati per creare evento record.
 		previous_data.pop("updated_at")
 
@@ -410,7 +411,7 @@ def cert_cons_generate(_id):
 		else:
 			note = cert.note_certificate
 
-		data_certificate = {
+		data = {
 			"certificate_nr": cert.certificate_nr,
 			"certificate_date": date_to_str(cert.certificate_date, '%d-%m-%Y'),
 			"head_category": cert.head_category,
@@ -420,12 +421,26 @@ def cert_cons_generate(_id):
 			"farmer_name": farmer.farmer_name,
 			"slaughter_name": slaught.slaughterhouse,
 			"buyer_name": buyer.buyer_name,
-			"note_cert": note,
-			"QRCode": ""
+			"sale_type": cert.sale_type,
+			"note_cert": note
 		}
 
+		# creo un pdf del certificato
+		if buyer.buyer_type and buyer.buyer_type == "Macelleria":
+			pdf = html_to_pdf("cert_cons/macellerie.html", data, img_qrc)
+		elif buyer.buyer_type and buyer.buyer_type == "Ristorante":
+			pdf = html_to_pdf("cert_cons/restaurants.html", data, img_qrc)
+		else:
+			flash(f"L'acquirente non ha il tipo specificato: Ristorante o Macelleria.")
+			return redirect(url_for(HISTORY_FOR, _id=_id))
+
+		if pdf is not False:
+			pdf_str = pdf_to_byte(pdf)
+		else:
+			flash(f"Errore creazione certificato pdf.")
+			return redirect(url_for(HISTORY_FOR, _id=_id))
+
 		# print("BUYER_TYPE:", buyer.buyer_type)
-		pdf_str = create_pdf_certificate(buyer.buyer_type, data_certificate, str_qr)
 		if pdf_str is not False and pdf_str is not None and len(pdf_str) > 10:
 			# assegno stringa in byte
 			cert.certificate_pdf = pdf_str

@@ -102,8 +102,8 @@
                         </thead>
                         <tbody>
                         {% for row in buyer_list %}
-                        <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                <a class="btn-table" type="button" title="Visualizza Record"
+                        <tr class="selectable-row" style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 <a class="tab-link" title="Visualizza" style=""
                                    href="{{ url_for(buyer_history, _id=row.id) }}">
                                     {{ row.id|e }}
@@ -160,7 +160,7 @@
                                     {{ row.id|e }}
                                 </a>
                             </td>
-                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz; font-size: 0.2rem;">
                                 {{ row.event|e }}
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
@@ -218,6 +218,10 @@
             }
         });
     });
+
+
+
+
 
 
 

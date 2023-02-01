@@ -1,42 +1,28 @@
-"""
-	In ambiente Linux per funzionare c'è bisogno che queste utilities siano installate:
-	apt-get install -y apt-utils --no-install-recommends
-	apt-get install -y dialog
-	apt-get install -y libreoffice --no-install-recommends
-	apt-get install python3-uno
-	apt-get install -y default-jre
-	apt-get install -y unoconv
-"""
-
 import base64
 import os
-import platform
-import shutil
-import subprocess as subp
-from subprocess import call
 
+import pdfkit
 import qrcode
-from docx import Document  # noqa
-from docx.shared import Inches  # noqa
-from docxtpl import DocxTemplate
+from flask import current_app as app, render_template
+
+from .functions import token_admin_validate
+from ..app import PATH_PROJECT as _path
 
 # imposta path file's models docx (Windows)
-path_docx = os.path.dirname(os.path.realpath(__file__))
-folders_models_docx = os.path.join(path_docx, "certificates_models_docx")
+folders_models_docx = os.path.join(_path, "utilitys", "certificates_models_docx")
 
 # imposta path file's models .odt (Linux)
-path_odt = os.path.dirname(os.path.realpath(__file__))
-folders_models_odt = os.path.join(path_odt, "certificates_models_odt")
+folders_models_odt = os.path.join(_path, "utilitys", "certificates_models_odt")
 
-# imposta path work
-folder_work = os.path.join(path_docx, "certificates_work")
-if not os.path.exists(folder_work):
-	os.makedirs(folder_work)
+# imposta path qrcode
+folder_temp_qrcode = os.path.join(_path, "static", "qrcode_temp")
+if not os.path.exists(folder_temp_qrcode):
+	os.makedirs(folder_temp_qrcode)
 
 # imposta path temp file
-folder_temp = os.path.join(path_docx, "temp_pdf")
-if not os.path.exists(folder_temp):
-	os.makedirs(folder_temp)
+folder_temp_pdf = os.path.join(_path, "utilitys", "temp_pdf")
+if not os.path.exists(folder_temp_pdf):
+	os.makedirs(folder_temp_pdf)
 
 
 def generate_qr_code(_str):
@@ -53,9 +39,9 @@ def generate_qr_code(_str):
 		img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
 		# print("")
 		# print(img)
-		img.save(os.path.join(folder_work, _str.replace("/", "_") + ".jpg"))
+		img.save(os.path.join(folder_temp_qrcode, _str.replace("/", "_") + ".jpg"))
 		# print("QR-Code Generated")
-		return _str
+		return _str.replace("/", "_") + ".jpg"
 	except Exception as err:
 		print(err)
 		return False
@@ -64,226 +50,76 @@ def generate_qr_code(_str):
 def byte_to_pdf(byte, f_name):
 	"""Ricrea il pdf da una stringa in byte."""
 	# svuoto la cartella da file vecchio
-	for filename in os.listdir(folder_temp):
-		file_path = os.path.join(folder_temp, filename)
+	for filename in os.listdir(folder_temp_pdf):
+		file_path = os.path.join(folder_temp_pdf, filename)
 		os.remove(file_path)
 
-	path_file = os.path.join(folder_temp, f_name.replace("/", "_") + ".pdf")
+	path_file = os.path.join(folder_temp_pdf, f_name.replace("/", "_") + ".pdf")
 	# print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
 	with open(path_file, "wb") as f:
 		f.write(byte)
 	return path_file
 
 
-def docx_to_pdf(target):
-	"""Converte file Word in pdf."""
-	try:
-		from comtypes import client
-		word = client.CreateObject('Word.Application')
-	except ImportError as err:
-		print(err)
-		return False
-
-	doc = word.Documents.Open(target)
-	outFile = target.replace("docx", "pdf")
-	# print("PDF_PATH:", outFile)
-	# print("")
-	try:
-		doc.ExportAsFixedFormat(
-			OutputFileName=outFile,
-			ExportFormat=17,  # 17 = PDF output, 18=XPS output
-			OpenAfterExport=False,
-			OptimizeFor=0,  # 0=Print (higher res), 1=Screen (lower res)
-			CreateBookmarks=1,  # 0=No bookmarks, 1=Heading bookmarks only, 2=bookmarks match word bookmarks
-			DocStructureTags=False
-		)
-		doc.Close()
-		os.remove(target)
-		print("SUCCESSFULLY_CONVERTED")
-		return outFile
-	except Exception as err:
-		os.remove(target)
-		print("ERROR_CONVERT:", err)
-		return False
-
-
-def odt_to_pdf(target):
-	"""Converte file LibreOffice in pdf."""
-	try:
-		outPath = target.replace("odt", "pdf").split("/")
-		outPath = os.path.join(folder_temp, outPath[len(outPath) - 1])
-		print("OUT_NAME:", outPath)
-		call(["libreoffice", "--headless", "--convert-to", "pdf", target, "--outdir", folder_temp])
-		print("SUCCESSFULLY_CONVERTED")
-		os.remove(target)
-		print("OUT_FILE:", outPath)
-		return outPath
-	except Exception as err:
-		print("ERROR_CONVERT:", err)
-		return False
-
-
-def insert_qrcode(target, _str):
-	"""Inserisce QR-Code dopo marker in file."""
-	try:
-		_jpg = os.path.join(folder_work, _str.replace("/", "_") + ".jpg")
-		document = Document(target)
-		for para in document.paragraphs:
-			if '{{QRCode}}' in para.text:
-				# print("PARA_TEXT:", para.text)
-				# create a new run (a new line of text)
-				run = para.add_run()
-				# insert the image
-				run.add_picture(_jpg, width=Inches(1.1), height=Inches(1.1))
-				os.remove(_jpg)
-		# save the modified docx file
-		document.save(target)
-		return True
-	except Exception as err:
-		print("ERRORE_INSERIMENTO_QRCOD:", err)
-		return False
-
-
-def insert_qrcode_linux(target, _str):
-	"""Inserisce QR-Code dopo marker in file odt."""
-	try:
-		_jpg = os.path.join(folder_work, _str.replace("/", "_") + ".jpg")
-		# print("QRCODE_FIND")
-
-		# Read the file into a string variable
-		with open(target, "r", encoding="ISO-8859-1") as model:
-			content = model.read()
-		# print("CONTENT_READ")
-
-		# Replace the marker with the image content
-		img = f'<p><img src={_jpg} alt="QRCode"></p>'
-		content = content.replace("{{QRCode}}", img)
-		# print("CONTENT_REPLACED")
-
-		# Write the updated content back to the file
-		with open(target, "w") as model:
-			model.write(content)
-		# print("SAVED")
-		return True
-	except Exception as err:
-		print("ERRORE_INSERIMENTO_QRCOD:", err)
-		return False
-
-
 def pdf_to_byte(_pdf):
 	"""Converte pdf in byte string."""
-	with open(_pdf, "rb") as f:
-		b_string = str(base64.b64encode(f.read()), 'utf-8')
-		# print(enc_string[100], type(enc_string))
-		# converto in string utf-8 per caricare su db
-		b_string = base64.b64decode(b_string)
-	os.remove(_pdf)
-	return b_string
-
-
-def insert_data(target, data):
-	"""Inserisce dati in file sostituendo i markers."""
 	try:
-		print("TARGET:", target, "data:", data)
-		tpl = DocxTemplate(target)  # leggi il template word
-		tpl.render(data)
-		# save the modified docx file
-		tpl.save(target)
-		return True
-	except Exception as err:
-		print("ERRORE_INSERMENTO_DATI_IN_FILE:", err)
-		return False
-
-
-def insert_data_linux(target, data):
-	"""Inserisce dati in file sostituendo i markers."""
-	try:
-		# print("TARGET:", target, "data:", data)
-		# Convert the ODT file to plain text
-		p = subp.run(["unoconv", "-f", "txt", target], capture_output=True, text=True)
-		text = p.stdout
-		print("READED:", str(text))
-		# Loop through the paragraphs and replace markers
-		for marker, replacement in data.items():
-			text = text.replace("{%s}" % str(marker), str(replacement))
-		print("REPLACED:", text)
-		# Save the modified plain text to a temporary file
-		with open("modified.txt", "w") as f:
-			f.write(text)
-		# Convert the modified plain text back to ODT format
-		subp.run(["unoconv", "-f", "odt", "-o", target, "modified.txt"])
-		print("SUBSTITUTED:", target)
-		return True
-	except Exception as err:
-		print("ERRORE_INSERMENTO_DATI_IN_FILE:", err)
-		return False
-
-
-def create_b_certificate_docx(data, _file, _str):
-	"""Legge il modello dal file word e sostituisce le chiavi."""
-	# copio il modello e lo salvo nella cartella di lavoro
-	_name = data["certificate_nr"].replace("/", "_") + ".docx"
-	target = os.path.join(folder_work, _name)
-	source = os.path.join(folders_models_docx, _file)
-	shutil.copy(source, target)
-	# inserisce QR_code
-	if insert_qrcode(target, _str):
-		# inserisce dati nel modello
-		if insert_data(target, data):
-			# convert docx to pdf
-			_pdf = docx_to_pdf(target)
-			# convert pdf to byte
-			if _pdf is not False:
-				return pdf_to_byte(_pdf)
-	else:
-		return False
-
-
-def create_b_certificate_odt(data, _file, _str):
-	"""Legge il modello dal file LibreOffice e sostituisce le chiavi."""
-	# copio il modello e lo salvo nella cartella di lavoro
-	_name = data["certificate_nr"].replace("/", "_") + ".odt"
-	target = os.path.join(folder_work, _name)
-	source = os.path.join(folders_models_odt, _file)
-	shutil.copy(source, target)
-	# inserisce QR_code
-	try:
-		if insert_qrcode_linux(target, _str):
-			# inserisce dati nel modello
-			if insert_data_linux(target, data):
-				# convert odt to pdf
-				_pdf = odt_to_pdf(target)
-				# convert pdf to byte
-				if _pdf is not False:
-					return pdf_to_byte(_pdf)
-		else:
-			return False
-	except Exception as err:
+		with open(_pdf, "rb") as f:
+			b_string = str(base64.b64encode(f.read()), 'utf-8')
+			b_string = base64.b64decode(b_string)
+		os.remove(_pdf)
+		return b_string
+	except FileNotFoundError as err:
 		print(err)
 		return False
 
 
-def create_pdf_certificate(buyer_type, _data, str_qr):
-	if buyer_type == "Ristorante":
-		if "Windows" in platform.platform():
-			model_name = "certificato_ristoranti.docx"
-			pdf_str = create_b_certificate_docx(_data, model_name, str_qr)
-		elif "Linux" in platform.platform():
-			model_name = "certificato_ristoranti.odt"
-			pdf_str = create_b_certificate_odt(_data, model_name, str_qr)
-		else:
-			print("PIATTAFORMA_NON_RICONOSCIUTA")
-			return False
-	else:
-		if "Windows" in platform.platform():
-			model_name = "certificato_macellerie.docx"
-			pdf_str = create_b_certificate_docx(_data, model_name, str_qr)
-		elif "Linux" in platform.platform():
-			print("PLATFORM:", str(platform.platform()))
-			model_name = "certificato_macellerie.odt"
-			pdf_str = create_b_certificate_odt(_data, model_name, str_qr)
-		else:
-			print("PIATTAFORMA_NON_RICONOSCIUTA")
-			return False
+@app.route("/cert_cons/<template>/<form>/<qrcode>/", methods=["GET", "POST"])
+@token_admin_validate
+def html_to_pdf(template, form, _qrcode):
+	"""Genera pdf da template html."""
+	_img = os.path.join(_path, "static", "qrcode_temp", _qrcode)
+	logo = os.path.join(_path, "static", "Logo.png")
+	# print("PATH_QRCODE:", _img)
 
-	return pdf_str
+	# PDF options
+	options = {
+		"orientation": "portrait",
+		"page-size": "A4",
+		"margin-top": "0cm",
+		"margin-right": "0cm",
+		"margin-bottom": "0cm",
+		"margin-left": "0cm",
+		"encoding": "UTF-8",
+		"enable-local-file-access": ""
+	}
+
+	try:
+		# Build PDF from HTML
+		_file = os.path.join(folder_temp_pdf, "report.pdf")
+		# print("PATH_PDF_FILE:", _file)
+		html = render_template(template, form=form, qrcode=_img, logo=logo)
+		# print("HTML:", html)
+
+		_html = os.path.join(folder_temp_pdf, "temp.html")
+
+		with open(_html, 'w') as f:
+			f.write(html)
+
+		_pdf = pdfkit.from_file(_html, False, options=options)
+
+		with open(_file, "wb") as f:
+			f.write(_pdf)
+
+		print("PDF_GENERATED:", _file)
+
+		# rimuovo il qrcode
+		for f in os.listdir(folder_temp_qrcode):
+			_f = os.path.join(folder_temp_qrcode, f)
+			# print("QRCODE_REMOVE:", _f)
+			os.remove(_f)
+
+		return _file
+	except Exception as err:
+		print("ERRORE_CREAZIONE_PDF_DA_HTML:", err)
+		return False

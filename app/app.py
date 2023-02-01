@@ -1,3 +1,4 @@
+import os
 import secrets
 
 from flask import Flask, session  # noqa
@@ -7,6 +8,8 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
+
+PATH_PROJECT = os.path.dirname(os.path.realpath(__file__))
 
 app = Flask(__name__, instance_relative_config=False)
 app.config.from_object(Config)

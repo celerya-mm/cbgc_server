@@ -72,22 +72,22 @@ class FormCertConsCreate(FlaskForm):
 	"""Form inserimento dati Certificato Consorzio."""
 	certificate_id = IntegerField('ID', validators=[DataRequired("Campo obbligatorio!")], default=calc_id())
 
-	certificate_var = StringField('Integrazione ID', validators=[Length(max=10), Optional()])
+	certificate_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
 	certificate_date = DateField(
-		'Data Certificato', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d', default=datetime.now()
+		'Data', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d', default=datetime.now()
 	)
 	certificate_year = IntegerField('Anno', validators=[DataRequired("Campo obbligatorio!")], default=year_cert_calc())
 
 	emitted = SelectField("Emesso", choices=["SI", "NO"], default="NO")
 
-	cockade_id = IntegerField('ID Coccarda', validators=[Optional()], default=calc_id())
-	cockade_var = StringField('Int. ID Cocc.', validators=[Length(max=10), Optional()])
+	cockade_id = IntegerField('ID Cocc.', validators=[Optional()], default=calc_id())
+	cockade_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
 
 	sale_type = SelectField(
 		"Tipo Vendita", validators=[DataRequired("Campo obbligatorio!")],
 		choices=["Capo intero", "Mezzena", "Parti Anatomiche", "Altro", ""], default="Mezzena"
 	)
-	sale_quantity = FloatField("Quantità Venduta (kg)", validators=[Optional()])
+	sale_quantity = FloatField("Quantità (kg)", validators=[Optional()])
 
 	head_category = SelectField(
 		'Categoria', choices=["Bue", "Manzo"], validators=[Length(max=10), Optional()], default="Bue"

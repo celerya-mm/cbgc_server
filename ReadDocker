@@ -8,10 +8,11 @@ pywin32==305
 
 # Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
 # docker classico
-docker build --force-rm --progres:tty -t cbgc:latest .
+docker build --force-rm -t cbgc:latest .
+docker build --force-rm -t nginx:latest .
 
 # docker-compose (da file docker-compose.yml)
-docker-compose build --progres:tty
+docker-compose build --force-rm --pull
 
 # Verificare l'immagine creata
 docker image ls
