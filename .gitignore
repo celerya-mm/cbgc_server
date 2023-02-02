@@ -119,9 +119,9 @@ flask_session
 to_do.md
 develop.env
 nginx/letsencrypt
-nginx/letsencrypt/
-utilitys/temp_pdf/
-
+app/utilitys/temp_pdf
+app/utilitys/temp_pdf/*
+nginx/letsencrypt/*
 
 # Spyder project settings
 .spyderproject

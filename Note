@@ -26,3 +26,11 @@ docker images
 
 # run container
 docker-compose run -ti "IMAGE ID" bash
+
+
+# scheduler backup on linux
+ssh user@ip
+crontab -e
+
+# sostituire asterischi in base a quando eseguire lo script
+* * * * * /path/to/backup_script.sh

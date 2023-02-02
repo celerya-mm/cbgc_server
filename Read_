@@ -11,6 +11,7 @@ docker image ls
 
 # Lanciare il docker usando l'immagine appena creata
 docker run -d -p 8000:5000 --name cbgc-service --restart=always cbgc:latest
+docker run -d -p 80:80 -p 62233:62233 --name reverse-proxy --restart=always nginx:latest
 
 # Rimuovere immagini non utilizzate
 docker image ls -f dangling=true
@@ -26,7 +27,7 @@ docker-compose up -d --build
 ### Nginx setup ssl certificate (
 # salire sul container
 docker exec -it <id_container o nome > bash
-docker exec -it reverse_proxy bash
+docker exec -it reverse-proxy bash
 
 # richieder certificato tramite "certbot" a Let' Encrypt (assicurarsi porta 80 reindirizza al docker nginx)
 certbot --nginx -d cbgc.celerya.com -d cbgc.celerya.com
