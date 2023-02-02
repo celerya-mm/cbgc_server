@@ -39,7 +39,7 @@ services:
       - static_volume:/home/app/src/app/static/
     ports:
       - "80:80"
-      - "62235:62235"
+      - "62233:62233"
     depends_on:
       - app
     healthcheck:
