@@ -2,17 +2,24 @@ import os
 import secrets  # noqa
 
 from flask import Flask, session  # noqa
-from flask_mail import Mail, Message
+from flask_mail import Mail, Message  # noqa
 from flask_migrate import Migrate
 from flask_misaka import Misaka
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
 
 PATH_PROJECT = os.path.dirname(os.path.realpath(__file__))
 
 app = Flask(__name__, instance_relative_config=False)
+
+# imposto app dietro reverse proxy
+app.wsgi_app = ProxyFix(app.wsgi_app)
+
+# carico parametri configurazione
 app.config.from_object(Config)
 
 # secret = secrets.token_urlsafe(32)

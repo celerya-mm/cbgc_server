@@ -5,7 +5,7 @@ from functools import wraps
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
-from flask import flash, url_for, redirect, session
+from flask import flash, url_for, redirect
 from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
@@ -226,7 +226,7 @@ def dict_group_by(_dict, group_d, group_f=None, year=False):  # group_d deve ess
 	df = pd.DataFrame.from_records(_dict)
 	# print("LENN_DF:", len(df))
 	if year:
-		# filtra DF al massimo 5 anni indietro
+		# filtra DF al massimo cinque anni indietro
 		current_year = datetime.now().year
 		past_year = current_year - 5
 		# print(current_year, past_year)

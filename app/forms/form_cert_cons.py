@@ -76,7 +76,8 @@ class FormCertConsCreate(FlaskForm):
 	certificate_date = DateField(
 		'Data', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d', default=datetime.now()
 	)
-	certificate_year = IntegerField('Anno', validators=[DataRequired("Campo obbligatorio!")], default=year_cert_calc())
+	certificate_year = IntegerField('Anno', validators=[DataRequired("Campo obbligatorio!")],
+	                                default=year_cert_calc())
 
 	emitted = SelectField("Emesso", choices=["SI", "NO"], default="NO")
 

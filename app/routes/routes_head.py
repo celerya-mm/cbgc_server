@@ -37,6 +37,7 @@ def head_view():
 
 	_list = Head.query.all()
 	_list = [r.to_dict() for r in _list]
+	print("LIST_HEAD:", json.dumps(_list[:5], indent=2))
 
 	# raggruppa per anno di nascita
 	group_birth = dict_group_by(_list, "birth_year", year=True)
@@ -190,7 +191,6 @@ def head_update(_id):
 		new_data["note"] = not_empty(new_data["note"])
 
 		new_data["birth_year"] = year_extract(new_data["birth_date"])
-		new_data["castration_year"] = year_extract(new_data["castration_date"])
 		new_data["castration_compliance"] = verify_castration(new_data["birth_date"], new_data["castration_date"])
 		new_data["sale_year"] = year_extract(new_data["sale_date"])
 

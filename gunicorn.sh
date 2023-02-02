@@ -1,2 +1,3 @@
 #!/bin/sh
-gunicorn --chdir . wsgi:app -w 2 --threads 4 -b 0.0.0.0:5000
+#echo Starting app...
+gunicorn -w 2 --threads 2 --log-config gunicorn/gunicorn_logging.conf -b 0.0.0.0:5000 --reload wsgi:app

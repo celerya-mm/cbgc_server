@@ -7,16 +7,15 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y bash
 RUN apt-get install -y vim
 
+# manager certificate SSL
+RUN apt-get install -y certbot python3-certbot-nginx cron
+
 # Add nginx.config to container
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Add default.conf to container
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Add proxy_params.conf to container
-COPY proxy_params.conf /etc/nginx/proxy_params.conf
+# abilito il rinnovo automatico del certificato
+RUN echo "0 12 * * * /usr/bin/certbot renew --quiet" | crontab -
 
-# set workdir
-#WORKDIR /etc/nginx
-#
-#CMD ["nginx", "-g", "daemon off;"]

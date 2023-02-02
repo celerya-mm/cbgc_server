@@ -1,5 +1,4 @@
 # Start with Debian Python 3.11 base image
-
 FROM python:3.11-bullseye
 
 MAINTAINER Marco Mazzini <mazzini@celerya.com>
@@ -9,7 +8,7 @@ RUN pip install pipenv
 
 # Update environment
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get clean && apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends gcc
+RUN apt-get clean && apt-get update && apt-get upgrade -y && apt-get install -y
 
 # Show stdout and stderr outputs instantly without buffering
 ENV PYTHONDONTWRITEBYTECODE 1

@@ -252,18 +252,24 @@ def reset_psw_user(_id):
 
 	# imposto link
 	_link = f"{Config.LINK_URL}:5000/reset_psw_user_token/{_token}/"
-	print("LINK:", _link)
+	_link = _link.replace("/:", ":")
+	# print("LINK:", _link)
 
 	try:
 		# imposto e invio la mail con il link per il reset
-		msg = Message('Hello from the other side!', sender="service@celerya.com", recipients=[_mail])
-		msg.body = f"Hey Marco, sending you this email from my Flask app, if it works.\n" \
-		           f"And this is the link for reset your password: \n{_link}\n" \
-		           f"The link expiry in 15  min."
+		msg = Message(
+			'Follow your request for change password in Consorzio Bue Grasso service.',
+			sender="service@celerya.com",
+			recipients=[_mail]
+		)
+		msg.body = f"This is the link for reset your password: \n{_link}\n" \
+		           f"The link expiry in 15 min."
 		mail.send(msg)
-		return "Message sent!"
+		flash("Richiesta reset password inviata correttamente.")
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	except Exception as err:
-		return f"Message don't sent: {str(err)}"
+		flash(f"Richiesta reset password NON inviata: {err}.")
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 
 
 @app.route('/reset_psw_user_token/<_token>/')
@@ -275,4 +281,4 @@ def reset_psw_user_token(_token):
 	else:
 		db.session.close()
 		_id = _token.user_id
-		return redirect(url_for(RESET_PSW_FOR, _id=_id))
+		return redirect(url_for(RESET_PSW_FOR, _id=_id, check=False))

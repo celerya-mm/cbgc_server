@@ -152,6 +152,7 @@ def event_view_history(_id):
 	# print("DATA:", json.dumps(_event, indent=2), "TYPE:", type(_event))
 
 	_event = json.loads(json.dumps(_event))
+	print("EVENT:", json.dumps(_event, indent=2))
 
 	db.session.close()
 	return render_template(
