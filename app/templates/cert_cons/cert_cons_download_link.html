@@ -3,10 +3,12 @@
 {% block content %}
 <div class="container text-center mt-5">
     <div class="row no-gutters justify-content-center">
-        <h2>Download certificato nr: [ {{ cert_nr }} ]</h2>
+        <h2>Download certificato nr:</h2>
+        <h2>[ {{ cert_nr }} ]</h2>
+        <br>
         <a class="btn btn-update" type="button" title="Download"
            href="{{ url_for(func, _link=cert_nr) }}">
-            <img class="icon-simple" src="{{ url_for('static', filename='icons/save.svg') }}" alt=""/>
+            <img class="icon-simple" src="{{ url_for('static', filename='icons/download.svg') }}" alt=""/>
         </a>
     </div>
     <div class="row no-gutters justify-content-center">

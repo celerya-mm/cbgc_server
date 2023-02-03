@@ -8,6 +8,5 @@ migrations
 flask_session
 docker-compose.yml
 Note
-Read_
+Read_for_build_docker
 README.md
-run_docker.sh
