@@ -3,7 +3,7 @@ import json
 from flask import current_app as app, flash, redirect, render_template, url_for, request, send_file
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
+from ..app import db, session, Config
 from ..forms.form_cert_cons import FormCertConsCreate, FormCertConsUpdate
 from ..models.buyers import Buyer
 from ..models.certificates_cons import CertificateCons, mount_code, year_cert_calc_update
@@ -35,6 +35,13 @@ GENERATE_FOR = "cert_cons_generate"
 
 DOWNLOAD = "/cert_cons/download/<_id>"
 DOWNLOAD_FOR = "cert_cons_download"
+
+DOWNLOAD_LINK = "/cert_cons/download_link/<_link>/"
+DOWNLOAD_LINK_FOR = "cert_cons_download_link"
+DOWNLOAD_LINK_HTML = "cert_cons/cert_cons_download_link.html"
+
+SAVE = "/cert_cons/save/<_link>/"
+SAVE_FOR = "cert_cons_download_save"
 
 
 @app.route(VIEW, methods=["GET", "POST"])
@@ -378,8 +385,12 @@ def cert_cons_generate(_id):
 
 	cert = CertificateCons.query.get(int(_id))
 	# genero QR-Code
-	str_qr = f"109-CERT-{cert.certificate_nr}"
-	img_qrc = generate_qr_code(str_qr)
+	# str_qr = f"109-CERT-{cert.certificate_nr}"
+	nr_cert = cert.certificate_nr.replace("/", "_")
+	str_qr = f"{Config.LINK_URL}:62233/cert_cons/download_link/{nr_cert}"
+	print("LINK_CERTIFICATO:", str_qr)
+
+	img_qrc = generate_qr_code(str_qr, nr_cert)
 	if img_qrc:
 		previous_data = cert.to_dict()  # salvo dati per creare evento record.
 		previous_data.pop("updated_at")
@@ -489,3 +500,25 @@ def cert_cons_download(_id):
 		return send_file(_pdf, as_attachment=True)
 	else:
 		return redirect(url_for(HISTORY_FOR, _id=_id))
+
+
+@app.route(DOWNLOAD_LINK, methods=["GET", "POST"])
+def cert_cons_download_link(_link):
+	return render_template(DOWNLOAD_LINK_HTML, cert_nr=_link, func=SAVE_FOR)
+
+
+@app.route(SAVE, methods=["GET", "POST"])
+def cert_cons_download_save(_link):
+	_link = _link.replace("_", "/")
+	try:
+		cert = db.session.query(CertificateCons).filter_by(certificate_nr=_link).first()
+		print("LINK", _link)
+		_pdf = byte_to_pdf(cert.certificate_pdf, cert.certificate_nr)
+		print("PDF_GENERATO")
+		flash(f"Certificato Consorzio Bue Grasso di Carrù nr {_link} scaricato.")
+		return send_file(_pdf, as_attachment=True)
+	except Exception as err:
+		print("PDF_NON_GENERATO:", err)
+		_link = _link.replace("/", "_")
+		flash(f"Certificato Consorzio Bue Grasso di Carrù nr {_link} non trovato.")
+		return render_template(DOWNLOAD_LINK_HTML, cert_nr=_link, func=SAVE_FOR)

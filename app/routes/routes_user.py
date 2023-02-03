@@ -251,7 +251,7 @@ def reset_psw_user(_id):
 	db.session.close()
 
 	# imposto link
-	_link = f"{Config.LINK_URL}:5000/reset_psw_user_token/{_token}/"
+	_link = f"{Config.LINK_URL}:62233/reset_psw_user_token/{_token}/"
 	_link = _link.replace("/:", ":")
 	# print("LINK:", _link)
 

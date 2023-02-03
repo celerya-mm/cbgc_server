@@ -25,7 +25,7 @@ if not os.path.exists(folder_temp_pdf):
 	os.makedirs(folder_temp_pdf)
 
 
-def generate_qr_code(_str):
+def generate_qr_code(_str, nr_cert):
 	"""Genera un QR-Code da una stringa."""
 	try:
 		qr = qrcode.QRCode(
@@ -34,14 +34,14 @@ def generate_qr_code(_str):
 			box_size=10,
 			border=1,
 		)
-		qr.add_data(_str.replace("/", "_"))
+		qr.add_data(_str)
 		qr.make(fit=True)
 		img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
 		# print("")
 		# print(img)
-		img.save(os.path.join(folder_temp_qrcode, _str.replace("/", "_") + ".jpg"))
+		img.save(os.path.join(folder_temp_qrcode, nr_cert + ".jpg"))
 		# print("QR-Code Generated")
-		return _str.replace("/", "_") + ".jpg"
+		return nr_cert + ".jpg"
 	except Exception as err:
 		print(err)
 		return False
