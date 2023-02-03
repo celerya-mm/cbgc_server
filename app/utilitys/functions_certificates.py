@@ -30,8 +30,8 @@ def generate_qr_code(_str, nr_cert):
 	try:
 		qr = qrcode.QRCode(
 			version=1,
-			error_correction=qrcode.constants.ERROR_CORRECT_H,
-			box_size=10,
+			error_correction=qrcode.constants.ERROR_CORRECT_Q,
+			box_size=15,
 			border=1,
 		)
 		qr.add_data(_str)

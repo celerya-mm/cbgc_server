@@ -3,6 +3,8 @@
 # Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
 
 ### docker classico
+cd Multimedia/05_Documenti/Flask/cbgc_server
+
 docker build --force-rm -t cbgc:latest .
 docker build --force-rm -t nginx:latest .
 

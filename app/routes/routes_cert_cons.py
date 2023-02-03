@@ -387,7 +387,7 @@ def cert_cons_generate(_id):
 	# genero QR-Code
 	# str_qr = f"109-CERT-{cert.certificate_nr}"
 	nr_cert = cert.certificate_nr.replace("/", "_")
-	str_qr = f"{Config.LINK_URL}:62233/cert_cons/download_link/{nr_cert}"
+	str_qr = f"{Config.LINK_URL}:62233/cert_cons/download_link/{nr_cert}/"
 	print("LINK_CERTIFICATO:", str_qr)
 
 	img_qrc = generate_qr_code(str_qr, nr_cert)
