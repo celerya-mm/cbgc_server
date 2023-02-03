@@ -105,25 +105,18 @@ celerybeat.pid
 .env
 .venv
 .flaskenv
-.idea/
 .idea
+.gitignore
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 migrations
-migrations/
-flask_session/
-/flask_session
+flask_session
 to_do.md
 develop.env
-/nginx/letsencrypt
-/nginx/letsencrypt/
-/app/utilitys/temp_pdf
-/app/utilitys/temp_pdf/
-
-./app/utilitys/temp_pdf/
+app/utilitys/temp_pdf
 
 
 # Spyder project settings
