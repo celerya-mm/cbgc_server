@@ -10,17 +10,37 @@
                        href="{{ url_for(create) }}">
                         <img class="icon-simple" src="{{ url_for('static', filename='icons/person_add.svg') }}" alt=""/>
                     </a>
-                    Elenco ALLEVATORI Consorzio:</h2>
+                    Elenco ALLEVATORI Consorzio:
+                </h2>
+                <div class="accordion" id="head_accordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="1">
+                            <button class="accordion-button" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse"
+                                    aria-expanded="true"
+                                    aria-controls="collapse">
+                                Mappa
+                            </button>
+                        </h2>
+                        <div id="collapse" class="accordion-collapse collapse"
+                             aria-labelledby="heading"
+                             data-bs-parent="#accordion">
+                            <iframe class="map" src="/map_farmer" style="width: 100%; height: 425px;"></iframe>
+                        </div>
+                    </div>
+                </div>
                 <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title text-center" id="h1">ID</th>
-                            <th class="title" id="h3">Aff.</th>
-                            <th class="title text-start" id="h4">Rag. Sociale</th>
-                            <th class="title text-start" id="h5">Email</th>
-                            <th class="title text-center" id="h6">Phone</th>
-                            <th class="title text-start" id="h7">Indirizzo</th>
+                            <th class="title" id="h2">Aff.</th>
+                            <th class="title text-start" id="h3">Rag. Sociale</th>
+                            <th class="title text-start" id="h4">Email</th>
+                            <th class="title text-center" id="h5">Phone</th>
+                            <th class="title text-start" id="h6">Indirizzo</th>
+                            <th class="title text-start" id="h7">Coord</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -63,6 +83,9 @@
                                 </a>
                                 {% endif %}
                                 {{ row.full_address|e }}
+                            </td>
+                            <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.coordinates|e }}
                             </td>
                         </tr>
                         {% endfor %}

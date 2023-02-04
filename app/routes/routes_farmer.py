@@ -1,6 +1,7 @@
 import json
+import re
 from datetime import datetime
-
+import folium
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
@@ -27,12 +28,68 @@ UPDATE_FOR = "farmer_update"
 UPDATE_HTML = "farmer/farmer_update.html"
 
 
+def create_map(_list):
+	"""Crea una mappa dalla base dati."""
+	m = folium.Map(location=[44.48, 7.87], zoom_start=10, name="Mappa acquirenti Consorzio", tiles='Stamen Terrain')
+	for record in _list:
+		if record.coordinates and len(record.coordinates) > 5:
+			if record.affiliation_status is False or record.affiliation_status in ["NO", "no"]:
+				color = "red"  # rosso (macellerie)
+				icon = "dollar"
+			elif record.affiliation_status is True or record.affiliation_status in ["SI", "si"]:
+				color = "green"  # blue (ristorante)
+				icon = "dollar"
+			else:
+				color = "grey"  # grigio (manca il tipo)
+				icon = "info-sign"
+			coordinates = record.coordinates.split(", ")
+			# print("COORDINATES:", coordinates)
+			lat = re.findall(r'\d+\.\d+', coordinates[0].replace("(", ""))
+			# print("LAT", lat)
+			lat = float(lat[0])
+
+			long = re.findall(r'\d+\.\d+', coordinates[1].replace(")", ""))
+			# print("LONG:", long)
+			long = float(long[0])
+
+			html = "<style> " \
+			       "h1 {font-size: 14px; color: #2B4692} " \
+			       "p {font-size: 10px; margin: 5px} " \
+			       "</style>" \
+			       f"<h1>{record.stable_type}</h1>" \
+			       f"<p><strong>Nome:</strong> {record.farmer_name}</p>" \
+			       f"<p><strong>Indirizzo:</strong> {record.full_address}</p>" \
+			       f"<p><strong>Telefono:</strong> {record.phone}</p>"
+
+			iframe = folium.IFrame(html=html, width=300, height=100, ratio=0.2)
+			popup = folium.Popup(iframe, max_width=300)
+
+			tooltip = "Clicca!"
+
+			folium.Marker(
+				location=[lat, long], popup=popup, tooltip=tooltip, icon_size=(20, 20),
+				icon=folium.Icon(color=color, prefix="fa", icon=icon)
+			).add_to(m)
+
+	return m._repr_html_()  # noqa
+
+
+@app.route("/map_farmer")
+def map_farmer():  # noqa
+	return render_template("map.html")
+
+
 @app.route(VIEW, methods=["GET", "POST"])
 @token_admin_validate
 def farmer_view():
 	"""Visualizzo informazioni Allevatori."""
 	# Estraggo la lista degli allevatori
 	_list = Farmer.query.all()
+
+	m = create_map(_list)
+	with open("./app/templates/map.html", "wb") as f:
+		f.write(m.encode('utf-8'))
+
 	_list = [r.to_dict() for r in _list]
 
 	for _dict in _list:

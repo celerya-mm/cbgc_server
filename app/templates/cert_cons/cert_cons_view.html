@@ -8,26 +8,46 @@
                 <h2 class="card-title" style="padding: 20px;">
                     Elenco CERTIFICATI Consorzio:</h2>
                 <!-- VISUALIZZO I GRAFICI -->
-                <div class="row no-gutters justify-content-center">
-                    <!-- GRAFICO PER ANNI -->
-                    <div class="col-md-4 order-first">
-                        <div class="card chart-container">
-                            <canvas id="chart_years"></canvas>
-                        </div>
-                    </div>
-                    <!-- GRAFICO PER ALLEVATORI -->
-                    <div class="col-md-4 order-second">
-                        <div class="card chart-container">
-                            <canvas id="chart_farmers"></canvas>
-                        </div>
-                    </div>
-                    <!-- GRAFICO PER ACQUIRENTI -->
-                    <div class="col-md-4 order-third">
-                        <div class="card chart-container">
-                            <canvas id="chart_buyers"></canvas>
+                <div class="accordion" id="head_accordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="1">
+                            <button class="accordion-button" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#collapse"
+                                    aria-expanded="true"
+                                    aria-controls="collapse">
+                                Grafici
+                            </button>
+                        </h2>
+                        <div id="collapse" class="accordion-collapse collapse"
+                             aria-labelledby="heading"
+                             data-bs-parent="#accordion">
+                            <br>
+                            <div class="row no-gutters justify-content-center">
+                                <!-- GRAFICO PER ANNI -->
+                                <div class="col-md-4 order-first" style="padding-left:15px">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_years"></canvas>
+                                    </div>
+                                </div>
+                                <!-- GRAFICO PER ALLEVATORI -->
+                                <div class="col-md-4 order-second">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_farmers"></canvas>
+                                    </div>
+                                </div>
+                                <!-- GRAFICO PER ACQUIRENTI -->
+                                <div class="col-md-4 order-third" style="padding-right:15px">
+                                    <div class="card chart-container">
+                                        <canvas id="chart_buyers"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                         </div>
                     </div>
                 </div>
+
                 <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>
@@ -223,9 +243,6 @@
     };
     const ctx2 = document.getElementById('chart_buyers').getContext('2d');
     const myChart2 = new Chart(ctx2, config2);
-
-
-
 
 </script>
 {% endblock %}

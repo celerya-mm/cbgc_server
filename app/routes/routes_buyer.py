@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 import folium
 
-from flask import current_app as app, flash, redirect, render_template, url_for, request, jsonify
+from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
 from ..app import db, session
@@ -33,15 +33,15 @@ UPDATE_HTML = "buyer/buyer_update.html"
 
 def create_map(_list):
 	"""Crea una mappa dalla base dati."""
-	m = folium.Map(location=[44.92, 10.01], zoom_start=6.5, name="Mappa acquirenti Consorzio")
+	m = folium.Map(location=[44.92, 10.01], zoom_start=6.5, name="Mappa acquirenti Consorzio", tiles='Stamen Terrain')
 	for record in _list:
 		if record.coordinates and len(record.coordinates) > 5:
 			if record.buyer_type == "Macelleria":
 				color = "red"  # rosso (macellerie)
-				icon = "app/static/icons/shop-white.png"
+				icon = "shop"
 			elif record.buyer_type == "Ristorante":
 				color = "blue"  # blue (ristorante)
-				icon = "app/static/icons/restaurant-white.png"
+				icon = "cutlery"
 			else:
 				color = "grey"  # grigio (manca il tipo)
 				icon = "info-sign"
@@ -55,15 +55,14 @@ def create_map(_list):
 			# print("LONG:", long)
 			long = float(long[0])
 
-			popup = {"name": record.buyer_name, "address": record.full_address, "phone": record.phone}
 			html = "<style> " \
 			       "h1 {font-size: 14px; color: #2B4692} " \
-			       "p {font-size: 10px;} " \
+			       "p {font-size: 10px; margin: 5px} " \
 			       "</style>" \
 			       f"<h1>{record.buyer_type}</h1>" \
-			       f"<p>Nome: {record.buyer_name}</p>" \
-			       f"<p>Indirizzo: {record.full_address}</p>" \
-			       f"<p>Telefono: {record.phone}</p>"
+			       f"<p><strong>Nome:</strong> {record.buyer_name}</p>" \
+			       f"<p><strong>Indirizzo:</strong> {record.full_address}</p>" \
+			       f"<p><strong>Telefono:</strong> {record.phone}</p>"
 
 			iframe = folium.IFrame(html=html, width=300, height=100, ratio=0.2)
 			popup = folium.Popup(iframe, max_width=300)
@@ -71,13 +70,14 @@ def create_map(_list):
 			tooltip = "Clicca!"
 
 			folium.Marker(
-				location=[lat, long], popup=popup, tooltip=tooltip, icon=folium.Icon(color=color)
+				location=[lat, long], popup=popup, tooltip=tooltip, icon_size=(20, 20),
+				icon=folium.Icon(color=color, prefix='fa', icon=icon)
 			).add_to(m)
-	return m._repr_html_()
+	return m._repr_html_()  # noqa
 
 
 @app.route("/map")
-def map():
+def map():  # noqa
 	return render_template("map.html")
 
 

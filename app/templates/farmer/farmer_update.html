@@ -172,6 +172,17 @@
                 </div>
                 <br>
                 <div class="form-group">
+                    {{ form.coordinates.label }}
+                    {{ form.coordinates(class="form-control") }}
+                    {% if form.coordinates.errors %}
+                    {% for error in form.coordinates.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    <br>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <br>
+                <div class="form-group">
                     {{ form.note.label }}
                     {{ form.note(class="form-control") }}
                     {% if form.note.errors %}
