@@ -23,6 +23,7 @@ class Buyer(db.Model):
 	cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
 	city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	full_address = db.Column(db.String(255), index=False, unique=False, nullable=True)
+	coordinates = db.Column(db.String(100), index=False, unique=False, nullable=True)
 
 	affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
 	affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
@@ -46,7 +47,7 @@ class Buyer(db.Model):
 
 	def __init__(self, buyer_name, buyer_type, email=None, phone=None, address=None, cap=None, city=None,
 	             affiliation_start_date=None, affiliation_status=None, affiliation_end_date=None, user_id=None,
-	             cons_certs=None, events=None, note=None):
+	             cons_certs=None, events=None, coordinates=None, note=None):
 		from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
 		self.buyer_name = buyer_name
@@ -59,6 +60,7 @@ class Buyer(db.Model):
 		self.cap = cap
 		self.city = city
 		self.full_address = address_mount(address, cap, city)
+		self.coordinates = coordinates
 
 		self.affiliation_start_date = str_to_date(affiliation_start_date)
 		self.affiliation_end_date = str_to_date(affiliation_end_date)
@@ -89,6 +91,7 @@ class Buyer(db.Model):
 			'cap': self.cap,
 			'city': self.city,
 			'full_address': self.full_address,
+			'coordinates': self.coordinates,
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date),
 			'affiliation_end_date': date_to_str(self.affiliation_end_date),

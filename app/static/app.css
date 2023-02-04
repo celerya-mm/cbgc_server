@@ -149,6 +149,11 @@ body {
     font-weight: bold;
 }
 
+.folium-map {
+    margin: 0px;
+    padding: 0px;
+}
+
 .footer-text,
 .footer {
     font-size: 0.6rem;

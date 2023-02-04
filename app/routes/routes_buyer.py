@@ -1,7 +1,9 @@
 import json
 from datetime import datetime
+import re
+import folium
 
-from flask import current_app as app, flash, redirect, render_template, url_for, request
+from flask import current_app as app, flash, redirect, render_template, url_for, request, jsonify
 from sqlalchemy.exc import IntegrityError
 
 from ..app import db, session
@@ -29,20 +31,72 @@ UPDATE_FOR = "buyer_update"
 UPDATE_HTML = "buyer/buyer_update.html"
 
 
+def create_map(_list):
+	"""Crea una mappa dalla base dati."""
+	m = folium.Map(location=[44.92, 10.01], zoom_start=6.5, name="Mappa acquirenti Consorzio")
+	for record in _list:
+		if record.coordinates and len(record.coordinates) > 5:
+			if record.buyer_type == "Macelleria":
+				color = "red"  # rosso (macellerie)
+				icon = "app/static/icons/shop-white.png"
+			elif record.buyer_type == "Ristorante":
+				color = "blue"  # blue (ristorante)
+				icon = "app/static/icons/restaurant-white.png"
+			else:
+				color = "grey"  # grigio (manca il tipo)
+				icon = "info-sign"
+			coordinates = record.coordinates.split(", ")
+			# print("COORDINATES:", coordinates)
+			lat = re.findall(r'\d+\.\d+', coordinates[0].replace("(", ""))
+			# print("LAT", lat)
+			lat = float(lat[0])
+
+			long = re.findall(r'\d+\.\d+', coordinates[1].replace(")", ""))
+			# print("LONG:", long)
+			long = float(long[0])
+
+			popup = {"name": record.buyer_name, "address": record.full_address, "phone": record.phone}
+			html = "<style> " \
+			       "h1 {font-size: 14px; color: #2B4692} " \
+			       "p {font-size: 10px;} " \
+			       "</style>" \
+			       f"<h1>{record.buyer_type}</h1>" \
+			       f"<p>Nome: {record.buyer_name}</p>" \
+			       f"<p>Indirizzo: {record.full_address}</p>" \
+			       f"<p>Telefono: {record.phone}</p>"
+
+			iframe = folium.IFrame(html=html, width=300, height=100, ratio=0.2)
+			popup = folium.Popup(iframe, max_width=300)
+
+			tooltip = "Clicca!"
+
+			folium.Marker(
+				location=[lat, long], popup=popup, tooltip=tooltip, icon=folium.Icon(color=color)
+			).add_to(m)
+	return m._repr_html_()
+
+
+@app.route("/map")
+def map():
+	return render_template("map.html")
+
+
 @app.route(VIEW, methods=["GET", "POST"])
 @token_admin_validate
 def buyer_view():
 	"""Visualizza informazioni Acquirenti."""
 	# Estraggo la lista degli allevatori
 	_list = Buyer.query.all()
+
+	m = create_map(_list)
+	with open("./app/templates/map.html", "wb") as f:
+		f.write(m.encode('utf-8'))
+
 	_list = [r.to_dict() for r in _list]
-	for _dict in _list:
-		_dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
-		                f'{_dict["address"].strip().replace(" ", "+")}' \
-		                f',{_dict["city"].strip().replace(" ", "+")}'
 
 	db.session.close()
-	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
+	return render_template(
+		VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
 
 
 @app.route(CREATE, methods=["GET", "POST"])
@@ -57,13 +111,14 @@ def buyer_create():
 		user_id = User.query.filter_by(username=form_data["user_id"]).first()
 		# print("USER_ID:", user_find.id)
 
-		new_farmer = Buyer(
+		new_buyer = Buyer(
 			buyer_name=form_data["buyer_name"].strip(),
 			buyer_type=form_data["buyer_type"].strip(),
 			email=form_data["email"].strip(),
 			phone=form_data["phone"].strip(),
 			address=form_data["address"].strip(),
 			cap=form_data["cap"].strip(),
+			coordinates=form_data["coordinates"].strip(),
 			city=form_data["city"].strip(),
 			affiliation_start_date=form_data["affiliation_start_date"],
 			affiliation_status=status_true_false(form_data["affiliation_status"]),
@@ -72,7 +127,7 @@ def buyer_create():
 		)
 
 		try:
-			db.session.add(new_farmer)
+			db.session.add(new_buyer)
 			db.session.commit()
 			db.session.close()
 			flash("ACQUIRENTE creato correttamente.")
@@ -125,9 +180,10 @@ def buyer_view_history(_id):
 	else:
 		cons_list = []
 
-	_buyer["maps"] = f'{_buyer["cap"].strip().replace(" ", "")},' \
-	                 f'{_buyer["address"].strip().replace(" ", "+")}' \
-	                 f',{_buyer["city"].strip().replace(" ", "+")}'
+	_buyer["maps"] = f'{_buyer["buyer_name"].strip().replace(" ", "+")}, '\
+	                 f'{_buyer["address"].strip().replace(" ", "+")}, '\
+					 f'{_buyer["cap"].strip().replace(" ", "")} ' \
+	                 f'{_buyer["city"].strip().replace(" ", "+")}'
 
 	db.session.close()
 	return render_template(
@@ -159,6 +215,8 @@ def buyer_update(_id):
 		# print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+		new_data["coordinates"] = new_data["coordinates"]
+
 		new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
 		new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
 		new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
@@ -216,6 +274,7 @@ def buyer_update(_id):
 		form.address.data = buyer.address
 		form.cap.data = buyer.cap
 		form.city.data = buyer.city
+		form.coordinates.data = buyer.coordinates
 
 		form.affiliation_start_date.data = str_to_date(buyer.affiliation_start_date)
 		form.affiliation_end_date.data = str_to_date(buyer.affiliation_end_date)

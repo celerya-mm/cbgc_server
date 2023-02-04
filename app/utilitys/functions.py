@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, date
-from functools import wraps
+from functools import wraps, partial
 
 import pandas as pd
 import requests
@@ -10,7 +10,7 @@ from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-from ..app import session
+from ..app import session, db
 from ..models.tokens import AuthToken
 from ..var_ambient import variables as var
 

@@ -29,6 +29,7 @@ class FormFarmerCreate(FlaskForm):
 	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 	affiliation_status = SelectField('Stato Affiliazione', choices=["SI", "NO"], default="SI")
@@ -67,6 +68,7 @@ class FormFarmerUpdate(FlaskForm):
 	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
 
 	stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
 	stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"])
@@ -108,6 +110,7 @@ class FormFarmerUpdate(FlaskForm):
 			'cap': self.cap.data,
 			'city': self.city.data,
 			'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
+			'coordinates': self.coordinates.data,
 
 			'stable_code': self.stable_code.data,
 			'stable_type': self.stable_type.data,

@@ -19,53 +19,73 @@ def list_cert():
 
 
 def list_farmer():
-	records = Farmer.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = ["-"]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['farmer_name']}")
+	try:
+		records = Farmer.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 
 def list_slaughterhouses():
-	records = Slaughterhouse.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = ["-"]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
+	try:
+		records = Slaughterhouse.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 
 def list_buyers():
-	records = Buyer.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = ["-"]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['buyer_name']}")
+	try:
+		records = Buyer.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['buyer_name']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 
 def list_heads():
-	records = Head.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = ["-"]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['headset']}")
+	try:
+		records = Head.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['headset']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 
 def calc_id():  # noqa
 	"""Calcola l'id per il nuovo certificato."""
-	certificates = CertificateCons.query.all()
-	old = max(certificates, key=lambda x: x.id)
-	today = datetime.now()
-	if today.month >= 7 > old.certificate_date.month and today.year == old.certificate_date.year:
-		new_id = 1
-	elif old.certificate_date.month < 7 and today.year > old.certificate_date.year:
-		new_id = 1
-	else:
-		new_id = old.certificate_id + 1
-	return new_id
+	try:
+		certificates = CertificateCons.query.all()
+		old = max(certificates, key=lambda x: x.id)
+		today = datetime.now()
+		if today.month >= 7 > old.certificate_date.month and today.year == old.certificate_date.year:
+			new_id = 1
+		elif old.certificate_date.month < 7 and today.year > old.certificate_date.year:
+			new_id = 1
+		else:
+			new_id = old.certificate_id + 1
+		return new_id
+	except Exception as err:
+		print(err)
+		return None
 
 
 class FormCertConsCreate(FlaskForm):

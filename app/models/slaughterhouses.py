@@ -2,7 +2,6 @@ from datetime import datetime
 
 from ..app import db
 
-
 class Slaughterhouse(db.Model):
 	# Table
 	__tablename__ = 'slaughterhouses'
@@ -18,6 +17,7 @@ class Slaughterhouse(db.Model):
 	cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
 	city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	full_address = db.Column(db.String(55), index=False, unique=False, nullable=True)
+	coordinates = db.Column(db.String(100), index=False, unique=False, nullable=True)
 
 	affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
 	affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
@@ -40,7 +40,7 @@ class Slaughterhouse(db.Model):
 
 	def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
 	             affiliation_start_date, affiliation_status, note, affiliation_end_date=None,
-	             cons_cert=None, events=None):
+	             cons_cert=None, events=None, coordinates=None):
 		from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
 		self.slaughterhouse = slaughterhouse
@@ -53,6 +53,7 @@ class Slaughterhouse(db.Model):
 		self.cap = cap or None
 		self.city = city or None
 		self.full_address = address_mount(address, cap, city)
+		self.coordinates = coordinates
 
 		self.affiliation_start_date = str_to_date(affiliation_start_date)
 		self.affiliation_end_date = str_to_date(affiliation_end_date)
@@ -81,6 +82,7 @@ class Slaughterhouse(db.Model):
 			'cap': self.cap,
 			'city': self.city,
 			'full_address': self.full_address,
+			'coordinates': self.coordinates,
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date),
 			'affiliation_end_date': date_to_str(self.affiliation_end_date),

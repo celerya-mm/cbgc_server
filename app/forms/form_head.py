@@ -18,11 +18,15 @@ def list_head():
 
 
 def list_farmer():
-	records = Farmer.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = ["-"]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['farmer_name']}")
+	try:
+		records = Farmer.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 

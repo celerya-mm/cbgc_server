@@ -41,7 +41,7 @@ DOWNLOAD_LINK_FOR = "cert_cons_download_link"
 DOWNLOAD_LINK_HTML = "cert_cons/cert_cons_download_link.html"
 
 SAVE = "/cert_cons/save/<_link>/"
-SAVE_FOR = "cert_cons_download_save"
+SAVE_FOR = "cert_cons_save"
 
 
 @app.route(VIEW, methods=["GET", "POST"])
@@ -508,7 +508,7 @@ def cert_cons_download_link(_link):
 
 
 @app.route(SAVE, methods=["GET", "POST"])
-def cert_cons_download_save(_link):
+def cert_cons_save(_link):
 	_link = _link.replace("_", "/")
 	try:
 		cert = db.session.query(CertificateCons).filter_by(certificate_nr=_link).first()

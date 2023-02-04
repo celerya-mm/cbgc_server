@@ -18,11 +18,15 @@ def list_buyer():
 
 
 def list_user():
-	records = User.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = ["-"]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['username']}")
+	try:
+		records = User.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['username']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 
@@ -40,6 +44,7 @@ class FormBuyerCreate(FlaskForm):
 	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
@@ -80,6 +85,7 @@ class FormBuyerUpdate(FlaskForm):
 	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
@@ -122,6 +128,7 @@ class FormBuyerUpdate(FlaskForm):
 			'cap': self.cap.data,
 			'city': self.city.data,
 			'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
+			'coordinates': self.coordinates.data,
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
 			'affiliation_end_date': date_to_str(self.affiliation_end_date.data),

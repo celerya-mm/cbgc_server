@@ -28,6 +28,7 @@ class FormSlaughterhouseCreate(FlaskForm):
 	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()], default="")
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="NO")
@@ -61,6 +62,7 @@ class FormSlaughterhouseUpdate(FlaskForm):
 	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
 	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
 	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
+	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
@@ -90,6 +92,7 @@ class FormSlaughterhouseUpdate(FlaskForm):
 			'cap': self.cap.data,
 			'city': self.city.data,
 			'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
+			'coordinates': self.coordinates.data,
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
 			'affiliation_end_date': date_to_str(self.affiliation_end_date.data),

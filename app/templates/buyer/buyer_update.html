@@ -46,6 +46,7 @@
                         <br>
                         <div class="form-group">
                             {{ form.address.label }}
+                            <p class="comment">Inserire rispettando la formula: Via xxx, x - dove x è il numero civico</p>
                             {{ form.address(class="form-control") }}
                             {% if form.address.errors %}
                             {% for error in form.address.errors %}
@@ -71,6 +72,17 @@
                             {{ form.city(class="form-control") }}
                             {% if form.city.errors %}
                             {% for error in form.city.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            {{ form.coordinates.label }}
+                            {{ form.coordinates(class="form-control") }}
+                            {% if form.coordinates.errors %}
+                            {% for error in form.coordinates.errors %}
                             <span class="text-danger">{{ error }}</span>
                             <br>
                             {% endfor %}

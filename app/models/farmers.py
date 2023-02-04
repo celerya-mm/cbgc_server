@@ -20,6 +20,7 @@ class Farmer(db.Model):
 	cap = db.Column(db.String(5), index=False, unique=False, nullable=True)
 	city = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	full_address = db.Column(db.String(255), index=False, unique=False, nullable=True)
+	coordinates = db.Column(db.String(100), index=False, unique=False, nullable=True)
 
 	affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
 	affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
@@ -50,7 +51,7 @@ class Farmer(db.Model):
 	def __init__(self, farmer_name, email, phone=None, address=None, cap=None, city=None, stable_code=None,
 	             stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
 	             affiliation_start_date=None, affiliation_end_date=None, affiliation_status=None,
-	             heads=None, dna_certs=None, cons_certs=None, events=None, note=None):
+	             heads=None, dna_certs=None, cons_certs=None, coordinates=None, events=None, note=None):
 		from ..utilitys.functions import address_mount, str_to_date, status_true_false
 
 		self.farmer_name = farmer_name
@@ -62,6 +63,7 @@ class Farmer(db.Model):
 		self.cap = cap or None
 		self.city = city or None
 		self.full_address = address_mount(address, cap, city)
+		self.coordinates = coordinates
 
 		self.affiliation_start_date = str_to_date(affiliation_start_date)
 		self.affiliation_end_date = str_to_date(affiliation_end_date)
@@ -98,6 +100,7 @@ class Farmer(db.Model):
 			'cap': self.cap,
 			'city': self.city,
 			'full_address': self.full_address,
+			'coordinates': self.coordinates,
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date),
 			'affiliation_end_date': date_to_str(self.affiliation_end_date),

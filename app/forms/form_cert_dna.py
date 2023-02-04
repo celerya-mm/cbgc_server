@@ -7,26 +7,29 @@ from app.models.heads import Head
 
 
 def list_head():
-	records = Head.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = [""]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['headset']}")
+	try:
+		records = Head.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['headset']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
 
 
 def list_farmer():
-	records = Farmer.query.all()
-	_dicts = [x.to_dict() for x in records]
 	_list = [""]
-	for d in _dicts:
-		_list.append(f"{str(d['id'])} - {d['farmer_name']}")
+	try:
+		records = Farmer.query.all()
+		_dicts = [x.to_dict() for x in records]
+		for d in _dicts:
+			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
+	except Exception as err:
+		print(err)
+		pass
 	return _list
-
-
-def pdf_to_byte(_pdf):
-	"""Converte file in byte."""
-	return _pdf
 
 
 class FormCertDnaCreate(FlaskForm):

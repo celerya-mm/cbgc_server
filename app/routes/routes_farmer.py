@@ -150,6 +150,7 @@ def farmer_update(_id):
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+
 		new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
 		new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
 		new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
