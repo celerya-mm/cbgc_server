@@ -37,7 +37,7 @@ class FormFarmerCreate(FlaskForm):
 	stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
 	stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"], default="Allevamento")
 	stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
-		"Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Carne")
+		"Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Latte e Da Carne")
 	stable_breeding_methods = SelectField("Modalità Allevamento", choices=[
 		"Estensivo", "Intensivo", "Transumante", "Brado"], default="Estensivo")
 
@@ -73,7 +73,7 @@ class FormFarmerUpdate(FlaskForm):
 	stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
 	stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"])
 	stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
-		"Da Latte", "Da Carne", "Da Latte e Da Carne"])
+		"Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Latte e Da Carne")
 	stable_breeding_methods = SelectField("Modalità Allevamento", choices=[
 		"Estensivo", "Intensivo", "Transumante", "Brado"])
 

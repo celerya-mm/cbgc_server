@@ -33,18 +33,26 @@ UPDATE_HTML = "buyer/buyer_update.html"
 
 def create_map(_list):
 	"""Crea una mappa dalla base dati."""
-	m = folium.Map(location=[44.92, 10.01], zoom_start=6.5, name="Mappa acquirenti Consorzio", tiles='Stamen Terrain')
+	m = folium.Map(location=[44.92, 10.01], zoom_start=6.5, name="Mappa acquirenti Consorzio", tiles=None)
+	folium.TileLayer('Stamen Terrain', control=False).add_to(m)
+	feature_group_m = folium.FeatureGroup(name="Macellerie", overlay=True)
+	feature_group_r = folium.FeatureGroup(name="Ristoranti", overlay=True)
+	feature_group_i = folium.FeatureGroup(name="Indefiniti", overlay=True)
 	for record in _list:
 		if record.coordinates and len(record.coordinates) > 5:
 			if record.buyer_type == "Macelleria":
 				color = "red"  # rosso (macellerie)
 				icon = "shop"
+				feature_group = feature_group_m
 			elif record.buyer_type == "Ristorante":
 				color = "blue"  # blue (ristorante)
 				icon = "cutlery"
+				feature_group = feature_group_r
 			else:
 				color = "grey"  # grigio (manca il tipo)
 				icon = "info-sign"
+				feature_group = feature_group_i
+
 			coordinates = record.coordinates.split(", ")
 			# print("COORDINATES:", coordinates)
 			lat = re.findall(r'\d+\.\d+', coordinates[0].replace("(", ""))
@@ -64,21 +72,23 @@ def create_map(_list):
 			       f"<p><strong>Indirizzo:</strong> {record.full_address}</p>" \
 			       f"<p><strong>Telefono:</strong> {record.phone}</p>"
 
-			iframe = folium.IFrame(html=html, width=300, height=100, ratio=0.2)
-			popup = folium.Popup(iframe, max_width=300)
+			iframe = folium.IFrame(html=html, height=450, ratio=0.2)
+			popup = folium.Popup(iframe)
 
 			tooltip = "Clicca!"
 
 			folium.Marker(
 				location=[lat, long], popup=popup, tooltip=tooltip, icon_size=(20, 20),
 				icon=folium.Icon(color=color, prefix='fa', icon=icon)
-			).add_to(m)
+			).add_to(feature_group)
+
+	feature_group_m.add_to(m)
+	feature_group_r.add_to(m)
+	feature_group_i.add_to(m)
+
+	folium.LayerControl().add_to(m)
+
 	return m._repr_html_()  # noqa
-
-
-@app.route("/map")
-def map():  # noqa
-	return render_template("map.html")
 
 
 @app.route(VIEW, methods=["GET", "POST"])
@@ -179,11 +189,6 @@ def buyer_view_history(_id):
 	# print("LEN:", len(cons_list), "DATA:", cons_list)
 	else:
 		cons_list = []
-
-	_buyer["maps"] = f'{_buyer["buyer_name"].strip().replace(" ", "+")}, '\
-	                 f'{_buyer["address"].strip().replace(" ", "+")}, '\
-					 f'{_buyer["cap"].strip().replace(" ", "")} ' \
-	                 f'{_buyer["city"].strip().replace(" ", "+")}'
 
 	db.session.close()
 	return render_template(

@@ -74,11 +74,6 @@ def create_map(_list):
 	return m._repr_html_()  # noqa
 
 
-@app.route("/map_farmer")
-def map_farmer():  # noqa
-	return render_template("map.html")
-
-
 @app.route(VIEW, methods=["GET", "POST"])
 @token_admin_validate
 def farmer_view():
@@ -91,11 +86,6 @@ def farmer_view():
 		f.write(m.encode('utf-8'))
 
 	_list = [r.to_dict() for r in _list]
-
-	for _dict in _list:
-		_dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
-		                f'{_dict["address"].strip().replace(" ", "+")}' \
-		                f',{_dict["city"].strip().replace(" ", "+")}'
 
 	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
@@ -173,10 +163,6 @@ def farmer_view_history(_id):
 	# Estraggo l'elenco dei DNA
 	dna_list = farmer.dna_certs
 	dna_list = [dna.to_dict() for dna in dna_list]
-
-	_farmer["maps"] = f'{_farmer["cap"].strip().replace(" ", "")},' \
-	                  f'{_farmer["address"].strip().replace(" ", "+")}' \
-	                  f',{_farmer["city"].strip().replace(" ", "+")}'
 
 	db.session.close()
 	return render_template(

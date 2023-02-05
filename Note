@@ -32,5 +32,5 @@ docker-compose run -ti "IMAGE ID" bash
 ssh user@ip
 crontab -e
 
-# sostituire asterischi in base a quando eseguire lo script
+# sostituire asterischi in base a quando eseguire lo script (rispettare spazzi)
 * * * * * /path/to/backup_script.sh

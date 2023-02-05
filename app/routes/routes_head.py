@@ -37,7 +37,7 @@ def head_view():
 
 	_list = Head.query.all()
 	_list = [r.to_dict() for r in _list]
-	print("LIST_HEAD:", json.dumps(_list[:5], indent=2))
+	# print("LIST_HEAD:", json.dumps(_list[:5], indent=2))
 
 	# raggruppa per anno di nascita
 	group_birth = dict_group_by(_list, "birth_year", year=True)

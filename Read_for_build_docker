@@ -3,7 +3,7 @@
 # Spostarsi all'interno della cartella radice dell'applicazione dove è contenuto il Dockerfile
 
 ### docker classico
-cd Multimedia/05_Documenti/Flask/cbgc_server
+cd share/Multimedia/05_Documenti/Flask/cbgc_server
 
 docker build --force-rm -t cbgc:latest .
 docker build --force-rm -t nginx:latest .
@@ -41,7 +41,7 @@ certbot --nginx -d cbgc.celerya.com -d cbgc.celerya.com
 # verifica attivazione rinnovo automatico
 certbot renew --dry-run
 
-# imposto aggiornamento automatico certificato
+# imposto aggiornamento automatico certificato dentro il container
 crontab -e
 # aggiungo la riga (premere i)
 0 12 * * * /usr/bin/certbot renew --quiet

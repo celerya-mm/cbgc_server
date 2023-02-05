@@ -35,10 +35,6 @@ def slaughterhouse_view():
 	# Estraggo la lista degli allevatori
 	_list = Slaughterhouse.query.all()
 	_list = [r.to_dict() for r in _list]
-	for _dict in _list:
-		_dict["maps"] = f'{_dict["cap"].strip().replace(" ", "")},' \
-		                f'{_dict["address"].strip().replace(" ", "+")}' \
-		                f',{_dict["city"].strip().replace(" ", "+")}'
 
 	db.session.close()
 	return render_template(VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR)
@@ -109,10 +105,6 @@ def slaughterhouse_view_history(_id):
 		if _h and _h not in head_list:
 			head_list.append(_h.to_dict())
 
-	_slaughterhouse["maps"] = f'{_slaughterhouse["cap"].strip().replace(" ", "")},' \
-	                          f'{_slaughterhouse["address"].strip().replace(" ", "+")}' \
-	                          f',{_slaughterhouse["city"].strip().replace(" ", "+")}'
-
 	db.session.close()
 	return render_template(
 		HISTORY_HTML, form=_slaughterhouse, history_list=history_list, h_len=len_history,
@@ -139,10 +131,9 @@ def slaughterhouse_update(_id):
 		slaughterhouse = Slaughterhouse.query.get(_id)
 		previous_data = slaughterhouse.to_dict()
 		previous_data.pop("updated_at")
-		# print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+		print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
-		new_data["coordinates"] = get_coordinates(new_data["address"], new_data["cap"], new_data["city"])
 
 		new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
 		new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])

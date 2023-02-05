@@ -14,13 +14,20 @@ def list_slaughterhouse():
 	return _list
 
 
+def list_slaughterhouse_code():
+	records = Slaughterhouse.query.all()
+	_list = [x.to_dict() for x in records]
+	_list = [d["slaughterhouse_code"] for d in _list if "slaughterhouse_code" in d]
+	return _list
+
+
 class FormSlaughterhouseCreate(FlaskForm):
 	"""Form inserimento dati Macello."""
 	slaughterhouse = StringField(
 		'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
 	)
 
-	slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20), Optional()])
+	slaughterhouse_code = StringField('Codice Macello', validators=[Length(max=20), Optional()])
 
 	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
 	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
@@ -47,6 +54,10 @@ class FormSlaughterhouseCreate(FlaskForm):
 		if self.slaughterhouse.data.strip() in list_slaughterhouse():
 			raise ValidationError("E' già presente un MACELLO con la stessa Ragione Sociale.")
 
+	def validate_slaughterhouse_code(self, field):  # noqa
+		if self.slaughterhouse_code.data.strip() in list_slaughterhouse_code():
+			raise ValidationError("E' già presente un MACELLO con lo stesso codice.")
+
 
 class FormSlaughterhouseUpdate(FlaskForm):
 	"""Form modifica dati Macello."""
@@ -54,7 +65,7 @@ class FormSlaughterhouseUpdate(FlaskForm):
 		'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
 	)
 
-	slaughterhouse_code = StringField('Codice Macello', validators=[Length(min=3, max=20), Optional()])
+	slaughterhouse_code = StringField('Codice Macello', validators=[Length(max=20), Optional()])
 
 	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
 	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])

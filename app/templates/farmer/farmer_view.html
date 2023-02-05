@@ -26,7 +26,7 @@
                         <div id="collapse" class="accordion-collapse collapse"
                              aria-labelledby="heading"
                              data-bs-parent="#accordion">
-                            <iframe class="map" src="/map_farmer" style="width: 100%; height: 425px;"></iframe>
+                            <iframe class="map" src="/map" style="width: 100%; height: 425px;"></iframe>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,6 @@
                             <th class="title text-start" id="h4">Email</th>
                             <th class="title text-center" id="h5">Phone</th>
                             <th class="title text-start" id="h6">Indirizzo</th>
-                            <th class="title text-start" id="h7">Coord</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -76,16 +75,13 @@
                                 {{ row.phone|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {% if row.full_address %}
+                                {% if row.coordinates %}
                                 <a class="tab-link" title="Google Maps" style=""
-                                   href="https://www.google.com/maps/place/{{ row.maps  }}">
+                                   href="https://www.google.com/maps/place/{{ row.coordinates  }}">
                                     <img src="{{ url_for('static', filename='icons/location.svg') }}" alt="">
                                 </a>
                                 {% endif %}
                                 {{ row.full_address|e }}
-                            </td>
-                            <td class="secondary text-center" style="padding-bottom: 0pz; padding-top: 0pz;">
-                                {{ row.coordinates|e }}
                             </td>
                         </tr>
                         {% endfor %}

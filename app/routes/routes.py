@@ -51,3 +51,8 @@ def info():
 @app.route('/flask-health-check')
 def flask_health_check():
 	return "success"
+
+
+@app.route("/map")
+def map():  # noqa
+	return render_template("map.html")

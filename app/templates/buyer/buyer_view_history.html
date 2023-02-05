@@ -108,9 +108,9 @@
         <div class="form-group rounded"
              style="background-color: #DEDEDE; padding: 10px;">
             <h6>
-                {% if form.full_address %}
+                {% if form.coordinates %}
                 <a class="tab-link" title="Google Maps" style=""
-                   href="https://www.google.com/maps/place/{{ form.maps }}">
+                   href="https://www.google.com/maps/place/{{ form.coordinates }}">
                     <img src="{{ url_for('static', filename='icons/location.svg') }}" alt="">
                 </a>
                 {% endif %}

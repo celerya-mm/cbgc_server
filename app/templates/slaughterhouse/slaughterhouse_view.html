@@ -60,10 +60,12 @@
                                 {{ row.phone|e }}
                             </td>
                             <td class="secondary text-start" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {% if row.coordinates %}
                                 <a class="tab-link" title="Google Maps" style=""
-                                   href="https://www.google.com/maps/place/{{ row.maps  }}">
+                                   href="https://www.google.com/maps/place/{{ row.coordinates  }}">
                                     <img src="{{ url_for('static', filename='icons/location.svg') }}" alt="">
                                 </a>
+                                {% endif %}
                                 {{ row.full_address|e }}
                             </td>
                         </tr>
