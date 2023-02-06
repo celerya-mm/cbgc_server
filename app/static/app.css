@@ -260,6 +260,12 @@ label {
     color: #ffffff;
 }
 
+.navbar-bg-red {
+    background-color: #830F0F;
+    border: 1px solid #830F0F;
+    color: #ffffff;
+}
+
 .navbar-container {
     max-width: 1080px;
     font-size: 0.875rem;

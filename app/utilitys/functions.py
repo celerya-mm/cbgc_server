@@ -40,18 +40,8 @@ def json_loads_replace_none(dict_obj):
 	return new_dict
 
 
-def token_user_validate(_token):
-	"""Valido il token ricevuto."""
-	authenticated = AuthToken.query.filter_by(token=_token).first()
-	if authenticated in ["", None] or authenticated.expires_at < datetime.now() or authenticated.user_id in ["", None]:
-		flash("You don't have a valid authentication token, please log in.")
-		return False
-	else:
-		return True
-
-
-def token_admin_validate(func):
-	"""Eseguo la funzione solo se presente token autenticazione valido."""
+def token_buyer_validate(func):
+	"""Eseguo la funzione solo se presente token autenticazione user valido."""
 
 	@wraps(func)
 	def wrap(*args, **kwargs):
@@ -59,20 +49,48 @@ def token_admin_validate(func):
 			# controlla validità token
 			authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
 			if authenticated is None:
-				print("AUTHORIZATION_CHECK_FAIL_1")
-				return redirect(url_for('logout'))
+				print("AUTHORIZATION_CHECK_FAIL_2")
+				return redirect(url_for('logout_buyer', cert_nr=session["cert_nr"]))
 			elif authenticated.expires_at < datetime.now():
+				print("AUTHORIZATION_CHECK_FAIL_3")
+				return redirect(url_for('logout_buyer', cert_nr=session["cert_nr"]))
+			elif authenticated.user_id in ["", None]:
+				print("AUTHORIZATION_CHECK_FAIL_4")
+				return redirect(url_for('logout_buyer', cert_nr=session["cert_nr"]))
+			else:
+				print("AUTHORIZATION_CHECK_PASS")
+				# esegue la funzione
+				return func(*args, **kwargs)
+		else:
+			print("AUTHORIZATION_CHECK_FAIL_1")
+			return redirect(url_for('logout_buyer', cert_nr=session["cert_nr"]))
+
+	return wrap
+
+
+def token_admin_validate(func):
+	"""Eseguo la funzione solo se presente token autenticazione admin valido."""
+
+	@wraps(func)
+	def wrap(*args, **kwargs):
+		if session is not None and "token_login" in session.keys():
+			# controlla validità token
+			authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
+			if authenticated is None:
 				print("AUTHORIZATION_CHECK_FAIL_2")
 				return redirect(url_for('logout'))
-			elif authenticated.admin_id in ["", None]:
+			elif authenticated.expires_at < datetime.now():
 				print("AUTHORIZATION_CHECK_FAIL_3")
+				return redirect(url_for('logout'))
+			elif authenticated.admin_id in ["", None]:
+				print("AUTHORIZATION_CHECK_FAIL_4")
 				return redirect(url_for('logout'))
 			else:
 				print("AUTHORIZATION_CHECK_PASS")
 				# esegue la funzione
 				return func(*args, **kwargs)
 		else:
-			print("AUTHORIZATION_CHECK_FAIL_4")
+			print("AUTHORIZATION_CHECK_FAIL_1")
 			return redirect(url_for('logout'))
 
 	return wrap
@@ -93,17 +111,17 @@ def admin_log_in(form):
 		return False
 
 
-def user_log_in(form):
+def buyer_log_in(form):
 	"""API - Login e ottengo il token."""
-	url = var.apiUrls_user["user_login"]
+	url = var.apiUrls_buyer["buyer_login"]
 	payload = json.dumps({"username": form.username.data, "password": form.password.data})
 	headers = {'Content-Type': 'application/json'}
 	response = requests.request("POST", url, headers=headers, data=payload, verify=False)
-	print("RESPONSE:", response.text)
-	dati = json.loads(response.text)
 	try:
+		print("RESPONSE:", response.text)
+		_resp = json.loads(response.text)
 		# dati = json.loads(response.text)
-		return dati["token"]
+		return _resp["data"]
 	except Exception as err:
 		print(f"ERRORE_RISPOSTA_SERVER: {err}")
 		return False

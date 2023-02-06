@@ -1,9 +1,9 @@
-{% extends '_base_login.html' %}
+{% extends '_base_buyer_login.html' %}
 
 {% block content %}
 <div class="container text-center mt-5">
     <div class="row no-gutters justify-content-center">
-        <div class="col-md-4 shadow rounded">
+        <div class="col-md-4 shadow rounded" style="background-color: #DEDEDE;">
             <br>
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}

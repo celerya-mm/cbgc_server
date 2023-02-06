@@ -47,7 +47,7 @@ with app.app_context():
 	                        slaughterhouses, tokens)
 	from app.routes import (routes, routes_admin, routes_buyer, routes_head, routes_farmer, routes_event,  # noqa
 	                        routes_slaughterhouse, routes_user, routes_cert_dna, routes_cert_cons)
-	from app.utilitys.functions import token_admin_validate, token_user_validate  # noqa
+	from app.utilitys.functions import token_admin_validate, token_buyer_validate  # noqa
 
 	db.reflect()  # Verifica tabelle presenti nel DB.
 	# db.drop_all()  # Attenzione elimina tutte le tabelle dal DB.

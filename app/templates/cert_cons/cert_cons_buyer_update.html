@@ -1,0 +1,47 @@
+{% extends '_base_buyer.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+    <div class="row no-gutters justify-content-center">
+        <h5 class="card-title">
+            <a class="btn btn-update" type="button" title="Annulla"
+               href="{{ url_for(history, cert_nr=session['cert_nr']) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
+            </a>
+            Modifica QUANTITA' RIMANENZA Certificato [ {{ nr }} ]:
+        </h5>
+        <div class="col-md-12 shadow rounded" style="border: solid 0.7px #ED6666 !important;">
+            <form enctype="multipart/form-data" method="POST" style="padding-top: 10px;">
+                {{ form.csrf_token }}
+                <div class="row no-gutters justify-content-center rounded"
+                     style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+                    <div class="col-md-4 order-first">
+                        <div class="form-group">
+                            {{ form.sale_rest.label(style="font-size: 1.2rem;") }}
+                            {{ form.sale_rest(class="form-control") }}
+                            {% if form.sale_rest.errors %}
+                            {% for error in form.sale_rest.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                            <br>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
+                    <img class="icon-simple" src="{{ url_for('static', filename='icons/save.svg') }}"
+                         alt=""/>
+                </button>
+                <p class="info">Data Creazione: {{ info.created_at }}</p>
+                <p class="info">Ultima Modifica: {{ info.updated_at }}</p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+</script>
+{% endblock %}

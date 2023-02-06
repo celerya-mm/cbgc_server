@@ -124,7 +124,7 @@ def administrator_login():
             response = make_response(jsonify(data), 201)
         else:
             token = __generate_auth_token()
-            save = __save_auth_token(_admin.id, "", token)
+            save = __save_auth_token(token, admin_id=_admin.id)
             data = {
                 'status': 'success',
                 'data': {

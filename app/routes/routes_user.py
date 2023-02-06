@@ -157,6 +157,9 @@ def user_update(_id):
 			"Previous_data": previous_data
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
+
+		db.session.close()
+
 		_event = event_create(_event, user_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
@@ -272,7 +275,7 @@ def reset_psw_user(_id):
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 
 
-@app.route('/reset_psw_user_token/<_token>/')
+@app.route('/reset_psw_user/token/<_token>/')
 def reset_psw_user_token(_token):
 	_token = db.session.query(AuthToken).filter_by(token=_token).first()
 	if datetime.now() > _token.expires_at:

@@ -1,9 +1,64 @@
+import json
 from datetime import datetime
 
-from flask import request, jsonify, current_app as app
+from flask import request, jsonify, current_app as app, make_response
 
-from app.models.buyers import Buyer
+from app.app import db
+from app.models.accounts import User
 from app.models.tokens import AuthToken
+from app.utilitys.functions_accounts import psw_hash, __generate_auth_token, __save_auth_token
+
+
+@app.route('/api/buyer/login/', methods=['POST'])
+def buyer_login():
+    """API login utente acquirente."""
+    data_received = request.get_json()
+    username = data_received['username'].replace(" ", "")
+    password = data_received['password'].replace(" ", "")
+
+    # print("USER:", username, "PSW:", psw_hash(str(password)))
+    _user = db.session.query(User).filter_by(
+        username=username,
+        password=psw_hash(str(password))
+    ).first()
+
+    if _user not in [None, ""]:
+        record = len(_user.auth_tokens) - 1
+        if record > 0 and _user.auth_tokens[record].expires_at > datetime.now():
+            token = _user.auth_tokens[record].token
+            data = {
+                'status': 'success',
+                'data': {
+                    'token': token,
+                    'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
+                    'buyer_id': _user.id
+                }
+            }
+            # print("RISPOSTA_API_LOGIN:", json.dumps(data, indent=2))
+            response = make_response(jsonify(data), 201)
+        else:
+            token = __generate_auth_token()
+            save = __save_auth_token(token, user_id=_user.id)
+            data = {
+                'status': 'success',
+                'data': {
+                    'token': token,
+                    'expiration': datetime.strftime(save.expires_at, "%Y-%m-%d %H:%M:%S"),
+                    'buyer_id': _user.id
+                }
+            }
+            # print("RISPOSTA_API_LOGIN:", json.dumps(data, indent=2))
+            response = make_response(jsonify(data), 201)
+    else:
+        data = {
+            '01_status': 'failed',
+            '02_message': f"Login fallita, non è presente nessun acquirente con questi username e password."
+                          f"Contatta il Consorzio per farti assegnare un utente.",
+            'username': username
+        }
+        # print("RISPOSTA_API_LOGIN:", json.dumps(data, indent=2))
+        response = make_response(jsonify(data), 500)
+    return response
 
 
 @app.route('/api/buyers/', methods=['GET'])
@@ -18,7 +73,7 @@ def get_buyers():
         if authenticated in ["", None] or authenticated.expires_at < datetime.now():
             return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
         else:
-            buyer_list = Buyer.query.all()
+            buyer_list = User.query.all()
             return jsonify([buyer.to_dict() for buyer in buyer_list]), 200
 
 
@@ -33,7 +88,7 @@ def get_buyer(buyer_id):
         if authenticated in ["", None] or authenticated.expires_at < datetime.now():
             return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
         else:
-            buyer = Buyer.query.filter_by(id=buyer_id).first()
+            buyer = User.query.filter_by(id=buyer_id).first()
             if buyer:
                 return jsonify(buyer.to_dict()), 200
             else:

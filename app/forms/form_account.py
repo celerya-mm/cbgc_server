@@ -165,3 +165,20 @@ class FormAccountUpdate(FlaskForm):
 			'phone': self.phone.data,
 			'note': self.note.data,
 		}
+
+
+class FormUserResetPsw(FlaskForm):
+	"""Form reset password utente."""
+	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
+
+	submit = SubmitField("MODIFICA")
+
+	def __repr__(self):
+		return f'<RESET PSW - email: {self.email}>'
+
+	def __str__(self):
+		return f'<RESET PSW - email: {self.email}>'
+
+	def to_dict(self):
+		"""Converte form in dict."""
+		return {'email': self.email.data}

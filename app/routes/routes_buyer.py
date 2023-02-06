@@ -6,13 +6,17 @@ import folium
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
+from ..app import db, session, Message, mail, Config
 from ..forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
+from ..forms.form_account import FormUserResetPsw
+from ..forms.forms import FormPswReset
 from ..models.accounts import User
 from ..models.buyers import Buyer
 from ..models.heads import Head
+from ..models.tokens import AuthToken, calc_exp_token_reset_psw
 from ..utilitys.functions import (status_si_no, status_true_false, str_to_date, token_admin_validate, address_mount,
                                   not_empty)
+from ..utilitys.functions_accounts import __generate_auth_token, psw_hash
 
 VIEW = "/buyer/view/"
 VIEW_FOR = "buyer_view"
@@ -118,7 +122,7 @@ def buyer_create():
 		form_data = json.loads(json.dumps(request.form))
 		# print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
 
-		user_id = User.query.filter_by(username=form_data["user_id"]).first()
+		user_id = Buyer.query.filter_by(username=form_data["user_id"]).first()
 		# print("USER_ID:", user_find.id)
 
 		new_buyer = Buyer(
@@ -258,6 +262,9 @@ def buyer_update(_id):
 			"Modification": f"Update Buyer whit id: {_id}",
 			"Previous_data": previous_data
 		}
+
+		db.session.close()
+
 		# print("BUYER_EVENT:", json.dumps(_event, indent=2))
 		_event = event_create(_event, buyer_id=_id)
 		if _event is True:
@@ -295,3 +302,109 @@ def buyer_update(_id):
 		# print("BUYER_FORM:", json.dumps(form.to_dict(form), indent=2))
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
+
+
+@app.route('/buyer/email_reset_psw/<cert_nr>/', methods=["GET", "POST"])
+def buyer_email_reset_psw(cert_nr):
+	form = FormUserResetPsw()
+	if form.validate_on_submit():
+		print("EMAIL:", form.email.data)
+		try:
+			# estraggo dati utente
+			_user = db.session.query(User).filter_by(email=str(form.email.data)).first()
+		except Exception as err:
+			flash(f"Nessun utente assegnato alla email inserita: {str(form.email.data)}. Errore: {err}")
+			return render_template("buyer/buyer_insert_email_reset_password.html", form=form, cert_nr=cert_nr)
+
+		# creo un token con validità 15 min
+		_token = __generate_auth_token()
+		auth_token = AuthToken(
+			user_id=_user.id,
+			token=_token,
+			expires_at=calc_exp_token_reset_psw()
+		)
+
+		db.session.add(auth_token)
+		db.session.commit()
+		db.session.close()
+
+		# imposto link
+		_link = f"{Config.LINK_URL}:62233/buyer/reset_psw_token/{_token}/"
+		_link = _link.replace("/:", ":")
+		# print("LINK:", _link)
+
+		try:
+			# imposto e invio la mail con il link per il reset
+			msg = Message(
+				'Follow your request for change password in Consorzio Bue Grasso service.',
+				sender="service@celerya.com",
+				recipients=[form.email.data]
+			)
+			msg.body = f"This is the link for reset your password: \n\n{_link}\n\n" \
+			           f"The link expiry in 15 min."
+			mail.send(msg)
+			flash("Richiesta reset password inviata correttamente.")
+			return redirect(url_for("login_buyer", cert_nr=cert_nr))
+		except Exception as err:
+			flash(f"Richiesta reset password NON inviata: {err}.")
+			return render_template("buyer/buyer_insert_email_reset_password.html", form=form, cert_nr=cert_nr)
+	else:
+		return render_template("buyer/buyer_insert_email_reset_password.html", form=form, cert_nr=cert_nr)
+
+
+@app.route('/buyer/reset_psw_token/<_token>/')
+def buyer_reset_psw_token(_token):
+	_token = db.session.query(AuthToken).filter_by(token=_token).first()
+	db.session.close()
+	if datetime.now() > _token.expires_at:
+		return "Il token è scaduto ripeti la procedura di ripristino password."
+	else:
+		_id = _token.user_id
+		return redirect(url_for('buyer_reset_password', _id=_id))
+
+
+@app.route("/buyer/reset_password/<_id>", methods=["GET", "POST"])
+def buyer_reset_password(_id):
+	"""Aggiorna password Utente Servizio."""
+	form = FormPswReset()
+	if form.validate_on_submit():
+		form_data = json.loads(json.dumps(request.form))
+		# _admin = json.loads(json.dumps(session["admin"]))
+
+		new_password = psw_hash(form_data["new_password_1"].replace(" ", "").strip())
+		# print("NEW:", new_password)
+
+		_user = User.query.get(_id)
+
+		if new_password == _user.password:
+			session.clear()
+			flash("La nuova password inserita è uguale a quella registrata.")
+			return render_template("buyer/buyer_reset_password.html", form=form, id=_id)
+		else:
+			from ..routes.routes_event import event_create
+
+			_user.password = new_password
+			_user.updated_at = datetime.now()
+
+			_user = _user.to_dict()
+
+			db.session.query(User).filter_by(id=_id).update(_user)
+			db.session.commit()
+
+			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
+			_event = {
+				"executor": session["username"],
+				"username": _user["username"],
+				"Modification": "Password reset"
+			}
+
+			db.session.close()
+
+			_event = event_create(_event, user_id=_id)
+			if _event is not True:
+				flash(_event)
+
+			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
+			return redirect(url_for('login_buyer', cert_nr="None"))
+	else:
+		return render_template("buyer/buyer_reset_password.html", form=form, id=_id)

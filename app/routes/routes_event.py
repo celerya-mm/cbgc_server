@@ -24,7 +24,6 @@ RESTORE = "/event/restore/<_id>/<id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_restore"
 
 
-@token_admin_validate
 def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=None,
                  slaughterhouse_id=None, head_id=None, cert_cons_id=None, cert_dna_id=None):
 	"""Registro evento DB."""
@@ -89,10 +88,10 @@ def event_view_history(_id):
 		type_related = "Amministratori"
 		view_related = ADMIN_HISTORY_FOR
 	elif event.user_id:
-		related = User.query.get(event.user_id)
+		related = Buyer.query.get(event.user_id)
 		related = related.to_dict()
 		field = "user_id"
-		table = User.__tablename__
+		table = Buyer.__tablename__
 		id_related = related["id"]
 		type_related = "Utenti"
 		view_related = USER_HISTORY_FOR
@@ -166,7 +165,7 @@ def event_view_history(_id):
 @token_admin_validate
 def event_restore(_id, id_record, table, view_for):
 	try:
-		models = [Administrator, User, Farmer, Buyer, Slaughterhouse, Head, CertificateDna, CertificateCons]
+		models = [Administrator, Buyer, Farmer, Buyer, Slaughterhouse, Head, CertificateDna, CertificateCons]
 		model = next((m for m in models if m.__tablename__ == table), None)
 		# print("TABLE_DB:", model, "ID:", id_record)
 		if model:

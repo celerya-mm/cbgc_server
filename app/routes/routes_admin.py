@@ -147,12 +147,13 @@ def admin_update(_id):
 			"Modification": f"Update account Administrator whit id: {_id}",
 			"Previous_data": previous_data
 		}
+
+		db.session.close()
+
 		_event = event_create(_event, admin_id=_id)
 		if _event is True:
-			db.session.close()
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 		else:
-			db.session.close()
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
@@ -198,9 +199,11 @@ def admin_update_password(_id):
 		administrator = Administrator.query.get(_id)
 
 		if new_password == administrator.password:
+			db.session.close()
 			flash("The 'New Password' inserted is equal to 'Registered Password'.")
 			return render_template("admin/admin_update_password.html", form=form, id=_id)
 		elif old_password != administrator.password:
+			db.session.close()
 			flash("The 'Current Passwort' inserted does not match the 'Registered Password'.")
 			return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 		else:
@@ -213,12 +216,13 @@ def admin_update_password(_id):
 				"username": session["username"],
 				"Modification": "Password changed"
 			}
+
+			db.session.close()
+
 			_event = event_create(_event, admin_id=_id)
 			if _event is True:
-				db.session.close()
 				return redirect(url_for('logout'))
 			else:
-				db.session.close()
 				flash(_event)
 				return redirect(url_for('logout'))
 	else:

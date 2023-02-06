@@ -15,13 +15,8 @@ def __generate_auth_token():
 	return str(uuid4())
 
 
-def __save_auth_token(admin_id, user_id, token):
+def __save_auth_token(token, admin_id=None, user_id=None):
 	"""Salvo il token nel DB."""
-	if admin_id in ["", None]:
-		admin_id = None
-	if user_id in ["", None]:
-		user_id = None
-
 	auth_token = AuthToken(admin_id=admin_id, user_id=user_id, token=token)
 	db.session.add(auth_token)
 	db.session.commit()

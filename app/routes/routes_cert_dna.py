@@ -188,6 +188,8 @@ def cert_dna_update(_id):
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
 
+		db.session.close()
+
 		_event = event_create(_event, cert_dna_id=_id)
 		if _event is True:
 			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))

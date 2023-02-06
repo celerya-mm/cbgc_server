@@ -1,4 +1,4 @@
-{% extends '_base2.html' %}
+{% extends '_base_buyer_login.html' %}
 
 {% block content %}
 <div class="container text-center mt-5">
@@ -12,9 +12,24 @@
         </a>
     </div>
     <div class="row no-gutters justify-content-center">
-        <div class="col-md-4">
-            <img class="img-fluid" style="max-width: 250px; margin: 10px;"
+        <div class="col-md-5">
+            <img class="img-fluid" style="max-width: 250px;"
                  src="{{ url_for('static', filename='Logo.png') }}" alt="">
+        </div>
+    </div>
+    <br>
+    <div class="card-footer px-lg-5 py-lg-4">
+        <div class="text-sm text-muted" style="font-size: 12px">
+            Associato al Consorzio:
+            <a title="Effettua la login" href="{{ url_for('login_buyer', cert_nr=cert_nr) }}">
+                log-in
+            </a>
+        </div>
+        <div class="text-sm text-muted" style="font-size: 12px">
+            <a title="Resetta password" href="{{ url_for('buyer_email_reset_psw', cert_nr=cert_nr) }}">
+                Resetta
+            </a>
+            Password dimenticata
         </div>
     </div>
     <br>

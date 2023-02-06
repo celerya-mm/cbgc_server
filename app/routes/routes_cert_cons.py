@@ -1,16 +1,18 @@
+import datetime
 import json
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request, send_file
 from sqlalchemy.exc import IntegrityError
 
 from ..app import db, session, Config
-from ..forms.form_cert_cons import FormCertConsCreate, FormCertConsUpdate
+from ..forms.form_cert_cons import FormCertConsCreate, FormCertConsUpdate, FormCertConsUpdateBuyer
+from ..models.accounts import User
 from ..models.buyers import Buyer
 from ..models.certificates_cons import CertificateCons, mount_code, year_cert_calc_update
 from ..models.farmers import Farmer
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import (not_empty, token_admin_validate, str_to_date, calc_age,
+from ..utilitys.functions import (not_empty, token_admin_validate, token_buyer_validate, str_to_date, calc_age,
                                   status_true_false, status_si_no, date_to_str, dict_group_by)
 from ..utilitys.functions_certificates import generate_qr_code, byte_to_pdf, html_to_pdf, pdf_to_byte
 
@@ -43,6 +45,18 @@ DOWNLOAD_LINK_HTML = "cert_cons/cert_cons_download_link.html"
 SAVE = "/cert_cons/save/<_link>/"
 SAVE_FOR = "cert_cons_save"
 
+BUYER_HISTORY = "/cert_cons/buyer/view/history/<cert_nr>"
+BUYER_HISTORY_FOR = "cert_cons_buyer_view_history"
+BUYER_HISTORY_HTML = "cert_cons/cert_cons_buyer_view_history.html"
+
+BUYER_VIEW = "/cert_cons/buyer/view/"
+BUYER_VIEW_FOR = "cert_cons_buyer_view"
+BUYER_VIEW_HTML = "cert_cons/cert_cons_buyer_view.html"
+
+BUYER_UPDATE = "/cert_cons/buyer/update/<_id>"
+BUYER_UPDATE_FOR = "cert_cons_buyer_update"
+BUYER_UPDATE_HTML = "cert_cons/cert_cons_buyer_update.html"
+
 
 @app.route(VIEW, methods=["GET", "POST"])
 @token_admin_validate
@@ -50,7 +64,7 @@ def cert_cons_view():
 	"""Visualizzo informazioni Capi."""
 	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
+	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
 	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
 
 	_list = CertificateCons.query.all()
@@ -162,7 +176,7 @@ def cert_cons_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record del Certificato."""
 	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
+	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
 	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
 	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
@@ -279,14 +293,13 @@ def cert_cons_update(_id):
 			try:
 				db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
 				db.session.commit()
-				db.session.close()
 				flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
 
 			except IntegrityError as err:
 				db.session.rollback()
-				db.session.close()
 				flash(f"ERRORE: {str(err.orig)}")
 				prev_cert = CertificateCons.query.get(int(_id) - 1)
+				db.session.close()
 				_info = {
 					'created_at': cert.created_at,
 					'updated_at': cert.updated_at,
@@ -300,6 +313,9 @@ def cert_cons_update(_id):
 				"Modification": f"Update Certificate whit id: {_id}",
 				"Previous_data": previous_data
 			}
+
+			db.session.close()
+
 			# print("EVENT:", json.dumps(_event, indent=2))
 			_event = event_create(_event, cert_cons_id=int(_id))
 			if _event is True:
@@ -504,6 +520,7 @@ def cert_cons_download(_id):
 
 @app.route(DOWNLOAD_LINK, methods=["GET", "POST"])
 def cert_cons_download_link(_link):
+	session["cert_nr"] = _link
 	return render_template(DOWNLOAD_LINK_HTML, cert_nr=_link, func=SAVE_FOR)
 
 
@@ -522,3 +539,139 @@ def cert_cons_save(_link):
 		_link = _link.replace("/", "_")
 		flash(f"Certificato Consorzio Bue Grasso di Carrù nr {_link} non trovato.")
 		return render_template(DOWNLOAD_LINK_HTML, cert_nr=_link, func=SAVE_FOR)
+
+
+@app.route(BUYER_VIEW, methods=["GET", "POST"])
+@token_buyer_validate
+def cert_cons_buyer_view():
+	"""Visualizzo informazioni Capi."""
+	if "username" in session:
+		user = db.session.query(User).filter_by(username=session["username"]).first()
+
+		certificates = [cert for buyer in user.buyers for cert in buyer.cons_certs]
+		for cert in certificates:
+			cert.certificate_date = date_to_str(cert.certificate_date)
+			cert.certificate_nr = cert.certificate_nr.replace("/", "_")
+
+		return render_template(BUYER_VIEW_HTML, form=certificates, history=BUYER_HISTORY_FOR)
+	else:
+		flash("effettua la login.")
+		return redirect(url_for("logout_buyer"))
+
+
+@app.route(BUYER_HISTORY, methods=["GET", "POST"])
+@token_buyer_validate
+def cert_cons_buyer_view_history(cert_nr):
+	"""Visualizzo la storia delle modifiche al record del Certificato."""
+	cert_nr = cert_nr.replace("_", "/")
+	cert = db.session.query(CertificateCons).filter_by(certificate_nr=cert_nr).first()
+	user = db.session.query(User).filter_by(username=session["username"]).first()
+	if cert and user.buyers:
+		_list_buyers = []
+		for buyer in user.buyers:
+			_list_buyers.append(buyer.id)
+
+		if cert.buyer_id in _list_buyers:
+			_cert = cert.to_dict()
+			# print("HEAD_FORM:", json.dumps(_head, indent=2), "TYPE:", type(_head))
+
+			if cert.head_id:
+				head = Head.query.get(cert.head_id)
+				_cert["head_id"] = head.headset
+
+			if cert.farmer_id:
+				farmer = Farmer.query.get(cert.farmer_id)
+				_cert["farmer_id"] = farmer.farmer_name
+
+			if cert.slaughterhouse_id:
+				slaugh = Slaughterhouse.query.get(cert.slaughterhouse_id)  # noqa
+				_cert["slaughterhouse_id"] = slaugh.slaughterhouse
+
+			db.session.close()
+
+			# print("CERT_DATA:", json.dumps(cert.to_dict(), indent=2))
+			return render_template(BUYER_HISTORY_HTML, form=_cert, view=BUYER_VIEW_FOR, update=BUYER_UPDATE_FOR)
+		else:
+			flash(f"Non sei autorizzato a manipolare il certificato nr: {cert_nr}. "
+			      f"Nell'elenco sono presenti i certificati assegnati al tuo account.")
+			return redirect(url_for("cert_cons_buyer_view"))
+	else:
+		flash(f"Non sei autorizzato a manipolare il certificato nr: {cert_nr}. "
+		      f"Nell'elenco sono presenti i certificati assegnati al tuo account.")
+		return redirect(url_for("cert_cons_buyer_view"))
+
+
+@app.route(BUYER_UPDATE, methods=["GET", "POST"])
+@token_buyer_validate
+def cert_cons_buyer_update(_id):
+	"""Aggiorna dati quantità residua in certificato."""
+	from ..routes.routes_event import event_create
+
+	form = FormCertConsUpdateBuyer()
+	if form.validate_on_submit():
+		try:
+			print("SESSION", json.dumps(session, indent=2))
+			new_quantity = json.loads(json.dumps(request.form))
+			new_quantity.pop('csrf_token', None)
+			# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+
+			cert = CertificateCons.query.get(int(_id))
+			previous_data = cert.to_dict()
+			new_data = previous_data
+			new_data["sale_rest"] = new_quantity["sale_rest"]
+			new_data["updated_at"] = datetime.datetime.now()
+
+			previous_data.pop("updated_at")
+			print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+			try:
+				db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
+				db.session.commit()
+				flash(f"QUANTITA' RIMANENTE Certificato {cert.certificate_nr} aggiornata correttamente.")
+
+			except IntegrityError as err:
+				db.session.rollback()
+				db.session.close()
+				flash(f"ERRORE: {str(err.orig)}")
+				_info = {
+					'created_at': cert.created_at,
+					'updated_at': cert.updated_at,
+				}
+				return render_template(
+					BUYER_UPDATE_HTML, form=form, id=cert.certificate_nr, info=_info, history=BUYER_HISTORY_FOR
+				)
+
+			_event = {
+				"buyer_username": session["username"],
+				"table": CertificateCons.__tablename__,
+				"Modification": f"Update Quantity Rest Certificate whit id: {_id}",
+				"Previous_data": previous_data
+			}
+
+			db.session.close()
+			print("EVENT:", json.dumps(_event, indent=2))
+			_event = event_create(_event, cert_cons_id=cert.id)
+			if _event is True:
+				return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
+			else:
+				flash(_event)
+				return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
+		except Exception as err:
+			flash(err)
+			return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
+	else:
+		# recupero i dati del record
+		cert = CertificateCons.query.get(int(_id))
+		form.sale_rest.data = cert.sale_rest
+		session["cert_nr"] = cert.certificate_nr.replace("/", "_")
+
+		db.session.close()
+
+		_info = {
+			'created_at': cert.created_at,
+			'updated_at': cert.updated_at,
+		}
+		# print("CERT_:", form)
+		# print("CERT_FORM:", form.to_dict())
+		return render_template(
+			BUYER_UPDATE_HTML, form=form, nr=cert.certificate_nr, info=_info, history=BUYER_HISTORY_FOR
+		)

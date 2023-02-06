@@ -3,7 +3,7 @@ from flask import current_app as app, flash, redirect, render_template, url_for,
 from ..app import session
 
 from ..forms.forms import FormLogin
-from ..utilitys.functions import admin_log_in
+from ..utilitys.functions import admin_log_in, buyer_log_in
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -30,6 +30,36 @@ def logout():
 	session.clear()
 	flash("Log-Out effettuato.")
 	return redirect(url_for('login'))
+
+
+@app.route("/logout/buyer/<cert_nr>/")
+def logout_buyer(cert_nr):
+	"""Effettua il log-out ed elimina i dati della sessione."""
+	session.clear()
+	flash("Log-Out effettuato.")
+	return redirect(url_for('login_buyer', cert_nr=cert_nr))
+
+
+@app.route("/buyer/login/<cert_nr>", methods=["GET", "POST"])
+def login_buyer(cert_nr):
+	"""Effettua la log-in."""
+	form = FormLogin()
+	if form.validate_on_submit():
+		# print(f"USER: {form.username.data}")
+		data = buyer_log_in(form)
+		if data["token"]:
+			session['cert_nr'] = cert_nr
+			session["token_login"] = data["token"]
+			session["username"] = form.username.data
+			if cert_nr not in ["", "None", None]:
+				return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
+			else:
+				return redirect(url_for('cert_cons_buyer_view'))
+		else:
+			flash("Invalid username or password. Please try again!", category="alert")
+			return render_template("buyer/buyer_login.html", form=form, cert_nr=cert_nr)
+	else:
+		return render_template("buyer/buyer_login.html", form=form, cert_nr=cert_nr)
 
 
 @app.route('/cache-me')

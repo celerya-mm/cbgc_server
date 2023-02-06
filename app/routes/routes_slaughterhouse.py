@@ -167,6 +167,8 @@ def slaughterhouse_update(_id):
 		}
 		# print("NEW_DATA:", new_data)
 
+		db.session.close()
+
 		_event = event_create(_event, slaughterhouse_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))

@@ -40,10 +40,10 @@ class Buyer(db.Model):
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<BUYER ID: {self.id.data}; Rag. Sociale: {self.buyer_name.data}>'
+		return f'<BUYER ID: {self.id}; Rag. Sociale: {self.buyer_name}>'
 
 	def __str__(self):
-		return f'<BUYER ID: {self.id.data}; Rag. Sociale: {self.buyer_name.data}>'
+		return f'<BUYER ID: {self.id}; Rag. Sociale: {self.buyer_name}>'
 
 	def __init__(self, buyer_name, buyer_type, email=None, phone=None, address=None, cap=None, city=None,
 	             affiliation_start_date=None, affiliation_status=None, affiliation_end_date=None, user_id=None,

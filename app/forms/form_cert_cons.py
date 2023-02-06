@@ -238,13 +238,13 @@ class FormCertConsUpdate(FlaskForm):
 	note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
 	note = StringField('Note', validators=[Length(max=255)])
 
-	submit = SubmitField("CREATE")
+	submit = SubmitField("Update")
 
 	def __repr__(self):
-		return f'<CERT_CONSORZIO CREATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
+		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
 
 	def __str__(self):
-		return f'<CERT_CONSORZIO CREATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
+		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
 
 	def validate_invoice_status(self, field):  # noqa
 		"""Valida campo invoice_status."""
@@ -285,4 +285,25 @@ class FormCertConsUpdate(FlaskForm):
 
 			'note_certificate': self.note_certificate.data,
 			'note': self.note.data,
+		}
+
+
+class FormCertConsUpdateBuyer(FlaskForm):
+	"""Form inserimento dati Certificato Consorzio."""
+	certificate_nr = IntegerField('Certificato nr.')
+	sale_rest = FloatField("kg Rimanenti", validators=[DataRequired("Campo obbligatorio!")])
+
+	submit = SubmitField("Update")
+
+	def __repr__(self):
+		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_nr.data}>'
+
+	def __str__(self):
+		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_nr.data}>'
+
+	def to_dict(self):
+		"""Converte form in dict."""
+		return {
+			'certificate_nr': self.certificate_nr.data,
+			'sale_rest': self.sale_rest.data,
 		}

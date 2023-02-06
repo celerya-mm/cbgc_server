@@ -230,6 +230,8 @@ def farmer_update(_id):
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
 
+		db.session.close()
+
 		_event = event_create(_event, farmer_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
