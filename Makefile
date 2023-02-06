@@ -1,6 +1,6 @@
 IMAGE=cbgc
 TAG_NAME=$(IMAGE):latest
-CONTAINER=cbgc-app
+CONTAINER=cbgc-service
 
 .PHONY:build
 build:
@@ -8,7 +8,7 @@ docker=build . --force-rm -t @(TAG_NAME)
 
 .PHONY:run
 run:
-    docker=run -d -p 8000:8000 -n @(CONTAINER) @(TAG_NAME)
+    docker=run -d -p 8000:5000 -n @(CONTAINER) @(TAG_NAME) --restart=always
     docker=image prune -f --filter 'dangling=true'
 
 kill:
