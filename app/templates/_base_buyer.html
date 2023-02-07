@@ -40,9 +40,7 @@
          style="padding-left: 20px; padding-rigth: 20px;">
         <!-- MENU-->
         <div class="container-fluid">
-            <a class="navbar-brand" title="Home" href="{{ url_for('logout_buyer', cert_nr=session['cert_nr']) }}">
-                <img src="{{ url_for('static', filename='Logo.png') }}" alt="" width="52" height="50"/>
-            </a>
+            <img src="{{ url_for('static', filename='Logo.png') }}" alt="" width="52" height="50"/>
             <a class="nav-link" title="Log-out" href="{{ url_for('logout_buyer', cert_nr=session['cert_nr']) }}"
                 style="padding-right: 20px;">
                 <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}"
@@ -87,7 +85,8 @@
     <hr>
     <br>
     <th class="footer-text"> Consorzio del Bue Grasso di Carrù - © Copyright 2017 - Tutti i diritti riservati - I marchi
-        riportati in questo sito appartengono ai legittimi proprietari
+        riportati in questo sito appartengono ai legittimi proprietari.
+        Contatto: <a href="mailto:info@consorziobuegrassocarru.it">info@consorziobuegrassocarru.it</a>
     </th>
     <br>
     <th class="footer-text">

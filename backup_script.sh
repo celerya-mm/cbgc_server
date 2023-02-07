@@ -1,10 +1,10 @@
 #!/bin/bash
-# per salire sul container e scegliere la cartella temporanea di salvataggio
+# per salire sul container e scegliere la cartella temporanea di salvataggio (eg tmp)
 # docker exec -it postgres-db bash
 
 # setup crontab per esecuzione script
 # crontab -e
-# 0 12 * * * /bin/bash /share/Multimedia/05_Documenti/Flask/cbgc_server/backup_script.sh
+# 0 13 * * * /bin/bash share/Multimedia/05_Documenti/Flask/cbgc_server/backup_script.sh
 
 # Define the maximum number of backups to keep
 max_backups=14
@@ -22,7 +22,7 @@ if [ "$num_backups" -gt $max_backups ]; then
 fi
 
 # print current folder
-sudo pwd
+# sudo pwd
 
 # Run the backup command inside container
 sudo docker exec postgres-db pg_dump -U "postgres" -F t -f "tmp/dump.tar" bue_grasso_web

@@ -12,7 +12,7 @@ docker build --force-rm -t nginx:latest .
 docker image ls
 
 # Lanciare il docker usando l'immagine appena creata
-docker run -d -p 8000:5000 --name cbgc-service --restart=always cbgc:latest
+docker run --detach --publish 8000:5000 --name cbgc-service --restart=always cbgc:latest
 docker run -d -p 80:80 -p 62233:62233 --name reverse-proxy --restart=always nginx:latest
 
 # Rimuovere immagini non utilizzate
