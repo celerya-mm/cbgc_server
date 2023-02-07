@@ -41,54 +41,73 @@ def create_map(_list):
 	folium.TileLayer('Stamen Terrain', control=False).add_to(m)
 	feature_group_m = folium.FeatureGroup(name="Macellerie", overlay=True)
 	feature_group_r = folium.FeatureGroup(name="Ristoranti", overlay=True)
-	feature_group_i = folium.FeatureGroup(name="Indefiniti", overlay=True)
+	feature_group_bm = folium.FeatureGroup(name="Bue in Macelleria", overlay=True)
+	feature_group_br = folium.FeatureGroup(name="Bue in Ristorante", overlay=True)
 	for record in _list:
 		if record.coordinates and len(record.coordinates) > 5:
 			if record.buyer_type == "Macelleria":
 				color = "red"  # rosso (macellerie)
 				icon = "shop"
 				feature_group = feature_group_m
-			elif record.buyer_type == "Ristorante":
+				feature_group_b = feature_group_bm
+			else:
 				color = "blue"  # blue (ristorante)
 				icon = "cutlery"
 				feature_group = feature_group_r
-			else:
-				color = "grey"  # grigio (manca il tipo)
-				icon = "info-sign"
-				feature_group = feature_group_i
+				feature_group_b = feature_group_br
+
+			_bue = 0
+			if record.cons_certs:
+				for cert in record.cons_certs:
+					if cert.sale_rest:
+						_bue = _bue + cert.sale_rest
 
 			coordinates = record.coordinates.split(", ")
-			# print("COORDINATES:", coordinates)
+
 			lat = re.findall(r'\d+\.\d+', coordinates[0].replace("(", ""))
-			# print("LAT", lat)
 			lat = float(lat[0])
 
 			long = re.findall(r'\d+\.\d+', coordinates[1].replace(")", ""))
-			# print("LONG:", long)
 			long = float(long[0])
 
 			html = "<style> " \
-			       "h1 {font-size: 14px; color: #2B4692} " \
-			       "p {font-size: 10px; margin: 5px} " \
+			       "h1 {font-size: 14px; color: #2B4692; padding: 0;} " \
+				   "p {font-size: 12px; color: #2B4692; margin: 5px; padding: 0;} " \
+				   "body {margin: 0px !important; line-height: 1; min-height: 1px;}" \
+				   "leaflet-popup-content {margin: 5px !important;}" \
 			       "</style>" \
 			       f"<h1>{record.buyer_type}</h1>" \
 			       f"<p><strong>Nome:</strong> {record.buyer_name}</p>" \
 			       f"<p><strong>Indirizzo:</strong> {record.full_address}</p>" \
 			       f"<p><strong>Telefono:</strong> {record.phone}</p>"
 
-			iframe = folium.IFrame(html=html, height=450, ratio=0.2)
+			iframe = folium.IFrame(html=html, height=80, width=400, ratio=0.2)
 			popup = folium.Popup(iframe)
 
 			tooltip = "Clicca!"
 
 			folium.Marker(
-				location=[lat, long], popup=popup, tooltip=tooltip, icon_size=(20, 20),
+				location=[lat, long], popup=popup, tooltip=tooltip,
 				icon=folium.Icon(color=color, prefix='fa', icon=icon)
 			).add_to(feature_group)
 
+			if _bue > 0:
+				iframe = folium.IFrame(html=html, height=80, width=400, ratio=0.2)
+				popup = folium.Popup(iframe)
+
+				folium.Marker(
+					location=[lat, long], popup=popup, tooltip=tooltip,
+					icon=folium.CustomIcon("app/static/Logo.png", icon_size=(20, 20))
+				).add_to(feature_group_b)
+
+				# folium.CircleMarker(
+				# 	location=[lat, long], popup=popup, tooltip=tooltip, radius=10, color="green"
+				# ).add_to(feature_group_b)
+
 	feature_group_m.add_to(m)
 	feature_group_r.add_to(m)
-	feature_group_i.add_to(m)
+	feature_group_bm.add_to(m)
+	feature_group_br.add_to(m)
 
 	folium.LayerControl().add_to(m)
 
@@ -336,11 +355,11 @@ def buyer_email_reset_psw(cert_nr):
 		try:
 			# imposto e invio la mail con il link per il reset
 			msg = Message(
-				'Follow your request for change password in Consorzio Bue Grasso service.',
+				'Password change request in Consorzio Bue Grasso account.',
 				sender="service@celerya.com",
 				recipients=[form.email.data]
 			)
-			msg.body = f"This is the link for reset your password: \n\n{_link}\n\n" \
+			msg.body = f"Follow this link for reset your password: \n\n{_link}\n\n" \
 			           f"The link expiry in 15 min."
 			mail.send(msg)
 			flash("Richiesta reset password inviata correttamente.")

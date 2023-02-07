@@ -54,7 +54,7 @@ def create_map(_list):
 
 			html = "<style> " \
 			       "h1 {font-size: 14px; color: #2B4692} " \
-			       "p {font-size: 10px; margin: 5px} " \
+			       "p {font-size: 12px; color: #2B4692; margin: 5px} " \
 			       "</style>" \
 			       f"<h1>{record.stable_type}</h1>" \
 			       f"<p><strong>Nome:</strong> {record.farmer_name}</p>" \

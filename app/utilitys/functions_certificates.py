@@ -39,9 +39,10 @@ def generate_qr_code(_str, nr_cert):
 		img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
 		# print("")
 		# print(img)
-		img.save(os.path.join(folder_temp_qrcode, nr_cert + ".jpg"))
+		nr_cert = nr_cert.replace("/", "_") + ".jpg"
+		img.save(os.path.join(folder_temp_qrcode, nr_cert))
 		# print("QR-Code Generated")
-		return nr_cert + ".jpg"
+		return nr_cert
 	except Exception as err:
 		print(err)
 		return False
@@ -55,7 +56,7 @@ def byte_to_pdf(byte, f_name):
 		os.remove(file_path)
 
 	path_file = os.path.join(folder_temp_pdf, f_name.replace("/", "_") + ".pdf")
-	# print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
+	print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
 	with open(path_file, "wb") as f:
 		f.write(byte)
 	return path_file

@@ -261,11 +261,11 @@ def reset_psw_user(_id):
 	try:
 		# imposto e invio la mail con il link per il reset
 		msg = Message(
-			'Follow your request for change password in Consorzio Bue Grasso service.',
+			'Password change request in Consorzio Bue Grasso account.',
 			sender="service@celerya.com",
 			recipients=[_mail]
 		)
-		msg.body = f"This is the link for reset your password: \n{_link}\n" \
+		msg.body = f"Follow this link for reset your password: \n\n{_link}\n\n" \
 		           f"The link expiry in 15 min."
 		mail.send(msg)
 		flash("Richiesta reset password inviata correttamente.")
