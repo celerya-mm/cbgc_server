@@ -97,12 +97,8 @@ def create_map(_list):
 
 				folium.Marker(
 					location=[lat, long], popup=popup, tooltip=tooltip,
-					icon=folium.CustomIcon("app/static/Logo.png", icon_size=(20, 20))
+					icon=folium.CustomIcon("app/static/Logo.png", icon_size=(50, 50))
 				).add_to(feature_group_b)
-
-				# folium.CircleMarker(
-				# 	location=[lat, long], popup=popup, tooltip=tooltip, radius=10, color="green"
-				# ).add_to(feature_group_b)
 
 	feature_group_m.add_to(m)
 	feature_group_r.add_to(m)
