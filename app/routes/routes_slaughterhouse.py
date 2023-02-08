@@ -189,6 +189,7 @@ def slaughterhouse_update(_id):
 		form.address.data = slaughterhouse.address
 		form.cap.data = slaughterhouse.cap
 		form.city.data = slaughterhouse.city
+		form.coordinates.data = slaughterhouse.coordinates
 
 		form.affiliation_start_date.data = str_to_date(slaughterhouse.affiliation_start_date)
 		form.affiliation_end_date.data = str_to_date(slaughterhouse.affiliation_end_date)

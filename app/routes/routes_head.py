@@ -86,7 +86,7 @@ def head_create():
 			castration_date=not_empty(form_data["castration_date"]),
 			slaughter_date=not_empty(form_data["slaughter_date"]),
 			sale_date=not_empty(form_data["sale_date"]),
-			farmer_id=not_empty(form_data["farmer_id"]),
+			farmer_id=not_empty(form_data["farmer_id"].split(" - ")[0]),
 			note=form_data["note"].strip()
 		)
 		# print("HEAD_NEW_DATA", json.dumps(new_head.to_dict(), indent=2))

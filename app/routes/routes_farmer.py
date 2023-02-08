@@ -249,6 +249,7 @@ def farmer_update(_id):
 		form.address.data = farmer.address
 		form.cap.data = farmer.cap
 		form.city.data = farmer.city
+		form.coordinates.data = farmer.coordinates
 
 		form.stable_code.data = farmer.stable_code
 		form.stable_type.data = farmer.stable_type

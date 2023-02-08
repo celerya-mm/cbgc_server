@@ -438,6 +438,11 @@ def cert_cons_generate(_id):
 		else:
 			note = cert.note_certificate
 
+		if slaught.slaughterhouse_code:
+			slaughter = f"{slaught.slaughterhouse_code} - {slaught.slaughterhouse}"
+		else:
+			slaughter = slaught.slaughterhouse
+
 		data = {
 			"certificate_nr": cert.certificate_nr,
 			"certificate_date": date_to_str(cert.certificate_date, '%d-%m-%Y'),
@@ -446,7 +451,7 @@ def cert_cons_generate(_id):
 			"batch_number": cert.batch_number,
 			"headset": head.headset,
 			"farmer_name": farmer.farmer_name,
-			"slaughter_name": slaught.slaughterhouse,
+			"slaughter_name": slaughter,
 			"buyer_name": buyer.buyer_name,
 			"sale_type": cert.sale_type,
 			"note_cert": note

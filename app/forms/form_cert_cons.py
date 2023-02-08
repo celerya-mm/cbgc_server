@@ -202,7 +202,7 @@ class FormCertConsUpdate(FlaskForm):
 
 	certificate_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
 	certificate_date = DateField(
-		'Data Certificato', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d'
+		'Data', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d'
 	)
 	certificate_year = IntegerField('Anno', validators=[DataRequired("Campo obbligatorio!")])
 

@@ -167,6 +167,7 @@
                             <th class="title" id="c7">Tipo</th>
                             <th class="title" id="c8">Quantità</th>
                             <th class="title" id="c9">Resto</th>
+                            <th class="title" id="c10">Fattura</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -198,6 +199,9 @@
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.sale_rest|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.invoice_status|e }}
                             </td>
                         </tr>
                         {% endfor %}

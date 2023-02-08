@@ -49,6 +49,6 @@ with app.app_context():
 	                        routes_slaughterhouse, routes_user, routes_cert_dna, routes_cert_cons)
 	from app.utilitys.functions import token_admin_validate, token_buyer_validate  # noqa
 
-	db.reflect()  # Verifica tabelle presenti nel DB.
+	# db.reflect()  # Verifica tabelle presenti nel DB.
 	# db.drop_all()  # Attenzione elimina tutte le tabelle dal DB.
-	db.create_all()  # Crea le tabelle nel DB
+	# db.create_all()  # Crea le tabelle nel DB

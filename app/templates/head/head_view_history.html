@@ -14,17 +14,23 @@
                href="{{ url_for(update, _id=form.id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
             </a>
+
             {% if form.headset != None and f_id != None and len_dna < 1 %}
             <a class="btn btn-update" type="button" title="Aggiungi Certificato DNA"
                href="{{ url_for(dna_create, h_id=form.id, f_id=form.farmer_id, h_set=form.headset) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/dna-red.png') }}" alt=""/>
             </a>
+            {% else %}
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/dna-grey.png') }}" alt=""/>
             {% endif %}
+
             {% if form.headset != None and f_id != None and form.slaughter_date != None %}
             <a class="btn btn-update" type="button" title="Aggiungi Certificato Consorzio"
                href="{{ url_for(cons_create, h_id=form.id, f_id=form.farmer_id, h_set=form.headset) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/certificate_red.svg') }}" alt=""/>
             </a>
+            {% else %}
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/certificate_grey.svg') }}" alt=""/>
             {% endif %}
         </h5>
     </div>

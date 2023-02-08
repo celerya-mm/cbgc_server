@@ -36,7 +36,7 @@ class FormBuyerCreate(FlaskForm):
 		'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
 	)
 
-	buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Macello", "Ristorante"], default="Ristorante")
+	buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Ristorante"], default="Ristorante")
 
 	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
 	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
@@ -77,7 +77,7 @@ class FormBuyerUpdate(FlaskForm):
 	buyer_name = StringField(
 		'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
 	)
-	buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Macello", "Ristorante"])
+	buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Ristorante"])
 
 	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
 	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
