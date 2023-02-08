@@ -120,7 +120,7 @@ class FormCertConsCreate(FlaskForm):
 	invoice_date = DateField('Fattura Data', format='%Y-%m-%d', validators=[Optional()])
 	invoice_status = SelectField(
 		'Fattura Stato', validators=[DataRequired("Campo obbligatorio!")], choices=[
-			"Da Emettere", "Emessa", "Annullata", "Non Pagata", "Pagata"
+			"Annullata", "Da Emettere", "Emessa", "Fiera", "Non Pagata", "Pagata"
 		], default="Da Emettere"
 	)
 
@@ -160,6 +160,13 @@ class FormCertConsCreate(FlaskForm):
 			                      f"'Da Emettere'.")
 		if self.invoice_nr.data and field.data == "Da Emettere":
 			raise ValidationError(f"Attenzione, la fattura non può essere presente e lo stato essere da 'Da Emettere'.")
+
+	def validate_head_category(self, field):  # noqa
+		"""Valida campo categoria capo."""
+		if self.head_age.data >= 46 and field.data == "Manzo":
+			raise ValidationError(f"Attenzione, il capo ha 46 o più mesi. Devi assegnare la categoria 'Bue'")
+		if self.head_age.data < 46 and field.data == "Bue":
+			raise ValidationError(f"Attenzione, il capo ha meno di 46 mesi. Devi assegnare la categoria 'Manzo'")
 
 	def to_dict(self):
 		"""Converte form in dict."""
@@ -226,7 +233,7 @@ class FormCertConsUpdate(FlaskForm):
 	invoice_date = DateField('Fattura Data', format='%Y-%m-%d', validators=[Optional()])
 	invoice_status = SelectField(
 		'Fattura Stato', validators=[DataRequired("Campo obbligatorio!")], choices=[
-			"Da Emettere", "Emessa", "Annullata", "Non Pagata", "Pagata"
+			"Annullata", "Da Emettere", "Emessa", "Fiera", "Non Pagata", "Pagata"
 		]
 	)
 
@@ -253,6 +260,13 @@ class FormCertConsUpdate(FlaskForm):
 			                      f"'Da Emettere'.")
 		if self.invoice_nr.data and field.data == "Da Emettere":
 			raise ValidationError(f"Attenzione, la fattura non può essere presente e lo stato essere da 'Da Emettere'.")
+
+	def validate_head_category(self, field):  # noqa
+		"""Valida campo categoria capo."""
+		if self.head_age.data >= 46 and field.data == "Manzo":
+			raise ValidationError(f"Attenzione, il capo ha 46 o più mesi. Devi assegnare la categoria 'Bue'")
+		if self.head_age.data < 46 and field.data == "Bue":
+			raise ValidationError(f"Attenzione, il capo ha meno di 46 mesi. Devi assegnare la categoria 'Manzo'")
 
 	def to_dict(self):
 		"""Converte form in dict."""

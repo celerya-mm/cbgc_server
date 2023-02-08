@@ -359,6 +359,11 @@ def cert_cons_update(_id):
 		else:
 			form.head_age.data = cert.head_age
 
+		if form.head_age.data >= 46:
+			form.head_category.data = "Bue"
+		else:
+			form.head_category.data = "Manzo"
+
 		form.batch_number.data = cert.batch_number
 
 		form.invoice_nr.data = cert.invoice_nr

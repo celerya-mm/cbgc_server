@@ -53,16 +53,19 @@
                         <thead>
                         <tr style="background-color: #2B4692; vertical-align: center;">
                             <th class="title" id="h1">ID</th>
-                            <th class="title" id="h2">Cert. nr</th>
+                            <th class="title" id="h2">NR</th>
                             <th class="title" id="h3">Data</th>
                             <th class="title" id="h4">Anno</th>
                             <th class="title" id="h5">Coccarda</th>
-                            <th class="title" id="h6">Tipo Vendita</th>
+                            <th class="title" id="h6">Vendita</th>
                             <th class="title" id="h7">Rimane</th>
                             <th class="title" id="h8">Capo</th>
                             <th class="title" id="h9">Allev.</th>
                             <th class="title" id="h10">Acquir.</th>
-                            <th class="title" id="h11">Fatt.</th>
+                            <th class="title" id="h11">Età</th>
+                            <th class="title" id="h12">Tipo</th>
+                            <th class="title" id="h13">Fatt.</th>
+                            <th class="title" id="h14">Note</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -110,8 +113,17 @@
                                     {{ row.buyer_id|e }}
                                 </a>
                             </td>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.head_age|e }}
+                            </td>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.head_category|e }}
+                            </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.invoice_status|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.note|e }}
                             </td>
                         </tr>
                         {% endfor %}

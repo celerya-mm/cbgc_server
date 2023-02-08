@@ -82,6 +82,7 @@
                             <th class="title" id="h6">Conf.</th>
                             <th class="title" id="h7">Venduto</th>
                             <th class="title" id="h8">Macellato</th>
+                            <th class="title" id="h9">Note</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -121,6 +122,9 @@
                             </td>
                             <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
                                 {{ row.slaughter_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.note|e }}
                             </td>
                         </tr>
                         {% endfor %}
