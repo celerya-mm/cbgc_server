@@ -675,6 +675,7 @@ def cert_cons_buyer_update(_id):
 		# recupero i dati del record
 		cert = CertificateCons.query.get(int(_id))
 		form.sale_rest.data = cert.sale_rest
+		form.prev.data = cert.sale_rest
 		session["cert_nr"] = cert.certificate_nr.replace("/", "_")
 
 		db.session.close()

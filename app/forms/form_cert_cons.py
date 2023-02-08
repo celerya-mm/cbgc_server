@@ -164,9 +164,9 @@ class FormCertConsCreate(FlaskForm):
 	def validate_head_category(self, field):  # noqa
 		"""Valida campo categoria capo."""
 		if self.head_age.data >= 46 and field.data == "Manzo":
-			raise ValidationError(f"Attenzione, il capo ha 46 o più mesi. Devi assegnare la categoria 'Bue'")
+			raise ValidationError(f"Attenzione, il capo ha 46 o più mesi. Devi assegnare la categoria 'Bue'.")
 		if self.head_age.data < 46 and field.data == "Bue":
-			raise ValidationError(f"Attenzione, il capo ha meno di 46 mesi. Devi assegnare la categoria 'Manzo'")
+			raise ValidationError(f"Attenzione, il capo ha meno di 46 mesi. Devi assegnare la categoria 'Manzo'.")
 
 	def to_dict(self):
 		"""Converte form in dict."""
@@ -264,9 +264,9 @@ class FormCertConsUpdate(FlaskForm):
 	def validate_head_category(self, field):  # noqa
 		"""Valida campo categoria capo."""
 		if self.head_age.data >= 46 and field.data == "Manzo":
-			raise ValidationError(f"Attenzione, il capo ha 46 o più mesi. Devi assegnare la categoria 'Bue'")
+			raise ValidationError(f"Attenzione, il capo ha 46 o più mesi. Devi assegnare la categoria 'Bue'.")
 		if self.head_age.data < 46 and field.data == "Bue":
-			raise ValidationError(f"Attenzione, il capo ha meno di 46 mesi. Devi assegnare la categoria 'Manzo'")
+			raise ValidationError(f"Attenzione, il capo ha meno di 46 mesi. Devi assegnare la categoria 'Manzo'.")
 
 	def to_dict(self):
 		"""Converte form in dict."""
@@ -306,8 +306,15 @@ class FormCertConsUpdateBuyer(FlaskForm):
 	"""Form inserimento dati Certificato Consorzio."""
 	certificate_nr = IntegerField('Certificato nr.')
 	sale_rest = FloatField("kg Rimanenti", validators=[DataRequired("Campo obbligatorio!")])
+	prev = FloatField("kg Rimanenti", validators=[Optional()])
 
 	submit = SubmitField("Update")
+
+	def validate_sale_rest(self, field):  # noqa
+		"""Valida campo sale_rest."""
+		if field.data > self.prev.data:
+			raise ValidationError(f"Attenzione, non puoi assegnare un quantitativo superiore a quello assegnato o "
+			                      f"precedentemente modificato.")
 
 	def __repr__(self):
 		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_nr.data}>'
