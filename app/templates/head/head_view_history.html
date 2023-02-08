@@ -21,7 +21,8 @@
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/dna-red.png') }}" alt=""/>
             </a>
             {% else %}
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/dna-grey.png') }}" alt=""/>
+                <img title="Cert. dna già presente"
+                     class="icon-simple" src="{{ url_for('static', filename='icons/dna-grey.png') }}" alt=""/>
             {% endif %}
 
             {% if form.headset != None and f_id != None and form.slaughter_date != None %}
@@ -30,7 +31,8 @@
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/certificate_red.svg') }}" alt=""/>
             </a>
             {% else %}
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/certificate_grey.svg') }}" alt=""/>
+                <img title="Aggiungi certificato disabilitato, manca data macellazione" class="icon-simple"
+                     src="{{ url_for('static', filename='icons/certificate_grey.svg') }}" alt=""/>
             {% endif %}
         </h5>
     </div>

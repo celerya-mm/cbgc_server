@@ -46,7 +46,7 @@ def head_view():
 
 	# raggruppa per anno di nascita e conformità castrazione
 	group_conf = dict_group_by(_list, group_d="birth_year", group_f="castration_compliance", year=True)
-	conf_labels = [sub["birth_year"] for sub in group_conf if sub["castration_compliance"] is False]
+	conf_labels = [sub["birth_year"] for sub in group_conf if sub["castration_compliance"] is True]
 	conf_values = [sub['number'] for sub in group_conf if sub["castration_compliance"] is True]
 	not_conf_values = [sub['number'] for sub in group_conf if sub["castration_compliance"] is False]
 
