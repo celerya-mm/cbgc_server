@@ -237,7 +237,7 @@ def cert_cons_update(_id):
 
 			cert.certificate_id = new_data["certificate_id"]
 			cert.certificate_var = new_data["certificate_var"]
-			cert.certificate_year = year_cert_calc_update(new_data["certificate_year"])
+			cert.certificate_year = year_cert_calc_update(new_data["certificate_date"])
 			cert.certificate_nr = mount_code(
 				new_data["certificate_id"], cert.certificate_year, new_data["certificate_var"]
 			)
@@ -267,7 +267,7 @@ def cert_cons_update(_id):
 
 			cert.invoice_nr = not_empty(new_data["invoice_nr"])
 			cert.invoice_date = str_to_date(new_data["invoice_date"])
-			cert.invoice_status = str_to_date(new_data["invoice_status"])
+			cert.invoice_status = not_empty(new_data["invoice_status"])
 
 			if new_data["head_id"] not in ["", "-", None]:
 				cert.head_id = int(new_data["head_id"].split(" - ")[0])
@@ -340,7 +340,7 @@ def cert_cons_update(_id):
 		form.certificate_id.data = cert.certificate_id
 		form.certificate_var.data = cert.certificate_var
 		form.certificate_date.data = str_to_date(cert.certificate_date)
-		form.certificate_year.data = cert.certificate_date
+		form.certificate_year.data = cert.certificate_year
 
 		form.emitted.data = status_si_no(cert.emitted)
 

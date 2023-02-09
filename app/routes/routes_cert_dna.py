@@ -163,7 +163,7 @@ def cert_dna_update(_id):
 		_cert.dna_cert_id = new_data["dna_cert_id"]
 		_cert.dna_cert_date = str_to_date(new_data["dna_cert_date"])
 		_cert.dna_cert_year = year_extract(new_data["dna_cert_date"])
-		_cert.dna_cert_nr = f'{new_data["dna_cert_id"]}/{new_data["dna_cert_year"]}'
+		_cert.dna_cert_nr = f'{new_data["dna_cert_id"]}/{_cert.dna_cert_year}'
 
 		_cert.veterinarian = new_data["veterinarian"]
 
@@ -195,10 +195,10 @@ def cert_dna_update(_id):
 
 		_event = event_create(_event, cert_dna_id=_id)
 		if _event is True:
-			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))
+			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"].split(" - ")[0]))
 		else:
 			flash(_event)
-			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))
+			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"].split(" - ")[0]))
 	else:
 		# recupera Capo
 		_head = Head.query.get(_cert.head_id)

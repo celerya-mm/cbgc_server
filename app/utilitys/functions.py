@@ -164,7 +164,7 @@ def mount_full_name(name, last_name):
 
 def year_extract(date):  # noqa
 	"""Estrae l'anno da una data"""
-	if date is None:
+	if date in ["", None]:
 		return None
 	elif isinstance(date, str):
 		year = datetime.strptime(date, "%Y-%m-%d")

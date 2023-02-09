@@ -9,7 +9,7 @@ from ..forms.form_account import FormAccountUpdate, FormUserSignup
 from ..forms.forms import FormPswReset
 from ..models.accounts import User
 from ..models.tokens import calc_exp_token_reset_psw, AuthToken
-from ..utilitys.functions import token_admin_validate
+from ..utilitys.functions import token_admin_validate, not_empty
 from ..utilitys.functions_accounts import psw_hash, __generate_auth_token
 
 VIEW = "/user/view/"
@@ -140,7 +140,7 @@ def user_update(_id):
 		user.email = new_data["email"].strip().replace(" ", "")
 		user.phone = new_data["phone"].strip()
 
-		user.note = new_data["note"].strip().replace("  ", "")
+		user.note = not_empty(new_data["note"].strip().replace("  ", ""))
 		user.updated_at = datetime.now()
 		# print("NEW_DATA:", new_data)
 		try:

@@ -219,7 +219,6 @@ def farmer_update(_id):
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.query(Farmer).filter_by(id=_id).update(new_data)
 			db.session.commit()
 			db.session.close()
 			flash("ALLEVATORE aggiornato correttamente.")
