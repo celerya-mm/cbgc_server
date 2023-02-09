@@ -2,6 +2,7 @@ from datetime import datetime
 
 from ..app import db
 
+
 class Slaughterhouse(db.Model):
 	# Table
 	__tablename__ = 'slaughterhouses'

@@ -117,6 +117,7 @@ flask_session
 to_do.md
 develop.env
 app/utilitys/temp_pdf
+map.html
 
 
 # Spyder project settings

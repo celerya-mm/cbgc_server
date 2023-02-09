@@ -20,11 +20,11 @@ CREATE = "/head/create/"
 CREATE_FOR = "head_create"
 CREATE_HTML = "head/head_create.html"
 
-HISTORY = "/head/view/history/<_id>"
+HISTORY = "/head/view/history/<int:_id>"
 HISTORY_FOR = "head_view_history"
 HISTORY_HTML = "head/head_view_history.html"
 
-UPDATE = "/head/update/<_id>"
+UPDATE = "/head/update/<int:_id>"
 UPDATE_FOR = "head_update"
 UPDATE_HTML = "head/head_update.html"
 
@@ -37,6 +37,7 @@ def head_view():
 
 	_list = Head.query.all()
 	_list = [r.to_dict() for r in _list]
+	db.session.close()
 	# print("LIST_HEAD:", json.dumps(_list[:5], indent=2))
 
 	# raggruppa per anno di nascita
@@ -60,7 +61,6 @@ def head_view():
 	farmer_labels = [sub["farmer_id"] for sub in group_farmer]
 	farmer_values = [sub['number'] for sub in group_farmer]
 
-	db.session.close()
 	return render_template(
 		VIEW_HTML, form=_list, create=CREATE_FOR, update=UPDATE_FOR, history=HISTORY_FOR, farmer=FARMER_HISTORY,
 		birth_labels=json.dumps(birth_labels), birth_values=json.dumps(birth_values),
@@ -174,38 +174,42 @@ def head_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormHeadUpdate()
+	# recupero i dati del record
+	head = Head.query.get(int(_id))
+
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
 		# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-		head = Head.query.get(_id)
 		previous_data = head.to_dict()
 		previous_data.pop("updated_at")
 		# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-		new_data["castration_date"] = not_empty(new_data["castration_date"])
-		new_data["sale_date"] = not_empty(new_data["sale_date"])
-		new_data["slaughter_date"] = not_empty(new_data["slaughter_date"])
+		head.headset = new_data["headset"].strip()
 
-		new_data["note"] = not_empty(new_data["note"])
+		head.birth_date = str_to_date(new_data["birth_date"])
+		head.birth_year = year_extract(new_data["birth_date"])
 
-		new_data["birth_year"] = year_extract(new_data["birth_date"])
-		new_data["castration_compliance"] = verify_castration(new_data["birth_date"], new_data["castration_date"])
-		new_data["sale_year"] = year_extract(new_data["sale_date"])
+		head.castration_date = not_empty(new_data["castration_date"])
+		head.castration_compliance = verify_castration(new_data["birth_date"], new_data["castration_date"])
+
+		head.slaughter_date = not_empty(new_data["slaughter_date"])
+
+		head.sale_date = not_empty(new_data["sale_date"])
+		head.sale_year = year_extract(new_data["sale_date"])
 
 		if new_data["farmer_id"] not in ["", "-", None]:
-			new_data["farmer_id"] = int(new_data["farmer_id"].split(" - ")[0])
+			head.farmer_id = int(new_data["farmer_id"].split(" - ")[0])
 		else:
-			new_data["farmer_id"] = None
+			head.farmer_id = None
 
-		new_data["created_at"] = head.created_at
-		new_data["updated_at"] = datetime.now()
+		head.note = not_empty(new_data["note"])
+		head.updated_at = datetime.now()
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.query(Head).filter_by(id=_id).update(new_data)
 			db.session.commit()
+			db.session.close()
 			flash("CAPO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -226,8 +230,6 @@ def head_update(_id):
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
 
-		db.session.close()
-
 		_event = event_create(_event, head_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
@@ -235,10 +237,6 @@ def head_update(_id):
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati del record
-		head = Head.query.get(int(_id))
-		# print("HEAD_FIND:", head, type(data))
-
 		form.headset.data = head.headset
 
 		form.birth_date.data = str_to_date(head.birth_date)

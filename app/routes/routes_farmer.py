@@ -19,11 +19,11 @@ CREATE = "/farmer/create/"
 CREATE_FOR = "farmer_create"
 CREATE_HTML = "farmer/farmer_create.html"
 
-HISTORY = "/farmer/view/history/<_id>"
+HISTORY = "/farmer/view/history/<int:_id>"
 HISTORY_FOR = "farmer_view_history"
 HISTORY_HTML = "farmer/farmer_view_history.html"
 
-UPDATE = "/farmer/update/<_id>"
+UPDATE = "/farmer/update/<int:_id>"
 UPDATE_FOR = "farmer_update"
 UPDATE_HTML = "farmer/farmer_update.html"
 
@@ -181,36 +181,47 @@ def farmer_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormFarmerUpdate()
+	# recupero i dati del record
+	farmer = Farmer.query.get(_id)
+
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
 		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
 		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
-		farmer = Farmer.query.get(_id)
 		previous_data = farmer.to_dict()
 		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+		farmer.farmer_name = new_data["farmer_name"].strip().replace("  ", " ")
 
-		new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
-		new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
-		new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
+		farmer.email = not_empty(new_data["email"])
+		farmer.phone = not_empty(new_data["phone"].strip())
 
-		new_data["phone"] = not_empty(new_data["phone"])
-		new_data["email"] = not_empty(new_data["email"])
-		new_data["stable_code"] = not_empty(new_data["stable_code"])
+		farmer.address = new_data["address"].strip()
+		farmer.cap = new_data["cap"].strip()
+		farmer.city = new_data["city"].strip()
+		farmer.full_address = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+		farmer.coordinates = new_data["coordinates"].strip()
 
-		new_data["note"] = not_empty(new_data["note"])
+		farmer.affiliation_start_date = str_to_date(new_data["affiliation_start_date"])
+		farmer.affiliation_end_date = str_to_date(new_data["affiliation_end_date"])
+		farmer.affiliation_status = status_true_false(new_data["affiliation_status"])
 
-		new_data["created_at"] = farmer.created_at
-		new_data["updated_at"] = datetime.now()
+		farmer.stable_code = not_empty(new_data["stable_code"])
+		farmer.stable_type = not_empty(new_data["stable_type"])
+		farmer.stable_productive_orientation = not_empty(new_data["stable_productive_orientation"])
+		farmer.stable_breeding_methods = not_empty(new_data["stable_breeding_methods"])
+
+		farmer.note = not_empty(new_data["note"])
+
+		farmer.updated_at = datetime.now()
 
 		# print("NEW_DATA:", new_data)
 		try:
 			db.session.query(Farmer).filter_by(id=_id).update(new_data)
 			db.session.commit()
+			db.session.close()
 			flash("ALLEVATORE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -230,8 +241,6 @@ def farmer_update(_id):
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
 
-		db.session.close()
-
 		_event = event_create(_event, farmer_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
@@ -239,9 +248,6 @@ def farmer_update(_id):
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati del record
-		farmer = Farmer.query.get(_id)
-
 		form.farmer_name.data = farmer.farmer_name
 		form.email.data = farmer.email
 		form.phone.data = farmer.phone

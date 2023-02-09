@@ -19,11 +19,11 @@ CREATE = "/slaughterhouse/create/"
 CREATE_FOR = "slaughterhouse_create"
 CREATE_HTML = "slaughterhouse/slaughterhouse_create.html"
 
-HISTORY = "/slaughterhouse/view/history/<_id>"
+HISTORY = "/slaughterhouse/view/history/<int:_id>"
 HISTORY_FOR = "slaughterhouse_view_history"
 HISTORY_HTML = "slaughterhouse/slaughterhouse_view_history.html"
 
-UPDATE = "/slaughterhouse/update/<_id>"
+UPDATE = "/slaughterhouse/update/<int:_id>"
 UPDATE_FOR = "slaughterhouse_update"
 UPDATE_HTML = "slaughterhouse/slaughterhouse_update.html"
 
@@ -121,33 +121,40 @@ def slaughterhouse_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormSlaughterhouseUpdate()
+	# recupero i dati del record
+	slaughterhouse = Slaughterhouse.query.get(int(_id))
+
 	if form.validate_on_submit():
-		# recupero i dati e li converto in dict
-		# form_data = json.loads(json.dumps(request.form))
 		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
 		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
-		slaughterhouse = Slaughterhouse.query.get(_id)
 		previous_data = slaughterhouse.to_dict()
 		previous_data.pop("updated_at")
-		print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+		# print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+		slaughterhouse.slaughterhouse = new_data["slaughterhouse"].strip()
+		slaughterhouse.slaughterhouse_code = new_data["slaughterhouse_code"].strip()
 
-		new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
-		new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
-		new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
+		slaughterhouse.email = not_empty(new_data["email"].strip())
+		slaughterhouse.phone = not_empty(new_data["phone"].strip())
 
-		new_data["note"] = not_empty(new_data["note"])
+		slaughterhouse.address = not_empty(new_data["address"].strip())
+		slaughterhouse.cap = not_empty(new_data["cap"].strip())
+		slaughterhouse.city = not_empty(new_data["city"].strip())
+		slaughterhouse.full_address = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+		slaughterhouse.coordinates = not_empty(new_data["coordinates"].strip())
 
-		new_data["created_at"] = slaughterhouse.created_at
-		new_data["updated_at"] = datetime.now()
+		slaughterhouse.affiliation_start_date = str_to_date(new_data["affiliation_start_date"])
+		slaughterhouse.affiliation_end_date = str_to_date(new_data["affiliation_end_date"])
+		slaughterhouse.affiliation_status = status_true_false(new_data["affiliation_status"])
 
-		print("SLAUGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
+		slaughterhouse.note = not_empty(new_data["note"])
+		slaughterhouse.updated_at = datetime.now()
+
+		# print("SLAUGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
 		try:
-			db.session.query(Slaughterhouse).filter_by(id=_id).update(new_data)
 			db.session.commit()
+			db.session.close()
 			flash("MACELLO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -167,8 +174,6 @@ def slaughterhouse_update(_id):
 		}
 		# print("NEW_DATA:", new_data)
 
-		db.session.close()
-
 		_event = event_create(_event, slaughterhouse_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
@@ -176,10 +181,6 @@ def slaughterhouse_update(_id):
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati del record
-		slaughterhouse = Slaughterhouse.query.get(int(_id))
-		# print("SLAUGHT_FIND:", slaughterhouse, type(slaughterhouse))
-
 		form.slaughterhouse.data = slaughterhouse.slaughterhouse
 		form.slaughterhouse_code.data = slaughterhouse.slaughterhouse_code
 

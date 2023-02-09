@@ -20,22 +20,22 @@ VIEW = "/cert_cons/view/"
 VIEW_FOR = "cert_cons_view"
 VIEW_HTML = "cert_cons/cert_cons_view.html"
 
-CREATE = "/cert_cons/create/<h_id>/<f_id>/<h_set>/"
+CREATE = "/cert_cons/create/<int:h_id>/<int:f_id>/<h_set>/"
 CREATE_FOR = "cert_cons_create"
 CREATE_HTML = "cert_cons/cert_cons_create.html"
 
-HISTORY = "/cert_cons/view/history/<_id>"
+HISTORY = "/cert_cons/view/history/<int:_id>"
 HISTORY_FOR = "cert_cons_view_history"
 HISTORY_HTML = "cert_cons/cert_cons_view_history.html"
 
-UPDATE = "/cert_cons/update/<_id>"
+UPDATE = "/cert_cons/update/<int:_id>"
 UPDATE_FOR = "cert_cons_update"
 UPDATE_HTML = "cert_cons/cert_cons_update.html"
 
-GENERATE = "/cert_cons/generate/<_id>"
+GENERATE = "/cert_cons/generate/<int:_id>"
 GENERATE_FOR = "cert_cons_generate"
 
-DOWNLOAD = "/cert_cons/download/<_id>"
+DOWNLOAD = "/cert_cons/download/<int:_id>"
 DOWNLOAD_FOR = "cert_cons_download"
 
 DOWNLOAD_LINK = "/cert_cons/download_link/<_link>/"
@@ -53,7 +53,7 @@ BUYER_VIEW = "/cert_cons/buyer/view/"
 BUYER_VIEW_FOR = "cert_cons_buyer_view"
 BUYER_VIEW_HTML = "cert_cons/cert_cons_buyer_view.html"
 
-BUYER_UPDATE = "/cert_cons/buyer/update/<_id>"
+BUYER_UPDATE = "/cert_cons/buyer/update/<int:_id>"
 BUYER_UPDATE_FOR = "cert_cons_buyer_update"
 BUYER_UPDATE_HTML = "cert_cons/cert_cons_buyer_update.html"
 
@@ -68,6 +68,7 @@ def cert_cons_view():
 	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
 
 	_list = CertificateCons.query.all()
+	db.session.close()
 	_list = [r.to_dict() for r in _list]
 
 	# raggruppa per anno del certificato
@@ -105,10 +106,6 @@ def cert_cons_create(h_id, f_id, h_set):
 		form_data = json.loads(json.dumps(request.form))
 		# print("HEAD_FORM_DATA", json.dumps(form_data, indent=2))
 
-		head = Head.query.get(int(h_id))
-		head_birth = head.birth_date
-		head_slaug = head.slaughter_date
-
 		new_cert = CertificateCons(
 			certificate_id=form_data["certificate_id"],
 			certificate_var=form_data["certificate_var"],
@@ -123,7 +120,7 @@ def cert_cons_create(h_id, f_id, h_set):
 			batch_number=form_data["batch_number"],
 
 			head_category=form_data["head_category"],
-			head_age=calc_age(head_birth, head_slaug),
+			head_age=form_data["head_age"],
 
 			invoice_nr=form_data["invoice_nr"],
 			invoice_date=form_data["invoice_date"],
@@ -225,74 +222,82 @@ def cert_cons_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormCertConsUpdate()
+
+	# recupero i dati del record
+	cert = CertificateCons.query.get(int(_id))
+
 	if form.validate_on_submit():
 		try:
 			new_data = json.loads(json.dumps(request.form))
-			new_data.pop('csrf_token', None)
 			# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-			cert = CertificateCons.query.get(int(_id))
 			previous_data = cert.to_dict()
 			previous_data.pop("updated_at")
 			# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-			new_data["certificate_nr"] = mount_code(
-				new_data["certificate_id"], new_data["certificate_year"], new_data["certificate_var"])
-			new_data["certificate_date"] = str_to_date(new_data["certificate_date"])
+			cert.certificate_id = new_data["certificate_id"]
+			cert.certificate_var = new_data["certificate_var"]
+			cert.certificate_year = year_cert_calc_update(new_data["certificate_year"])
+			cert.certificate_nr = mount_code(
+				new_data["certificate_id"], cert.certificate_year, new_data["certificate_var"]
+			)
 
-			new_data["emitted"] = status_true_false(new_data["emitted"])
+			cert.emitted = status_true_false(new_data["emitted"])
 
-			new_data["cockade_id"] = not_empty(new_data["cockade_id"])
-			new_data["cockade_nr"] = mount_code(
-				new_data["cockade_id"], new_data["certificate_year"], new_data["cockade_var"])
+			cert.cockade_id = not_empty(new_data["cockade_id"])
+			cert.cockade_nr = mount_code(new_data["cockade_id"], cert.certificate_year, new_data["cockade_var"])
 
-			new_data["sale_type"] = not_empty(new_data["sale_type"])
-			new_data["sale_quantity"] = not_empty(new_data["sale_quantity"])
-			new_data["sale_rest"] = not_empty(new_data["sale_rest"])
+			cert.certificate_date = str_to_date(new_data["certificate_date"])
 
-			new_data["head_category"] = not_empty(new_data["head_category"])
+			cert.sale_type = not_empty(new_data["sale_type"])
+			cert.sale_quantity = not_empty(new_data["sale_quantity"])
+			cert.sale_rest = not_empty(new_data["sale_rest"])
+
+			cert.head_category = not_empty(new_data["head_category"])
+
 			if new_data["head_age"] in ["", None, 0]:
 				head = Head.query.get(int(cert.head_id))
 				birth = head.birth_date
 				slaug = head.slaughter_date
-				new_data["head_age"] = calc_age(birth, slaug)
+				cert.head_age = calc_age(birth, slaug)
 			else:
-				new_data["head_age"] = not_empty(new_data["head_age"])
+				cert.head_age = not_empty(new_data["head_age"])
 
-			new_data["batch_number"] = not_empty(new_data["batch_number"])
+			cert.batch_number = not_empty(new_data["batch_number"])
 
-			new_data["invoice_nr"] = not_empty(new_data["invoice_nr"])
-			new_data["invoice_date"] = str_to_date(new_data["invoice_date"])
-
-			new_data["note_certificate"] = not_empty(new_data["note_certificate"])
-			new_data["note"] = not_empty(new_data["note"])
+			cert.invoice_nr = not_empty(new_data["invoice_nr"])
+			cert.invoice_date = str_to_date(new_data["invoice_date"])
+			cert.invoice_status = str_to_date(new_data["invoice_status"])
 
 			if new_data["head_id"] not in ["", "-", None]:
-				new_data["head_id"] = int(new_data["head_id"].split(" - ")[0])
+				cert.head_id = int(new_data["head_id"].split(" - ")[0])
 			else:
-				new_data["head_id"] = None
+				cert.head_id = None
 
 			if new_data["buyer_id"] not in ["", "-", None]:
-				new_data["buyer_id"] = int(new_data["buyer_id"].split(" - ")[0])
+				cert.buyer_id = int(new_data["buyer_id"].split(" - ")[0])
 			else:
-				new_data["buyer_id"] = None
+				cert.buyer_id = None
 
 			if new_data["farmer_id"] not in ["", "-", None]:
-				new_data["farmer_id"] = int(new_data["farmer_id"].split(" - ")[0])
+				cert.farmer_id = int(new_data["farmer_id"].split(" - ")[0])
 			else:
-				new_data["farmer_id"] = None
+				cert.farmer_id = None
 
 			if new_data["slaughterhouse_id"] not in ["", "-", None]:
-				new_data["slaughterhouse_id"] = int(new_data["slaughterhouse_id"].split(" - ")[0])
+				cert.slaughterhouse_id = int(new_data["slaughterhouse_id"].split(" - ")[0])
 			else:
-				new_data["slaughterhouse_id"] = None
+				cert.slaughterhouse_id = None
 
-			new_data["created_at"] = cert.created_at
+			cert.note_certificate = not_empty(new_data["note_certificate"])
+			cert.note = not_empty(new_data["note"])
+
+			cert.updated_at = datetime.datetime.now()
 
 			# print("CERT_NEW_DATA:", new_data)
 			try:
-				db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
 				db.session.commit()
+				db.session.close()
 				flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
 
 			except IntegrityError as err:
@@ -314,8 +319,6 @@ def cert_cons_update(_id):
 				"Previous_data": previous_data
 			}
 
-			db.session.close()
-
 			# print("EVENT:", json.dumps(_event, indent=2))
 			_event = event_create(_event, cert_cons_id=int(_id))
 			if _event is True:
@@ -327,8 +330,6 @@ def cert_cons_update(_id):
 			flash(err)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati del record
-		cert = CertificateCons.query.get(int(_id))
 		# recupero il record precedente
 		max_id = db.session.query(db.func.max(CertificateCons.id)).scalar()
 		prev_cert = CertificateCons.query.get(max_id)
@@ -339,7 +340,7 @@ def cert_cons_update(_id):
 		form.certificate_id.data = cert.certificate_id
 		form.certificate_var.data = cert.certificate_var
 		form.certificate_date.data = str_to_date(cert.certificate_date)
-		form.certificate_year.data = year_cert_calc_update(cert.certificate_date)
+		form.certificate_year.data = cert.certificate_date
 
 		form.emitted.data = status_si_no(cert.emitted)
 
@@ -351,6 +352,7 @@ def cert_cons_update(_id):
 		form.sale_rest.data = cert.sale_rest
 
 		form.head_category.data = cert.invoice_nr
+
 		if cert.head_age in ["", None, 0]:
 			head = Head.query.get(int(cert.head_id))
 			birth = head.birth_date
@@ -394,8 +396,7 @@ def cert_cons_update(_id):
 		}
 		# print("CERT_:", form)
 		# print("CERT_FORM:", form.to_dict())
-		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR,
-		                       prev_cert=prev_cert)
+		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, prev_cert=prev_cert)
 
 
 @app.route(GENERATE, methods=["GET", "POST"])
@@ -468,12 +469,14 @@ def cert_cons_generate(_id):
 		elif buyer.buyer_type and buyer.buyer_type == "Ristorante":
 			pdf = html_to_pdf("cert_cons/restaurants.html", data, img_qrc)
 		else:
+			db.session.close()
 			flash(f"L'acquirente non ha il tipo specificato: Ristorante o Macelleria.")
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
 		if pdf is not False:
 			pdf_str = pdf_to_byte(pdf)
 		else:
+			db.session.close()
 			flash(f"Errore creazione certificato pdf.")
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
@@ -483,7 +486,6 @@ def cert_cons_generate(_id):
 			cert.certificate_pdf = pdf_str
 			cert.emitted = True
 			try:
-				# db.session.query(CertificateCons).filter_by(id=cert.id).update(cert)
 				db.session.commit()
 				flash("CERTIFICATO CREATO correttamente.")
 				previous_data["certificate_pdf"] = "Campo troppo lungo, rimosso i dati." \
@@ -521,6 +523,7 @@ def cert_cons_generate(_id):
 @token_admin_validate
 def cert_cons_download(_id):
 	cert = CertificateCons.query.get(int(_id))
+	db.session.close()
 	if cert.certificate_pdf and len(cert.certificate_pdf) > 100:
 		_pdf = byte_to_pdf(cert.certificate_pdf, cert.certificate_nr)
 		return send_file(_pdf, as_attachment=True)
@@ -532,7 +535,7 @@ def cert_cons_download(_id):
 @app.route(DOWNLOAD_LINK, methods=["GET", "POST"])
 def cert_cons_download_link(_link):
 	_cert = _link.replace("_", "/")
-	print("CERT_FORM_LINK:", _cert)
+	# print("CERT_FORM_LINK:", _cert)
 	session["cert_nr"] = _cert
 	return render_template(DOWNLOAD_LINK_HTML, cert_nr=_cert, link=_link, func=SAVE_FOR)
 
@@ -541,8 +544,9 @@ def cert_cons_download_link(_link):
 def cert_cons_save(_link):
 	_link = _link.replace("_", "/")
 	try:
-		print("LINK", _link)
+		# print("LINK", _link)
 		cert = db.session.query(CertificateCons).filter_by(certificate_nr=_link).first()
+		db.session.close()
 		_pdf = byte_to_pdf(cert.certificate_pdf, cert.certificate_nr)
 		print("PDF_GENERATO")
 		flash(f"Attestato Consorzio Bue Grasso di Carrù nr {_link} scaricato.")
@@ -550,7 +554,7 @@ def cert_cons_save(_link):
 	except Exception as err:
 		print("PDF_NON_GENERATO:", err)
 		_link = _link.replace("/", "_")
-		flash(f"Attestato Consorzio Bue Grasso di Carrù nr {_link} non trovato.")
+		flash(f"Attestato Consorzio Bue Grasso di Carrù nr {_link} non presente.")
 		return render_template(DOWNLOAD_LINK_HTML, cert_nr=_link, func=SAVE_FOR)
 
 
@@ -560,15 +564,14 @@ def cert_cons_buyer_view():
 	"""Visualizzo informazioni Capi."""
 	if "username" in session:
 		user = db.session.query(User).filter_by(username=session["username"]).first()
-
+		db.session.close()
 		certificates = [cert for buyer in user.buyers for cert in buyer.cons_certs]
 		for cert in certificates:
 			cert.certificate_date = date_to_str(cert.certificate_date)
 			cert.certificate_nr = cert.certificate_nr.replace("/", "_")
-
 		return render_template(BUYER_VIEW_HTML, form=certificates, history=BUYER_HISTORY_FOR)
 	else:
-		flash("effettua la login.")
+		flash("Devi effettuare la login.")
 		return redirect(url_for("logout_buyer"))
 
 
@@ -605,10 +608,12 @@ def cert_cons_buyer_view_history(cert_nr):
 			# print("CERT_DATA:", json.dumps(cert.to_dict(), indent=2))
 			return render_template(BUYER_HISTORY_HTML, form=_cert, view=BUYER_VIEW_FOR, update=BUYER_UPDATE_FOR)
 		else:
+			db.session.close()
 			flash(f"Non sei autorizzato ad accedere all' Attestato nr: {cert_nr}. "
 			      f"Nell'elenco sono presenti gli Attestati assegnati al tuo account.")
 			return redirect(url_for("cert_cons_buyer_view"))
 	else:
+		db.session.close()
 		flash(f"Non sei autorizzato a manipolare il certificato nr: {cert_nr}. "
 		      f"Nell'elenco sono presenti i certificati assegnati al tuo account.")
 		return redirect(url_for("cert_cons_buyer_view"))
@@ -621,26 +626,26 @@ def cert_cons_buyer_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormCertConsUpdateBuyer()
+	# recupero i dati del record
+	cert = CertificateCons.query.get(int(_id))
+
 	if form.validate_on_submit():
 		try:
-			print("SESSION", json.dumps(session, indent=2))
+			# print("SESSION", json.dumps(session, indent=2))
 			new_quantity = json.loads(json.dumps(request.form))
-			new_quantity.pop('csrf_token', None)
 			# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-			cert = CertificateCons.query.get(int(_id))
 			previous_data = cert.to_dict()
-			new_data = previous_data
-			new_data["sale_rest"] = new_quantity["sale_rest"]
-			new_data["updated_at"] = datetime.datetime.now()
-
 			previous_data.pop("updated_at")
-			print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-			try:
-				db.session.query(CertificateCons).filter_by(id=_id).update(new_data)
-				db.session.commit()
-				flash(f"QUANTITA' RIMANENTE Attestato {cert.certificate_nr} aggiornata correttamente.")
+			# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
+			cert.sale_rest = new_quantity["sale_rest"]
+			cert.updated_at = datetime.datetime.now()
+
+			try:
+				db.session.commit()
+				db.session.close()
+				flash(f"QUANTITA' RIMANENTE Attestato {cert.certificate_nr} aggiornata correttamente.")
 			except IntegrityError as err:
 				db.session.rollback()
 				db.session.close()
@@ -659,9 +664,7 @@ def cert_cons_buyer_update(_id):
 				"Modification": f"Update Quantity Rest Certificate whit id: {_id}",
 				"Previous_data": previous_data
 			}
-
-			db.session.close()
-			print("EVENT:", json.dumps(_event, indent=2))
+			# print("EVENT:", json.dumps(_event, indent=2))
 			_event = event_create(_event, cert_cons_id=cert.id)
 			if _event is True:
 				return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
@@ -669,11 +672,10 @@ def cert_cons_buyer_update(_id):
 				flash(_event)
 				return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
 		except Exception as err:
+			db.session.close()
 			flash(err)
 			return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
 	else:
-		# recupero i dati del record
-		cert = CertificateCons.query.get(int(_id))
 		form.sale_rest.data = cert.sale_rest
 		form.prev.data = cert.sale_rest
 		session["cert_nr"] = cert.certificate_nr.replace("/", "_")

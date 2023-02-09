@@ -8,6 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/flask_session" />
       <excludeFolder url="file://$MODULE_DIR$/migrations" />
       <excludeFolder url="file://$MODULE_DIR$/app/utilitys/temp_pdf" />
+      <excludeFolder url="file://$MODULE_DIR$/app/utilitys/flask_session" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

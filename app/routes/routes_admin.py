@@ -111,25 +111,27 @@ def admin_update(_id):
 	form = FormAccountUpdate()
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
 		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
 		administrator = Administrator.query.get(_id)
-		db.session.close()
+
 		previous_data = administrator.to_dict()
 		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-		new_data["full_name"] = f'{new_data["name"]} {new_data["last_name"]}'
-		new_data["created_at"] = administrator.created_at
-		new_data["updated_at"] = datetime.now()
+		administrator.name = new_data["name"]
+		administrator.last_name = new_data["last_name"]
+		administrator.full_name = f'{new_data["name"]} {new_data["last_name"]}'
+		administrator.phone = new_data["phone"]
+		administrator.email = new_data["email"]
 
-		new_data["note"] = not_empty(new_data["note"])
+		administrator.note = not_empty(new_data["note"])
+		administrator.updated_at = datetime.now()
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.query(Administrator).filter_by(id=_id).update(new_data)
 			db.session.commit()
+			db.session.close()
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()

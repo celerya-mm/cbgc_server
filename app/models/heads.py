@@ -33,7 +33,6 @@ class Head(db.Model):
 	birth_year = db.Column(db.Integer, index=False, nullable=False)
 
 	castration_date = db.Column(db.DateTime, index=False, nullable=True)
-
 	# True if (castration_date - castration_date) <= 8 month
 	castration_compliance = db.Column(db.Boolean, index=False, nullable=True)
 

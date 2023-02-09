@@ -26,11 +26,11 @@ CREATE = "/buyer/create/"
 CREATE_FOR = "buyer_create"
 CREATE_HTML = "buyer/buyer_create.html"
 
-HISTORY = "/buyer/view/history/<_id>"
+HISTORY = "/buyer/view/history/<int:_id>"
 HISTORY_FOR = "buyer_view_history"
 HISTORY_HTML = "buyer/buyer_view_history.html"
 
-UPDATE = "/buyer/update/<_id>"
+UPDATE = "/buyer/update/<int:_id>"
 UPDATE_FOR = "buyer_update"
 UPDATE_HTML = "buyer/buyer_update.html"
 
@@ -97,7 +97,7 @@ def create_map(_list):
 
 				folium.Marker(
 					location=[lat, long], popup=popup, tooltip=tooltip,
-					icon=folium.CustomIcon("app/static/Logo.png", icon_size=(50, 50))
+					icon=folium.CustomIcon("app/static/Logo.png", icon_size=(30, 30))
 				).add_to(feature_group_b)
 
 	feature_group_m.add_to(m)
@@ -226,39 +226,44 @@ def buyer_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormBuyerUpdate()
+	# recupero i dati del record
+	buyer = Buyer.query.get(_id)
+
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
 		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
 		# print("BUYER_UPDATE_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
-
-		buyer = Buyer.query.get(_id)
 
 		previous_data = buyer.to_dict()
 		previous_data.pop("updated_at")
 		# print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-		new_data["full_address"] = address_mount(new_data["address"], new_data["cap"], new_data["city"])
-		new_data["coordinates"] = new_data["coordinates"]
+		buyer.buyer_name = new_data["buyer_name"]
+		buyer.buyer_type = new_data["buyer_type"]
 
-		new_data["affiliation_start_date"] = str_to_date(new_data["affiliation_start_date"])
-		new_data["affiliation_end_date"] = str_to_date(new_data["affiliation_end_date"])
-		new_data["affiliation_status"] = status_true_false(new_data["affiliation_status"])
+		buyer.email = not_empty(new_data["email"])
+		buyer.phone = not_empty(new_data["phone"])
 
-		new_data["phone"] = not_empty(new_data["phone"])
-		new_data["email"] = not_empty(new_data["email"])
-		new_data["note"] = not_empty(new_data["note"])
+		buyer.address = new_data["address"]
+		buyer.cap = new_data["cap"]
+		buyer.city = new_data["city"]
+		buyer.full_address = address_mount(new_data["address"], new_data["cap"], new_data["city"])
+		buyer.coordinates = new_data["coordinates"]
+
+		buyer.affiliation_start_date = str_to_date(new_data["affiliation_start_date"])
+		buyer.affiliation_end_date = str_to_date(new_data["affiliation_end_date"])
+		buyer.affiliation_status = status_true_false(new_data["affiliation_status"])
 
 		if new_data["user_id"] not in ["", "-", None]:
-			new_data["user_id"] = int(new_data["user_id"].split(" - ")[0])
+			buyer.user_id = int(new_data["user_id"].split(" - ")[0])
 		else:
-			new_data["user_id"] = None
+			buyer.user_id = None
 
-		new_data["created_at"] = buyer.created_at
-		new_data["updated_at"] = datetime.now()
+		buyer.note = not_empty(new_data["note"])
+		buyer.updated_at = datetime.now()
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.query(Buyer).filter_by(id=_id).update(new_data)
+			# db.session.query(Buyer).filter_by(id=_id).update(new_data)
 			db.session.commit()
 			flash("ACQUIRENTE aggiornato correttamente.")
 		except IntegrityError as err:
@@ -288,10 +293,6 @@ def buyer_update(_id):
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati del record
-		buyer = Buyer.query.get(int(_id))
-		# print("BUYER_FIND:", buyer, type(buyer))
-
 		form.buyer_name.data = buyer.buyer_name
 		form.buyer_type.data = buyer.buyer_type
 
@@ -306,6 +307,10 @@ def buyer_update(_id):
 		form.affiliation_start_date.data = str_to_date(buyer.affiliation_start_date)
 		form.affiliation_end_date.data = str_to_date(buyer.affiliation_end_date)
 		form.affiliation_status.data = status_si_no(buyer.affiliation_status)
+
+		if buyer.user_id not in ["", None]:
+			_user = User.query.get(buyer.user_id)
+			form.user_id.data = str(buyer.user_id) + " - " + _user.username
 
 		form.note.data = buyer.note
 
@@ -333,6 +338,7 @@ def buyer_email_reset_psw(cert_nr):
 
 		# creo un token con validità 15 min
 		_token = __generate_auth_token()
+
 		auth_token = AuthToken(
 			user_id=_user.id,
 			token=_token,
@@ -378,7 +384,7 @@ def buyer_reset_psw_token(_token):
 		return redirect(url_for('buyer_reset_password', _id=_id))
 
 
-@app.route("/buyer/reset_password/<_id>", methods=["GET", "POST"])
+@app.route("/buyer/reset_password/<int:_id>", methods=["GET", "POST"])
 def buyer_reset_password(_id):
 	"""Aggiorna password Utente Servizio."""
 	form = FormPswReset()
@@ -393,6 +399,7 @@ def buyer_reset_password(_id):
 
 		if new_password == _user.password:
 			session.clear()
+			db.session.close()
 			flash("La nuova password inserita è uguale a quella registrata.")
 			return render_template("buyer/buyer_reset_password.html", form=form, id=_id)
 		else:
@@ -400,11 +407,8 @@ def buyer_reset_password(_id):
 
 			_user.password = new_password
 			_user.updated_at = datetime.now()
-
-			_user = _user.to_dict()
-
-			db.session.query(User).filter_by(id=_id).update(_user)
 			db.session.commit()
+			db.session.close()
 
 			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
 			_event = {
@@ -412,9 +416,6 @@ def buyer_reset_password(_id):
 				"username": _user["username"],
 				"Modification": "Password reset"
 			}
-
-			db.session.close()
-
 			_event = event_create(_event, user_id=_id)
 			if _event is not True:
 				flash(_event)

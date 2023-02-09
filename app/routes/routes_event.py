@@ -16,11 +16,11 @@ from ..models.certificates_cons import CertificateCons
 from ..models.certificates_dna import CertificateDna
 from ..utilitys.functions import token_admin_validate, date_to_str
 
-HISTORY = "/event/view/history/<_id>/"
+HISTORY = "/event/view/history/<int:_id>/"
 HISTORY_FOR = "event_view_history"
 HISTORY_HTML = "event/event_view_history.html"
 
-RESTORE = "/event/restore/<_id>/<id_record>/<table>/<view_for>/"
+RESTORE = "/event/restore/<int:_id>/<int:id_record>/<table>/<view_for>/"
 RESTORE_FOR = "event_restore"
 
 
@@ -88,10 +88,10 @@ def event_view_history(_id):
 		type_related = "Amministratori"
 		view_related = ADMIN_HISTORY_FOR
 	elif event.user_id:
-		related = Buyer.query.get(event.user_id)
+		related = User.query.get(event.user_id)
 		related = related.to_dict()
 		field = "user_id"
-		table = Buyer.__tablename__
+		table = User.__tablename__
 		id_related = related["id"]
 		type_related = "Utenti"
 		view_related = USER_HISTORY_FOR
@@ -151,7 +151,7 @@ def event_view_history(_id):
 	# print("DATA:", json.dumps(_event, indent=2), "TYPE:", type(_event))
 
 	_event = json.loads(json.dumps(_event))
-	print("EVENT:", json.dumps(_event, indent=2))
+	# print("EVENT:", json.dumps(_event, indent=2))
 
 	db.session.close()
 	return render_template(
@@ -185,23 +185,23 @@ def event_restore(_id, id_record, table, view_for):
 				else:
 					pass
 
-			data = data.copy()
-
 			# print("UPDATE_DATA:", json.dumps(data, indent=2), "TYPE:", type(data))
 			try:
 				record = model.query.get(id_record)
-				print("DATA_FROM_DB:", json.dumps(record.to_dict(), indent=2), "TYPE:", type(data))
+				# print("DATA_FROM_DB:", json.dumps(record.to_dict(), indent=2), "TYPE:", type(data))
 				for k, v in data.items():
 					setattr(record, k, v)
 				db.session.commit()
 				db.session.close()
 				flash(f"Record ripristinato correttamente alla situazione precedente il: {updated_at}.")
+				return redirect(url_for(view_for, _id=id_record))
 			except IntegrityError as err:
 				db.session.rollback()
 				db.session.close()
 				flash(f"ERRORE: {str(err.orig)}")
-
-		return redirect(url_for(view_for, _id=id_record))
+				return redirect(url_for(view_for, _id=id_record))
+		else:
+			return redirect(url_for(view_for, _id=id_record))
 	except Exception as err:
 		db.session.close()
 		flash(f"ERROR: {err}")

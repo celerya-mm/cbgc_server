@@ -20,15 +20,15 @@ CREATE = "/user/create/"
 CREATE_FOR = "user_create"
 CREATE_HTML = "user/user_create.html"
 
-HISTORY = "/user/view/history/<_id>"
+HISTORY = "/user/view/history/<int:_id>"
 HISTORY_FOR = "user_view_history"
 HISTORY_HTML = "user/user_view_history.html"
 
-UPDATE = "/user/update/<_id>"
+UPDATE = "/user/update/<int:_id>"
 UPDATE_FOR = "user_update"
 UPDATE_HTML = "user/user_update.html"
 
-RESET_PSW = "/user/reset_password/<_id>"
+RESET_PSW = "/user/reset_password/<int:_id>"
 RESET_PSW_FOR = "user_reset_password"
 RESET_PSW_HTML = "user/user_reset_password.html"
 
@@ -121,24 +121,31 @@ def user_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormAccountUpdate()
+	# recupero i dati
+	user = User.query.get(_id)
+
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
-		new_data.pop('csrf_token', None)
 		# print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
-		user = User.query.get(_id)
 		previous_data = user.to_dict()
 		previous_data.pop("updated_at")
 		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-		new_data["full_name"] = f'{new_data["name"]} {new_data["last_name"]}'
+		user.username = new_data["username"].strip().replace(" ", "")
+		user.name = new_data["name"].strip()
+		user.last_name = new_data["last_name"].strip()
+		user.full_name = f'{new_data["name"]} {new_data["last_name"]}'
 
-		new_data["created_at"] = user.created_at
-		new_data["updated_at"] = datetime.now()
+		user.email = new_data["email"].strip().replace(" ", "")
+		user.phone = new_data["phone"].strip()
+
+		user.note = new_data["note"].strip().replace("  ", "")
+		user.updated_at = datetime.now()
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.query(User).filter_by(id=_id).update(new_data)
 			db.session.commit()
+			db.session.close()
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -158,8 +165,6 @@ def user_update(_id):
 		}
 		# print("EVENT:", json.dumps(_event, indent=2))
 
-		db.session.close()
-
 		_event = event_create(_event, user_id=_id)
 		if _event is True:
 			return redirect(url_for(HISTORY_FOR, _id=_id))
@@ -167,11 +172,6 @@ def user_update(_id):
 			flash(_event)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati
-		user = User.query.get(_id)
-		# print("USER:", user)
-		# print("USER_FIND:", json.dumps(user.to_dict(), indent=2))
-
 		form.username.data = user.username
 		form.name.data = user.name
 		form.last_name.data = user.last_name
@@ -211,12 +211,10 @@ def user_reset_password(_id):
 		else:
 			_user.password = new_password
 			_user.updated_at = datetime.now()
-
-			_user = _user.to_dict()
-
-			db.session.query(User).filter_by(id=_id).update(_user)
 			db.session.commit()
-			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
+			db.session.close()
+			msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
+
 			_event = {
 				"executor": session["username"],
 				"username": _user["username"],
@@ -224,13 +222,10 @@ def user_reset_password(_id):
 			}
 			_event = event_create(_event, user_id=_id)
 			if _event is True:
-				db.session.close()
-				msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
 				return msg
 			else:
-				db.session.close()
-				flash(_event)
-				msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
+				msg = f"{msg}\n" \
+				      f"{_event}"
 				return msg
 	else:
 		return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
@@ -278,10 +273,9 @@ def reset_psw_user(_id):
 @app.route('/reset_psw_user/token/<_token>/')
 def reset_psw_user_token(_token):
 	_token = db.session.query(AuthToken).filter_by(token=_token).first()
+	db.session.close()
 	if datetime.now() > _token.expires_at:
-		db.session.close()
 		return "Il token è scaduto ripeti la procedura di ripristino password."
 	else:
-		db.session.close()
 		_id = _token.user_id
 		return redirect(url_for(RESET_PSW_FOR, _id=_id, check=False))
