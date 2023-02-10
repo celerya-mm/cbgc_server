@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
+    </style>
+    <meta charset="UTF-8">
+</head>
+<div class="sheet-outer.A4 justify-content-center">
+    <div style="padding-left: 85%; padding-top: 20px">
+        <img src="{{ qrcode }}" alt="" width="125" height="125"/>
+    </div>
+    <div>
+        <h1 class="cert-title" style="text-align: center;">ETICHETTATURA CARNI BOVINE</h1>
+        <p style="text-align: center; font-size: 18px;">(Reg. CE 1760/2000 e s.m.i.)</p>
+    </div>
+    <br>
+    <div style="padding-left: 32%;">
+        <img src="{{ logo }}" width="350" height="350">
+    </div>
+    <br>
+    <div style="text-align: center !important;">
+        <p style="text-align: center; font-size: 22px; line-height: 24px">
+            <strong>Attestato n.</strong> {{ form.certificate_nr }} <strong>del</strong> {{ form.certificate_date }}
+        </p>
+    </div>
+    <br>
+    <div>
+        <h1 style="text-align: center;">SI ATTESTA</h1>
+    </div>
+    <br>
+    <div>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>N. riconoscimento:</strong>
+            {{form.headset}}
+        </p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Luogo di nascita:</strong> ITALIA</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Allevato in:</strong> ITALIA - REGIONE
+            PIEMONTE</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Da:</strong> {{form.farmer_name}}</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Macellato in Italia da:</strong>
+            {{form.slaughter_name}}</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Sezionato in Italia da:</strong>
+            ______________________________________</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Categoria BOVINO ADULTO di categoria
+            C:
+        </strong> {{form.head_category}} - <strong>Eta:</strong> {{form.age_month}} mesi</p>
+    </div>
+</div>
+</html>

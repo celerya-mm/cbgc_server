@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
+    </style>
+    <meta charset="UTF-8">
+</head>
+<div class="sheet-outer.A4 justify-content-center">
+    <div style="padding-left: 85%; padding-top: 20px">
+        <img src="{{ qrcode }}" alt="" width="125" height="125"/>
+    </div>
+    <div>
+        <h1 class="cert-title" style="text-align: center;">ETICHETTATURA CARNI BOVINE</h1>
+        <p style="text-align: center; font-size: 18px;">(Reg. CE 178/2002 e s.m.i.)</p>
+    </div>
+    <br>
+    <div style="padding-left: 32%;">
+        <img src="{{ logo }}" width="350" height="350">
+    </div>
+    <br>
+    <div style="text-align: center !important;">
+        <p style="text-align: center; font-size: 22px; line-height: 24px">
+            <strong>Attestato n.</strong> {{ form.certificate_nr }} <strong>del</strong> {{ form.certificate_date }}
+        </p>
+    </div>
+    <br>
+    <div>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>N. riconoscimento: </strong>
+            {{form.headset}}
+        </p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Allevato da: </strong>
+            {{form.farmer_name}}</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Luogo di nascita: </strong> ITALIA</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Bovino adulto di categoria C:
+        </strong> {{form.head_category}} - <strong>Eta:</strong> {{form.age_month}} mesi</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Macelleria: </strong>
+            {{form.slaughter_name}}</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Lotto n.:</strong>
+            {{form.batch_number}}</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Categoria BOVINO ADULTO di categoria
+            C: </strong> {{form.head_category}} - <strong>Eta:</strong> {{form.age_month}} mesi</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Parti anatomiche:</strong>
+            {{form.sale_type}}</p>
+        <p style="padding-left: 50px; font-size: 20px; line-height: 28px"><strong>Acquistato dal ristorante:</strong>
+            {{form.buyer_name}}</p>
+    </div>
+</div>
+<footer style="padding-top: 100px">
+    <h6 style="text-align: center; font-size: 12px; text-style: oblique !important; font-weight: lighter;">I capi del
+        Consorzio sono tutti
+        iscritti al libro genealogico della razza piemontese come da disciplinare Art. 3</h6>
+</footer>
+</html>

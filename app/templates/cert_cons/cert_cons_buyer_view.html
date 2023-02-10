@@ -1,0 +1,83 @@
+{% extends '_base_buyer.html' %}
+
+{% block content %}
+<form enctype="multipart/form-data" method="POST">
+    <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
+        <div class="row no-gutters justify-content-center">
+            <div class="col-md-12 shadow rounded">
+                <h2 class="card-title" style="padding: 20px;">
+                    Elenco Certificati UTENTE Consorzio:</h2>
+                <div class="table-responsive" style="padding: 10px">
+                    <table id="data" class="table table-striped" style="width:100%">
+                        <thead>
+                        <tr style="background-color: #830F0F; vertical-align: center;">
+                            <th class="title" id="h1">ID</th>
+                            <th class="title" id="h2">Cert. nr</th>
+                            <th class="title" id="h3">Data</th>
+                            <th class="title" id="h4">Anno</th>
+                            <th class="title" id="h5">Coccarda</th>
+                            <th class="title" id="h6">Tipo Vendita</th>
+                            <th class="title" id="h7">Rimane</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in form %}
+                        <tr style="border: 0pz; vertical-align: center;">
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.id|e }}
+                            </td>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                <a class="tab-link" title="Visualizza" style=""
+                                   href="{{ url_for(history, cert_nr=row.certificate_nr) }}">
+                                    {{ row.certificate_nr|e }}
+                                </a>
+                            </td>
+                            <td class="primary fw-bold" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_date|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.certificate_year|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.cockade_nr|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_type|e }}
+                            </td>
+                            <td class="secondary" style="padding-bottom: 0pz; padding-top: 0pz;">
+                                {{ row.sale_rest|e }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#data').DataTable({
+            responsive: {
+                breakpoints: [
+                    { name: 'bigdesktop', width: 1920 },
+                    { name: 'meddesktop', width: 1480 },
+                    { name: 'smalldesktop', width: 1280 },
+                    { name: 'medium', width: 1188 },
+                    { name: 'tabletl', width: 1024 },
+                    { name: 'btwtabllandp', width: 848 },
+                    { name: 'tabletp', width: 768 },
+                    { name: 'mobilel', width: 480 },
+                    { name: 'mobilep', width: 320 }
+                ]
+            }
+        });
+    });
+</script>
+{% endblock %}
