@@ -7,6 +7,4 @@ nginx
 migrations
 flask_session
 docker-compose.yml
-Note
-Read_for_build_docker
 README.md

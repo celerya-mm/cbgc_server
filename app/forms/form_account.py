@@ -96,7 +96,7 @@ class FormUserSignup(FlaskForm):
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = StringField('Read_for_migrate_db', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SIGNUP")
 
@@ -143,7 +143,7 @@ class FormAccountUpdate(FlaskForm):
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
 	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()])
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = StringField('Read_for_migrate_db', validators=[Length(max=255)])
 
 	submit = SubmitField("MODIFICA")
 

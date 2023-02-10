@@ -14,6 +14,7 @@ def login():
 		# print(f"USER: {form.username.data}")
 		token = admin_log_in(form)
 		if token:
+			session.permanent = False
 			session["token_login"] = token
 			session["username"] = form.username.data
 			return redirect(url_for('cert_cons_view'))
@@ -32,6 +33,7 @@ def login_buyer(cert_nr):
 		# print(f"USER: {form.username.data}")
 		data = buyer_log_in(form)
 		if data:
+			session.permanent = False
 			session['cert_nr'] = cert_nr
 			session["token_login"] = data["token"]
 			session["username"] = form.username.data

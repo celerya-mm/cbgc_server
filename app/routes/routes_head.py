@@ -10,7 +10,7 @@ from ..models.buyers import Buyer
 from ..models.farmers import Farmer
 from ..models.heads import Head, verify_castration
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import (not_empty, token_admin_validate, str_to_date, year_extract, dict_group_by)
+from ..utilitys.functions import not_empty, str_to_date, year_extract, dict_group_by, token_admin_validate
 
 VIEW = "/head/view/"
 VIEW_FOR = "head_view"

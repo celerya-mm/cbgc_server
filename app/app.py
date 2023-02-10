@@ -7,7 +7,6 @@ from flask_migrate import Migrate
 from flask_misaka import Misaka
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
@@ -47,8 +46,3 @@ with app.app_context():
 	                        slaughterhouses, tokens)
 	from app.routes import (routes, routes_admin, routes_buyer, routes_head, routes_farmer, routes_event,  # noqa
 	                        routes_slaughterhouse, routes_user, routes_cert_dna, routes_cert_cons)
-	from app.utilitys.functions import token_admin_validate, token_buyer_validate  # noqa
-
-	# db.reflect()  # Verifica tabelle presenti nel DB.
-	# db.drop_all()  # Attenzione elimina tutte le tabelle dal DB.
-	# db.create_all()  # Crea le tabelle nel DB
