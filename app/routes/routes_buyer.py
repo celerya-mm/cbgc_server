@@ -81,7 +81,7 @@ def create_map(_list):
 			       f"<p><strong>Indirizzo:</strong> {record.full_address}</p>" \
 			       f"<p><strong>Telefono:</strong> {record.phone}</p>"
 
-			iframe = folium.IFrame(html=html, height=80, width=400, ratio=0.2)
+			iframe = folium.IFrame(html=html, ratio=0.2)
 			popup = folium.Popup(iframe)
 
 			tooltip = "Clicca!"
