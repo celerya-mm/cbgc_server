@@ -67,9 +67,7 @@ def cert_dna_create(h_id, f_id, h_set):
 		)
 		# print("NEW_DATA:", json.dumps(new_data.to_dict(), indent=2))
 		try:
-			db.session.add(new_data)
-			db.session.commit()
-			db.session.close()
+			CertificateDna.create(new_data)
 			flash("CERTIFICATO DNA creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -172,8 +170,7 @@ def cert_dna_update(_id):
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.commit()
-			db.session.close()
+			CertificateDna.update()
 			flash("CERTIFICATO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()

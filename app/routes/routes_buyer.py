@@ -156,9 +156,7 @@ def buyer_create():
 		)
 
 		try:
-			db.session.add(new_buyer)
-			db.session.commit()
-			db.session.close()
+			Buyer.create(new_buyer)
 			flash("ACQUIRENTE creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -263,8 +261,7 @@ def buyer_update(_id):
 		buyer.updated_at = datetime.now()
 		# print("NEW_DATA:", new_data)
 		try:
-			# db.session.query(Buyer).filter_by(id=_id).update(new_data)
-			db.session.commit()
+			Buyer.update()
 			flash("ACQUIRENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -345,9 +342,7 @@ def buyer_email_reset_psw(cert_nr):
 			expires_at=calc_exp_token_reset_psw()
 		)
 
-		db.session.add(auth_token)
-		db.session.commit()
-		db.session.close()
+		AuthToken.create(auth_token)
 
 		# imposto link
 		_link = f"{Config.LINK_URL}:62233/buyer/reset_psw_token/{_token}/"
@@ -407,8 +402,8 @@ def buyer_reset_password(_id):
 
 			_user.password = new_password
 			_user.updated_at = datetime.now()
-			db.session.commit()
-			db.session.close()
+
+			User.update()
 
 			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
 			_event = {

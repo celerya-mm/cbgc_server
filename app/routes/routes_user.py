@@ -64,9 +64,7 @@ def user_create():
 			note=form_data["note"].strip()
 		)
 		try:
-			db.session.add(new_user)
-			db.session.commit()
-			db.session.close()
+			User.create(new_user)
 			flash("UTENTE servizio creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -144,8 +142,7 @@ def user_update(_id):
 		user.updated_at = datetime.now()
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.commit()
-			db.session.close()
+			User.update()
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -211,8 +208,7 @@ def user_reset_password(_id):
 		else:
 			_user.password = new_password
 			_user.updated_at = datetime.now()
-			db.session.commit()
-			db.session.close()
+			User.update()
 			msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
 
 			_event = {
@@ -239,14 +235,14 @@ def reset_psw_user(_id):
 
 	# creo un token con validità 15 min
 	_token = __generate_auth_token()
+
 	auth_token = AuthToken(
 		user_id=_id,
 		token=_token,
 		expires_at=calc_exp_token_reset_psw()
 	)
-	db.session.add(auth_token)
-	db.session.commit()
-	db.session.close()
+
+	AuthToken.create(auth_token)
 
 	# imposto link
 	_link = f"{Config.LINK_URL}:62233/reset_psw_user_token/{_token}/"

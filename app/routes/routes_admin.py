@@ -67,8 +67,7 @@ def admin_create():
 			note=form_data["note"].strip(),
 		)
 		try:
-			db.session.add(new_admin)
-			db.session.commit()
+			Administrator.create(new_admin)
 			flash("Utente amministratore creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -130,8 +129,7 @@ def admin_update(_id):
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.commit()
-			db.session.close()
+			Administrator.update()
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -149,8 +147,6 @@ def admin_update(_id):
 			"Modification": f"Update account Administrator whit id: {_id}",
 			"Previous_data": previous_data
 		}
-
-		db.session.close()
 
 		_event = event_create(_event, admin_id=_id)
 		if _event is True:
@@ -212,7 +208,7 @@ def admin_update_password(_id):
 			administrator.password = new_password
 			administrator.updated_at = datetime.now()
 
-			db.session.commit()
+			Administrator.update()
 			flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
 			_event = {
 				"username": session["username"],

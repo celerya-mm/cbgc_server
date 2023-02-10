@@ -70,6 +70,18 @@
                         </div>
                     </div>
                 </div>
+                <!-- Ricerca per anno-->
+                <br>
+                <form method="post">
+                    <label for="birth_year">Anno nascita:</label>
+                    <input id="birth_year" type='search' name='birth_year' style="width: 80px;"/>
+                    <label for="sale_year">Anno vendita:</label>
+                    <input id="sale_year" type='search' name='sale_year' style="width: 80px;"/>
+                    <button type="submit" class="btn" title="Ricerca" style="">
+                        <img src="{{ url_for('static', filename='icons/search.svg') }}" alt="">
+                    </button>
+                </form>
+                <!--Tabella-->
                 <div class="table-responsive" style="padding: 10px">
                     <table id="data" class="table table-striped" style="width:100%">
                         <thead>

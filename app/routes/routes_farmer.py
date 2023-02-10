@@ -121,9 +121,7 @@ def farmer_create():
 			note=form_data["note"].strip()
 		)
 		try:
-			db.session.add(new_farmer)
-			db.session.commit()
-			db.session.close()
+			Farmer.create(new_farmer)
 			flash("ALLEVATORE creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -219,8 +217,7 @@ def farmer_update(_id):
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.commit()
-			db.session.close()
+			Farmer.update()
 			flash("ALLEVATORE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()

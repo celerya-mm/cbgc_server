@@ -67,8 +67,22 @@ def cert_cons_view():
 	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
 	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
 
-	_list = CertificateCons.query.all()
+	if request.method == 'POST':
+		year = request.form.get('year')
+		if year:
+			_list = CertificateCons.query.filter_by(certificate_year=int(year)).all()
+			flash(f"Certificati trovati: {len(_list)}")
+			if len(_list) == 0:
+				flash("Nessun Certificato emesso nel periodo cercato.")
+				return redirect(url_for(VIEW_FOR))
+		else:
+			_list = CertificateCons.query.all()
+			flash(f"Nessun Anno selezionato, mostro tutti i records: {len(_list)}")
+	else:
+		_list = CertificateCons.query.all()
+
 	db.session.close()
+
 	_list = [r.to_dict() for r in _list]
 
 	# raggruppa per anno del certificato
@@ -136,9 +150,7 @@ def cert_cons_create(h_id, f_id, h_set):
 		)
 		print("CERT_NEW_DATA", json.dumps(new_cert.to_dict(), indent=2))
 		try:
-			db.session.add(new_cert)
-			db.session.commit()
-			db.session.close()
+			CertificateCons.create(new_cert)
 			flash("CERTIFICATO CONSORZIO creato correttamente.")
 			return redirect(url_for(HEAD_HISTORY, _id=h_id))
 		except IntegrityError as err:
@@ -257,9 +269,7 @@ def cert_cons_update(_id):
 
 			if new_data["head_age"] in ["", None, 0]:
 				head = Head.query.get(int(cert.head_id))
-				birth = head.birth_date
-				slaug = head.slaughter_date
-				cert.head_age = calc_age(birth, slaug)
+				cert.head_age = calc_age(head.birth_date, head.slaughter_date)
 			else:
 				cert.head_age = not_empty(new_data["head_age"])
 
@@ -296,8 +306,7 @@ def cert_cons_update(_id):
 
 			# print("CERT_NEW_DATA:", new_data)
 			try:
-				db.session.commit()
-				db.session.close()
+				CertificateCons.update()
 				flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
 
 			except IntegrityError as err:
@@ -486,7 +495,7 @@ def cert_cons_generate(_id):
 			cert.certificate_pdf = pdf_str
 			cert.emitted = True
 			try:
-				db.session.commit()
+				CertificateCons.update()
 				flash("CERTIFICATO CREATO correttamente.")
 				previous_data["certificate_pdf"] = "Campo troppo lungo, rimosso i dati." \
 				                                   "Conterrebbe il certificato pdf convertito in byte."
@@ -643,8 +652,7 @@ def cert_cons_buyer_update(_id):
 			cert.updated_at = datetime.datetime.now()
 
 			try:
-				db.session.commit()
-				db.session.close()
+				CertificateCons.update()
 				flash(f"QUANTITA' RIMANENTE Attestato {cert.certificate_nr} aggiornata correttamente.")
 			except IntegrityError as err:
 				db.session.rollback()

@@ -63,9 +63,7 @@ def slaughterhouse_create():
 		)
 
 		try:
-			db.session.add(new_slaughterhouse)
-			db.session.commit()
-			db.session.close()
+			Slaughterhouse.create(new_slaughterhouse)
 			flash("MACELLO creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -153,8 +151,7 @@ def slaughterhouse_update(_id):
 
 		# print("SLAUGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
 		try:
-			db.session.commit()
-			db.session.close()
+			Slaughterhouse.update()
 			flash("MACELLO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()

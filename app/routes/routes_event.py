@@ -40,9 +40,7 @@ def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=No
 			cert_dna_id=cert_dna_id
 		)
 
-		db.session.add(new_event)
-		db.session.commit()
-		db.session.close()
+		EventDB.create(new_event)
 		print("EVENT_CREATED.")
 		return True
 	except IntegrityError as err:
@@ -192,7 +190,6 @@ def event_restore(_id, id_record, table, view_for):
 				for k, v in data.items():
 					setattr(record, k, v)
 				db.session.commit()
-				db.session.close()
 				flash(f"Record ripristinato correttamente alla situazione precedente il: {updated_at}.")
 				return redirect(url_for(view_for, _id=id_record))
 			except IntegrityError as err:

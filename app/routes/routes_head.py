@@ -35,9 +35,30 @@ def head_view():
 	"""Visualizzo informazioni Capi."""
 	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
-	_list = Head.query.all()
-	_list = [r.to_dict() for r in _list]
+	if request.method == 'POST':
+		birth_year = request.form.get('birth_year') or "*"
+		sale_year = request.form.get('sale_year') or "*"
+		print(birth_year, sale_year)
+		if birth_year != "*" and sale_year != "*":
+			_list = Head.query.filter_by(birth_year=int(birth_year), sale_year=sale_year).all()
+		elif birth_year != "*":
+			_list = Head.query.filter_by(birth_year=int(birth_year)).all()
+		elif sale_year != "*":
+			_list = Head.query.filter_by(sale_year=int(sale_year)).all()
+		else:
+			_list = Head.query.all()
+			flash(f"Nessun Anno selezionato, mostro tutti i records: {len(_list)}")
+
+		flash(f"Capi trovati: {len(_list)}")
+		if len(_list) == 0:
+			flash(f"Nessun Capo presente con i parametri cercati. Mostro tutti i records.")
+			return redirect(url_for(VIEW_FOR))
+	else:
+		_list = Head.query.all()
+
 	db.session.close()
+
+	_list = [r.to_dict() for r in _list]
 	# print("LIST_HEAD:", json.dumps(_list[:5], indent=2))
 
 	# raggruppa per anno di nascita
@@ -91,9 +112,7 @@ def head_create():
 		)
 		# print("HEAD_NEW_DATA", json.dumps(new_head.to_dict(), indent=2))
 		try:
-			db.session.add(new_head)
-			db.session.commit()
-			db.session.close()
+			Head.create(new_head)
 			flash("CAPO creato correttamente.")
 			return redirect(url_for(VIEW_FOR))
 		except IntegrityError as err:
@@ -208,8 +227,7 @@ def head_update(_id):
 
 		# print("NEW_DATA:", new_data)
 		try:
-			db.session.commit()
-			db.session.close()
+			Head.update()
 			flash("CAPO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()

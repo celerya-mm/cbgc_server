@@ -59,6 +59,15 @@ class Administrator(db.Model):
 		self.created_at = datetime.now()
 		self.updated_at = datetime.now()
 
+	def create(self):
+		"""Crea un nuovo record e lo salva nel db."""
+		db.session.add(self)
+		db.session.commit()
+
+	def update():  # noqa
+		"""Salva le modifiche a un record."""
+		db.session.commit()
+
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
 		from ..utilitys.functions import date_to_str
@@ -135,6 +144,15 @@ class User(db.Model):
 		self.note = note or None
 		self.created_at = datetime.now()
 		self.updated_at = datetime.now()
+
+	def create(self):
+		"""Crea un nuovo record e lo salva nel db."""
+		db.session.add(self)
+		db.session.commit()
+
+	def update():  # noqa
+		"""Salva le modifiche a un record."""
+		db.session.commit()
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""

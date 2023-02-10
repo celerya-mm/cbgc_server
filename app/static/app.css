@@ -223,6 +223,11 @@ input,
     text-align: center;
 }
 
+input[type=search]:focus {
+  border: 2px solid #9BB5E8;
+  outline: none;
+}
+
 .json-key {
     font-family: 'Jost', sans-serif;
     color: #5B5A5B;
