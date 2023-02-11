@@ -39,10 +39,12 @@ def create_map(_list):
 	"""Crea una mappa dalla base dati."""
 	m = folium.Map(location=[44.92, 10.01], zoom_start=6.5, name="Mappa acquirenti Consorzio", tiles=None)
 	folium.TileLayer('Stamen Terrain', control=False).add_to(m)
+
 	feature_group_m = folium.FeatureGroup(name="Macellerie", overlay=True)
 	feature_group_r = folium.FeatureGroup(name="Ristoranti", overlay=True)
 	feature_group_bm = folium.FeatureGroup(name="Bue in Macelleria", overlay=True)
 	feature_group_br = folium.FeatureGroup(name="Bue in Ristorante", overlay=True)
+
 	for record in _list:
 		if record.coordinates and len(record.coordinates) > 5:
 			if record.buyer_type == "Macelleria":
@@ -197,13 +199,12 @@ def buyer_view_history(_id):
 	# estraggo i certificati del consorzio e i capi acquistati
 	cons_list = buyer.cons_certs
 	head_list = []
-	if cons_list:
+	if len(cons_list) > 0:
 		cons_list = [cert.to_dict() for cert in cons_list]
 		for cert in cons_list:
 			_h = Head.query.get(cert["head_id"])
 			if _h and _h not in head_list:
 				head_list.append(_h)
-	# print("LEN:", len(cons_list), "DATA:", cons_list)
 	else:
 		cons_list = []
 
@@ -273,22 +274,15 @@ def buyer_update(_id):
 			}
 			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 
+		db.session.close()
 		_event = {
 			"username": session["username"],
 			"table": Buyer.__tablename__,
 			"Modification": f"Update Buyer whit id: {_id}",
 			"Previous_data": previous_data
 		}
-
-		db.session.close()
-
-		# print("BUYER_EVENT:", json.dumps(_event, indent=2))
 		_event = event_create(_event, buyer_id=_id)
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-		else:
-			flash(_event)
-			return redirect(url_for(HISTORY_FOR, _id=_id))
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		form.buyer_name.data = buyer.buyer_name
 		form.buyer_type.data = buyer.buyer_type
@@ -405,16 +399,12 @@ def buyer_reset_password(_id):
 
 			User.update()
 
-			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
 			_event = {
 				"executor": session["username"],
 				"username": _user["username"],
 				"Modification": "Password reset"
 			}
 			_event = event_create(_event, user_id=_id)
-			if _event is not True:
-				flash(_event)
-
 			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
 			return redirect(url_for('login_buyer', cert_nr="None"))
 	else:

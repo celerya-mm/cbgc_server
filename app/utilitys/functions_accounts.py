@@ -9,8 +9,6 @@ from ..models.tokens import AuthToken
 
 
 def __generate_auth_token():
-	# """Genero random token."""
-	# return ''.join([random.choice(string.ascii_letters + string.digits) for _n in range(64)])
 	"""Genero token UUID4."""
 	return str(uuid4())
 
@@ -18,8 +16,7 @@ def __generate_auth_token():
 def __save_auth_token(token, admin_id=None, user_id=None):
 	"""Salvo il token nel DB."""
 	auth_token = AuthToken(admin_id=admin_id, user_id=user_id, token=token)
-	db.session.add(auth_token)
-	db.session.commit()
+	AuthToken.create(auth_token)
 	return auth_token
 
 

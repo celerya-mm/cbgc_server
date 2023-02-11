@@ -47,8 +47,6 @@ def slaughterhouse_create():
 	form = FormSlaughterhouseCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# print("SLAUGHT_FORM_DATA", json.dumps(form_data, indent=2))
-
 		new_slaughterhouse = Slaughterhouse(
 			slaughterhouse=form_data["slaughterhouse"].strip(),
 			slaughterhouse_code=form_data["slaughterhouse_code"].strip(),
@@ -124,11 +122,9 @@ def slaughterhouse_update(_id):
 
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
-		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
 		previous_data = slaughterhouse.to_dict()
 		previous_data.pop("updated_at")
-		# print("SLAUGH_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		slaughterhouse.slaughterhouse = new_data["slaughterhouse"].strip()
 		slaughterhouse.slaughterhouse_code = new_data["slaughterhouse_code"].strip()
@@ -149,7 +145,6 @@ def slaughterhouse_update(_id):
 		slaughterhouse.note = not_empty(new_data["note"])
 		slaughterhouse.updated_at = datetime.now()
 
-		# print("SLAUGH_NEW_DATA:", json.dumps(slaughterhouse.to_dict(), indent=2))
 		try:
 			Slaughterhouse.update()
 			flash("MACELLO aggiornato correttamente.")
@@ -169,14 +164,8 @@ def slaughterhouse_update(_id):
 			"Modification": f"Update Slaughterhouse whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		# print("NEW_DATA:", new_data)
-
 		_event = event_create(_event, slaughterhouse_id=_id)
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-		else:
-			flash(_event)
-			return redirect(url_for(HISTORY_FOR, _id=_id))
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		form.slaughterhouse.data = slaughterhouse.slaughterhouse
 		form.slaughterhouse_code.data = slaughterhouse.slaughterhouse_code
@@ -199,8 +188,5 @@ def slaughterhouse_update(_id):
 			'created_at': slaughterhouse.created_at,
 			'updated_at': slaughterhouse.updated_at,
 		}
-		# print("SLAUGHT_:", form)
-		# print("SLAUGHT_FORM:", json.dumps(form.to_dict(form), indent=2))
-
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

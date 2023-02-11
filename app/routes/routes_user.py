@@ -52,8 +52,6 @@ def user_create():
 	form = FormUserSignup()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# print("USER_FORM_DATA", json.dumps(form_data, indent=2))
-
 		new_user = User(
 			username=form_data["username"].replace(" ", ""),
 			name=form_data["name"].strip(),
@@ -124,11 +122,9 @@ def user_update(_id):
 
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
-		# print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		previous_data = user.to_dict()
 		previous_data.pop("updated_at")
-		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		user.username = new_data["username"].strip().replace(" ", "")
 		user.name = new_data["name"].strip()
@@ -140,7 +136,6 @@ def user_update(_id):
 
 		user.note = not_empty(new_data["note"].strip().replace("  ", ""))
 		user.updated_at = datetime.now()
-		# print("NEW_DATA:", new_data)
 		try:
 			User.update()
 			flash("UTENTE aggiornato correttamente.")
@@ -160,14 +155,8 @@ def user_update(_id):
 			"Modification": f"Update account USER whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		# print("EVENT:", json.dumps(_event, indent=2))
-
 		_event = event_create(_event, user_id=_id)
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-		else:
-			flash(_event)
-			return redirect(url_for(HISTORY_FOR, _id=_id))
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		form.username.data = user.username
 		form.name.data = user.name
@@ -180,8 +169,6 @@ def user_update(_id):
 			'created_at': user.created_at,
 			'updated_at': user.updated_at,
 		}
-		# print("USER_UPDATE:", json.dumps(form.to_dict(form), indent=2))
-
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 
@@ -194,10 +181,7 @@ def user_reset_password(_id):
 	form = FormPswReset()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# _admin = json.loads(json.dumps(session["admin"]))
-
 		new_password = psw_hash(form_data["new_password_1"].replace(" ", "").strip())
-		# print("NEW:", new_password)
 
 		_user = User.query.get(_id)
 
@@ -208,6 +192,7 @@ def user_reset_password(_id):
 		else:
 			_user.password = new_password
 			_user.updated_at = datetime.now()
+
 			User.update()
 			msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
 
@@ -217,12 +202,7 @@ def user_reset_password(_id):
 				"Modification": "Password reset"
 			}
 			_event = event_create(_event, user_id=_id)
-			if _event is True:
-				return msg
-			else:
-				msg = f"{msg}\n" \
-				      f"{_event}"
-				return msg
+			return msg
 	else:
 		return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 
@@ -247,8 +227,6 @@ def reset_psw_user(_id):
 	# imposto link
 	_link = f"{Config.LINK_URL}:62233/reset_psw_user_token/{_token}/"
 	_link = _link.replace("/:", ":")
-	# print("LINK:", _link)
-
 	try:
 		# imposto e invio la mail con il link per il reset
 		msg = Message(

@@ -16,7 +16,7 @@ PATH_PROJECT = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__, instance_relative_config=False)
 
 # imposto app dietro reverse proxy
-app.wsgi_app = ProxyFix(app.wsgi_app)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # carico parametri configurazione
 app.config.from_object(Config)

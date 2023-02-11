@@ -42,8 +42,7 @@ def user_signup():
                         email=data_received["email"],
                         note=data_received["note"]
                     )
-                    db.session.add(new_user)
-                    db.session.commit()
+                    User.create(new_user)
                     print('NEW user ID: {}'.format(new_user.id))
 
                     data = {

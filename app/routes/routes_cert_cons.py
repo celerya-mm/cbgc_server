@@ -71,10 +71,11 @@ def cert_cons_view():
 		year = request.form.get('year')
 		if year:
 			_list = CertificateCons.query.filter_by(certificate_year=int(year)).all()
-			flash(f"Certificati trovati: {len(_list)}")
 			if len(_list) == 0:
 				flash("Nessun Certificato emesso nel periodo cercato.")
 				return redirect(url_for(VIEW_FOR))
+			else:
+				flash(f"Certificati trovati: {len(_list)}")
 		else:
 			_list = CertificateCons.query.all()
 			flash(f"Nessun Anno selezionato, mostro tutti i records: {len(_list)}")
@@ -119,7 +120,6 @@ def cert_cons_create(h_id, f_id, h_set):
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		# print("HEAD_FORM_DATA", json.dumps(form_data, indent=2))
-
 		new_cert = CertificateCons(
 			certificate_id=form_data["certificate_id"],
 			certificate_var=form_data["certificate_var"],
@@ -168,14 +168,11 @@ def cert_cons_create(h_id, f_id, h_set):
 		head_slaug = head.slaughter_date
 		db.session.close()
 
-		# print("HEAD", h_set, "LAST:", prev_cert)
 		h_set = f"{int(h_id)} - {h_set}"
-		# print("HEAD", h_set)
 
 		form.head_id.data = h_set
 		form.farmer_id.data = f_id
 		form.head_age.data = calc_age(head_birth, head_slaug)
-
 		return render_template(CREATE_HTML, form=form, view=HEAD_HISTORY, _id=h_id, h_set=h_set, prev_cert=prev_cert)
 
 
@@ -234,7 +231,6 @@ def cert_cons_update(_id):
 	from ..routes.routes_event import event_create
 
 	form = FormCertConsUpdate()
-
 	# recupero i dati del record
 	cert = CertificateCons.query.get(int(_id))
 
@@ -308,7 +304,6 @@ def cert_cons_update(_id):
 			try:
 				CertificateCons.update()
 				flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
-
 			except IntegrityError as err:
 				db.session.rollback()
 				flash(f"ERRORE: {str(err.orig)}")
@@ -327,14 +322,8 @@ def cert_cons_update(_id):
 				"Modification": f"Update Certificate whit id: {_id}",
 				"Previous_data": previous_data
 			}
-
-			# print("EVENT:", json.dumps(_event, indent=2))
 			_event = event_create(_event, cert_cons_id=int(_id))
-			if _event is True:
-				return redirect(url_for(HISTORY_FOR, _id=int(_id)))
-			else:
-				flash(_event)
-				return redirect(url_for(HISTORY_FOR, _id=_id))
+			return redirect(url_for(HISTORY_FOR, _id=_id))
 		except Exception as err:
 			flash(err)
 			return redirect(url_for(HISTORY_FOR, _id=_id))
@@ -364,9 +353,7 @@ def cert_cons_update(_id):
 
 		if cert.head_age in ["", None, 0]:
 			head = Head.query.get(int(cert.head_id))
-			birth = head.birth_date
-			slaug = head.slaughter_date
-			form.head_age.data = calc_age(birth, slaug)
+			form.head_age.data = calc_age(head.birth_date, head.slaughter_date)
 		else:
 			form.head_age.data = cert.head_age
 
@@ -391,7 +378,7 @@ def cert_cons_update(_id):
 		form.buyer_id.data = f"{buyer.id} - {buyer.buyer_name}"
 
 		if cert.slaughterhouse_id:
-			slaugh = Slaughterhouse.query.get(cert.slaughterhouse_id)  # noqa
+			slaugh = Slaughterhouse.query.get(cert.slaughterhouse_id)
 			form.slaughterhouse_id.data = f"{slaugh.id} - {slaugh.slaughterhouse}"
 
 		form.note_certificate.data = cert.note_certificate
@@ -403,8 +390,6 @@ def cert_cons_update(_id):
 			'created_at': cert.created_at,
 			'updated_at': cert.updated_at,
 		}
-		# print("CERT_:", form)
-		# print("CERT_FORM:", form.to_dict())
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, prev_cert=prev_cert)
 
 
@@ -442,7 +427,7 @@ def cert_cons_generate(_id):
 			head = Head.query.get(cert.head_id)
 			farmer = Farmer.query.get(cert.farmer_id)
 			buyer = Buyer.query.get(cert.buyer_id)
-			slaught = Slaughterhouse.query.get(cert.slaughterhouse_id)  # noqa
+			slaugh = Slaughterhouse.query.get(cert.slaughterhouse_id)
 		except Exception as err:
 			db.session.close()
 			flash(f"ERRORE: {err}")
@@ -453,10 +438,10 @@ def cert_cons_generate(_id):
 		else:
 			note = cert.note_certificate
 
-		if slaught.slaughterhouse_code:
-			slaughter = f"{slaught.slaughterhouse_code} - {slaught.slaughterhouse}"
+		if slaugh.slaughterhouse_code:
+			slaughter = f"{slaugh.slaughterhouse_code} - {slaugh.slaughterhouse}"
 		else:
-			slaughter = slaught.slaughterhouse
+			slaughter = slaugh.slaughterhouse
 
 		data = {
 			"certificate_nr": cert.certificate_nr,
@@ -489,7 +474,6 @@ def cert_cons_generate(_id):
 			flash(f"Errore creazione certificato pdf.")
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
-		# print("BUYER_TYPE:", buyer.buyer_type)
 		if pdf_str is not False and pdf_str is not None and len(pdf_str) > 10:
 			# assegno stringa in byte
 			cert.certificate_pdf = pdf_str
@@ -511,13 +495,8 @@ def cert_cons_generate(_id):
 				"Modification": f"Update Certificate whit id: {_id}",
 				"Previous_data": previous_data
 			}
-			# print("EVENT:", json.dumps(_event, indent=2))
 			_event = event_create(_event, cert_cons_id=int(_id))
-			if _event is True:
-				return redirect(url_for(HISTORY_FOR, _id=int(_id)))
-			else:
-				flash(_event)
-				return redirect(url_for(HISTORY_FOR, _id=int(_id)))
+			return redirect(url_for(HISTORY_FOR, _id=int(_id)))
 		else:
 			flash(f"ERRORE CREAZIONE PDF.")
 			db.session.close()
@@ -544,7 +523,6 @@ def cert_cons_download(_id):
 @app.route(DOWNLOAD_LINK, methods=["GET", "POST"])
 def cert_cons_download_link(_link):
 	_cert = _link.replace("_", "/")
-	# print("CERT_FORM_LINK:", _cert)
 	session["cert_nr"] = _cert
 	return render_template(DOWNLOAD_LINK_HTML, cert_nr=_cert, link=_link, func=SAVE_FOR)
 
@@ -553,11 +531,9 @@ def cert_cons_download_link(_link):
 def cert_cons_save(_link):
 	_link = _link.replace("_", "/")
 	try:
-		# print("LINK", _link)
-		cert = db.session.query(CertificateCons).filter_by(certificate_nr=_link).first()
+		cert = CertificateCons.query.filter_by(certificate_nr=_link).first()
 		db.session.close()
 		_pdf = byte_to_pdf(cert.certificate_pdf, cert.certificate_nr)
-		print("PDF_GENERATO")
 		flash(f"Attestato Consorzio Bue Grasso di Carrù nr {_link} scaricato.")
 		return send_file(_pdf, as_attachment=True)
 	except Exception as err:
@@ -572,7 +548,7 @@ def cert_cons_save(_link):
 def cert_cons_buyer_view():
 	"""Visualizzo informazioni Capi."""
 	if "username" in session:
-		user = db.session.query(User).filter_by(username=session["username"]).first()
+		user = User.query.filter_by(username=session["username"]).first()
 		db.session.close()
 		certificates = [cert for buyer in user.buyers for cert in buyer.cons_certs]
 		for cert in certificates:
@@ -589,8 +565,9 @@ def cert_cons_buyer_view():
 def cert_cons_buyer_view_history(cert_nr):
 	"""Visualizzo dettaglio record Certificato."""
 	cert_nr = cert_nr.replace("_", "/")
-	cert = db.session.query(CertificateCons).filter_by(certificate_nr=cert_nr).first()
-	user = db.session.query(User).filter_by(username=session["username"]).first()
+	cert = CertificateCons.query.filter_by(certificate_nr=cert_nr).first()
+	user = User.query.filter_by(username=session["username"]).first()
+
 	if cert and user.buyers:
 		_list_buyers = []
 		for buyer in user.buyers:
@@ -598,7 +575,6 @@ def cert_cons_buyer_view_history(cert_nr):
 
 		if cert.buyer_id in _list_buyers:
 			_cert = cert.to_dict()
-			# print("HEAD_FORM:", json.dumps(_head, indent=2), "TYPE:", type(_head))
 
 			if cert.head_id:
 				head = Head.query.get(cert.head_id)
@@ -613,8 +589,6 @@ def cert_cons_buyer_view_history(cert_nr):
 				_cert["slaughterhouse_id"] = slaugh.slaughterhouse
 
 			db.session.close()
-
-			# print("CERT_DATA:", json.dumps(cert.to_dict(), indent=2))
 			return render_template(BUYER_HISTORY_HTML, form=_cert, view=BUYER_VIEW_FOR, update=BUYER_UPDATE_FOR)
 		else:
 			db.session.close()
@@ -640,13 +614,10 @@ def cert_cons_buyer_update(_id):
 
 	if form.validate_on_submit():
 		try:
-			# print("SESSION", json.dumps(session, indent=2))
 			new_quantity = json.loads(json.dumps(request.form))
-			# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 			previous_data = cert.to_dict()
 			previous_data.pop("updated_at")
-			# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 			cert.sale_rest = new_quantity["sale_rest"]
 			cert.updated_at = datetime.datetime.now()
@@ -672,13 +643,8 @@ def cert_cons_buyer_update(_id):
 				"Modification": f"Update Quantity Rest Certificate whit id: {_id}",
 				"Previous_data": previous_data
 			}
-			# print("EVENT:", json.dumps(_event, indent=2))
 			_event = event_create(_event, cert_cons_id=cert.id)
-			if _event is True:
-				return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
-			else:
-				flash(_event)
-				return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
+			return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
 		except Exception as err:
 			db.session.close()
 			flash(err)
@@ -694,8 +660,6 @@ def cert_cons_buyer_update(_id):
 			'created_at': cert.created_at,
 			'updated_at': cert.updated_at,
 		}
-		# print("CERT_:", form)
-		# print("CERT_FORM:", form.to_dict())
 		return render_template(
 			BUYER_UPDATE_HTML, form=form, nr=cert.certificate_nr, info=_info, history=BUYER_HISTORY_FOR
 		)

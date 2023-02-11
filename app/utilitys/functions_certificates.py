@@ -28,6 +28,8 @@ if not os.path.exists(folder_temp_pdf):
 def generate_qr_code(_str, nr_cert):
 	"""Genera un QR-Code da una stringa."""
 	try:
+		nr_cert = nr_cert.replace("/", "_") + ".jpg"
+
 		qr = qrcode.QRCode(
 			version=1,
 			error_correction=qrcode.constants.ERROR_CORRECT_Q,
@@ -36,12 +38,10 @@ def generate_qr_code(_str, nr_cert):
 		)
 		qr.add_data(_str)
 		qr.make(fit=True)
+
 		img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
-		# print("")
-		# print(img)
-		nr_cert = nr_cert.replace("/", "_") + ".jpg"
 		img.save(os.path.join(folder_temp_qrcode, nr_cert))
-		# print("QR-Code Generated")
+
 		return nr_cert
 	except Exception as err:
 		print(err)
@@ -56,7 +56,7 @@ def byte_to_pdf(byte, f_name):
 		os.remove(file_path)
 
 	path_file = os.path.join(folder_temp_pdf, f_name.replace("/", "_") + ".pdf")
-	print("PDF_STR_TYPE:", type(byte), "LEN:", len(byte))
+
 	with open(path_file, "wb") as f:
 		f.write(byte)
 	return path_file
@@ -81,7 +81,6 @@ def html_to_pdf(template, form, _qrcode):
 	"""Genera pdf da template html."""
 	_img = os.path.join(_path, "static", "qrcode_temp", _qrcode)
 	logo = os.path.join(_path, "static", "Logo.png")
-	# print("PATH_QRCODE:", _img)
 
 	# PDF options
 	options = {
@@ -98,10 +97,7 @@ def html_to_pdf(template, form, _qrcode):
 	try:
 		# Build PDF from HTML
 		_file = os.path.join(folder_temp_pdf, "report.pdf")
-		# print("PATH_PDF_FILE:", _file)
 		html = render_template(template, form=form, qrcode=_img, logo=logo)
-		# print("HTML:", html)
-
 		_html = os.path.join(folder_temp_pdf, "temp.html")
 
 		with open(_html, 'w') as f:
@@ -112,12 +108,9 @@ def html_to_pdf(template, form, _qrcode):
 		with open(_file, "wb") as f:
 			f.write(_pdf)
 
-		print("PDF_GENERATED:", _file)
-
 		# rimuovo il qrcode
 		for f in os.listdir(folder_temp_qrcode):
 			_f = os.path.join(folder_temp_qrcode, f)
-			# print("QRCODE_REMOVE:", _f)
 			os.remove(_f)
 
 		return _file

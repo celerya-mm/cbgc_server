@@ -42,14 +42,12 @@ def create_map(_list):
 			else:
 				color = "grey"  # grigio (manca il tipo)
 				icon = "info-sign"
+
 			coordinates = record.coordinates.split(", ")
-			# print("COORDINATES:", coordinates)
 			lat = re.findall(r'\d+\.\d+', coordinates[0].replace("(", ""))
-			# print("LAT", lat)
 			lat = float(lat[0])
 
 			long = re.findall(r'\d+\.\d+', coordinates[1].replace(")", ""))
-			# print("LONG:", long)
 			long = float(long[0])
 
 			html = "<style> " \
@@ -98,8 +96,6 @@ def farmer_create():
 	form = FormFarmerCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# print("FARMER_FORM_DATA", json.dumps(form_data, indent=2))
-
 		new_farmer = Farmer(
 			farmer_name=form_data["farmer_name"].strip(),
 
@@ -185,11 +181,9 @@ def farmer_update(_id):
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
 		new_data = json.loads(json.dumps(request.form))
-		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
 		previous_data = farmer.to_dict()
 		previous_data.pop("updated_at")
-		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		farmer.farmer_name = new_data["farmer_name"].strip().replace("  ", " ")
 
@@ -215,7 +209,6 @@ def farmer_update(_id):
 
 		farmer.updated_at = datetime.now()
 
-		# print("NEW_DATA:", new_data)
 		try:
 			Farmer.update()
 			flash("ALLEVATORE aggiornato correttamente.")
@@ -235,14 +228,8 @@ def farmer_update(_id):
 			"Modification": f"Update Farmer whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		# print("EVENT:", json.dumps(_event, indent=2))
-
 		_event = event_create(_event, farmer_id=_id)
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-		else:
-			flash(_event)
-			return redirect(url_for(HISTORY_FOR, _id=_id))
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		form.farmer_name.data = farmer.farmer_name
 		form.email.data = farmer.email
@@ -269,7 +256,5 @@ def farmer_update(_id):
 			'created_at': farmer.created_at,
 			'updated_at': farmer.updated_at,
 		}
-		# print("FARMER_:", form)
-		# print("FARMER_FORM:", json.dumps(form.to_dict(form), indent=2))
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

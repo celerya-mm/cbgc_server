@@ -125,7 +125,7 @@
                            data-bs-toggle="dropdown" aria-expanded="false">
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <!--                    Ammin.-->
+                            <!--  Ammin.-->
                             <li>
                                 <a class="dropdown-item nav-link {% if request.path == '/admin/view/' %} active {% endif %}"
                                    title="Amministratori" href="{{ url_for('admin_view') }}">
@@ -137,7 +137,7 @@
                                     Ammin.
                                 </a>
                             </li>
-                            <!--                    Utenti-->
+                            <!--  Utenti-->
                             <li>
                                 <a class="dropdown-item nav-link {% if request.path == '/user/view/' %} active {% endif %}"
                                    title="Utenti" href="{{ url_for('user_view') }}">
@@ -150,7 +150,7 @@
                                     Utenti
                                 </a>
                             </li>
-                            <!--                    LogOut-->
+                            <!--  LogOut-->
                             <li>
                                 <a class="dropdown-item nav-link" title="Log-out" href="{{ url_for('logout') }}">
                                     <img src="{{ url_for('static', filename='icons/box-arrow-out-right.svg') }}"
@@ -169,7 +169,7 @@
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         {% for message in messages %}
-        <p style="color: #ED6666">{{ message }}</p>
+        <p style="color: #ED6666; line-height: 0.6;">{{ message }}</p>
         {% endfor %}
         {% endif %}
         {% endwith %}

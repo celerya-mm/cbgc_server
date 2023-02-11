@@ -9,8 +9,9 @@
       <excludeFolder url="file://$MODULE_DIR$/migrations" />
       <excludeFolder url="file://$MODULE_DIR$/app/utilitys/temp_pdf" />
       <excludeFolder url="file://$MODULE_DIR$/app/utilitys/flask_session" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/codeStyles" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (cbgc_server)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

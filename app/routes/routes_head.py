@@ -59,7 +59,6 @@ def head_view():
 	db.session.close()
 
 	_list = [r.to_dict() for r in _list]
-	# print("LIST_HEAD:", json.dumps(_list[:5], indent=2))
 
 	# raggruppa per anno di nascita
 	group_birth = dict_group_by(_list, "birth_year", year=True)
@@ -99,8 +98,6 @@ def head_create():
 	form = FormHeadCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# print("HEAD_FORM_DATA", json.dumps(form_data, indent=2))
-
 		new_head = Head(
 			headset=form_data["headset"],
 			birth_date=not_empty(form_data["birth_date"]),
@@ -110,7 +107,7 @@ def head_create():
 			farmer_id=not_empty(form_data["farmer_id"].split(" - ")[0]),
 			note=form_data["note"].strip()
 		)
-		# print("HEAD_NEW_DATA", json.dumps(new_head.to_dict(), indent=2))
+
 		try:
 			Head.create(new_head)
 			flash("CAPO creato correttamente.")
@@ -137,7 +134,6 @@ def head_view_history(_id):
 
 	head = Head.query.get(int(_id))
 	_head = head.to_dict()
-	# print("HEAD_FORM:", json.dumps(_head, indent=2), "TYPE:", type(_head))
 
 	if head.farmer_id:
 		farmer = Farmer.query.get(head.farmer_id)
@@ -160,9 +156,6 @@ def head_view_history(_id):
 		_b = Buyer.query.get(cert.buyer_id)
 		if _b and _b not in buyer_list:
 			_b = _b.to_dict()
-			_b["maps"] = f'{_b["cap"].strip().replace(" ", "")},' \
-			             f'{_b["address"].strip().replace(" ", "+")},' \
-			             f'{_b["city"].strip().replace(" ", "+")}'
 			buyer_list.append(_b)
 
 	slaug_list = []
@@ -198,11 +191,9 @@ def head_update(_id):
 
 	if form.validate_on_submit():
 		new_data = json.loads(json.dumps(request.form))
-		# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		previous_data = head.to_dict()
 		previous_data.pop("updated_at")
-		# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		head.headset = new_data["headset"].strip()
 
@@ -246,14 +237,8 @@ def head_update(_id):
 			"Modification": f"Update Head whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		# print("EVENT:", json.dumps(_event, indent=2))
-
 		_event = event_create(_event, head_id=_id)
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-		else:
-			flash(_event)
-			return redirect(url_for(HISTORY_FOR, _id=_id))
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		form.headset.data = head.headset
 
@@ -271,9 +256,6 @@ def head_update(_id):
 			'created_at': head.created_at,
 			'updated_at': head.updated_at,
 		}
-		# print("HEAD_:", form)
-		# print("HEAD_FORM:", json.dumps(form.to_dict(), indent=2))
-
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, f_id=head.farmer_id,
 		                       dna_create=DNA_CREATE_FOR)

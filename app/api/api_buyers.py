@@ -11,85 +11,78 @@ from app.utilitys.functions_accounts import psw_hash, __generate_auth_token, __s
 
 @app.route('/api/buyer/login/', methods=['POST'])
 def buyer_login():
-    """API login utente acquirente."""
-    data_received = request.get_json()
-    username = data_received['username'].replace(" ", "")
-    password = data_received['password'].replace(" ", "")
+	"""API login utente acquirente."""
+	data_received = request.get_json()
+	username = data_received['username'].replace(" ", "")
+	password = data_received['password'].replace(" ", "")
 
-    # print("USER:", username, "PSW:", psw_hash(str(password)))
-    _user = db.session.query(User).filter_by(
-        username=username,
-        password=psw_hash(str(password))
-    ).first()
+	_user = User.query.filter_by(username=username, password=psw_hash(str(password))).first()
 
-    if _user not in [None, ""]:
-        record = len(_user.auth_tokens) - 1
-        if record > 0 and _user.auth_tokens[record].expires_at > datetime.now():
-            token = _user.auth_tokens[record].token
-            data = {
-                'status': 'success',
-                'data': {
-                    'token': token,
-                    'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
-                    'buyer_id': _user.id
-                }
-            }
-            # print("RISPOSTA_API_LOGIN:", json.dumps(data, indent=2))
-            response = make_response(jsonify(data), 201)
-        else:
-            token = __generate_auth_token()
-            save = __save_auth_token(token, user_id=_user.id)
-            data = {
-                'status': 'success',
-                'data': {
-                    'token': token,
-                    'expiration': datetime.strftime(save.expires_at, "%Y-%m-%d %H:%M:%S"),
-                    'buyer_id': _user.id
-                }
-            }
-            # print("RISPOSTA_API_LOGIN:", json.dumps(data, indent=2))
-            response = make_response(jsonify(data), 201)
-    else:
-        data = {
-            '01_status': 'failed',
-            '02_message': f"Login fallita, non è presente nessun acquirente con questi username e password."
-                          f"Contatta il Consorzio per farti assegnare un utente.",
-            'username': username
-        }
-        # print("RISPOSTA_API_LOGIN:", json.dumps(data, indent=2))
-        response = make_response(jsonify(data), 500)
-    return response
+	if _user not in [None, ""]:
+		record = len(_user.auth_tokens) - 1
+		if record > 0 and _user.auth_tokens[record].expires_at > datetime.now():
+			token = _user.auth_tokens[record].token
+			data = {
+				'status': 'success',
+				'data': {
+					'token': token,
+					'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
+					'buyer_id': _user.id
+				}
+			}
+			response = make_response(jsonify(data), 201)
+		else:
+			token = __generate_auth_token()
+			save = __save_auth_token(token, user_id=_user.id)
+			data = {
+				'status': 'success',
+				'data': {
+					'token': token,
+					'expiration': datetime.strftime(save.expires_at, "%Y-%m-%d %H:%M:%S"),
+					'buyer_id': _user.id
+				}
+			}
+			response = make_response(jsonify(data), 201)
+	else:
+		data = {
+			'01_status': 'failed',
+			'02_message': f"Login fallita, non è presente nessun acquirente con questi username e password."
+			              f"Contatta il Consorzio per farti assegnare un utente.",
+			'username': username
+		}
+		response = make_response(jsonify(data), 500)
+	return response
 
 
 @app.route('/api/buyers/', methods=['GET'])
 def get_buyers():
-    """API ricezione elenco acquirenti."""
-    token = request.headers.get("token")
-    print("TOKEN", token)
-    if not token:
-        return jsonify({"message": "Please log in."}), 401
-    else:
-        authenticated = AuthToken.query.filter(AuthToken.token == token).first()
-        if authenticated in ["", None] or authenticated.expires_at < datetime.now():
-            return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
-        else:
-            buyer_list = User.query.all()
-            return jsonify([buyer.to_dict() for buyer in buyer_list]), 200
+	"""API ricezione elenco acquirenti."""
+	token = request.headers.get("token")
+	print("TOKEN", token)
+	if not token:
+		return jsonify({"message": "Please log in."}), 401
+	else:
+		authenticated = AuthToken.query.filter(AuthToken.token == token).first()
+		if authenticated in ["", None] or authenticated.expires_at < datetime.now():
+			return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
+		else:
+			buyer_list = User.query.all()
+			return jsonify([buyer.to_dict() for buyer in buyer_list]), 200
 
 
 @app.route('/api/buyer/<int:buyer_id>', methods=['GET'])
 def get_buyer(buyer_id):
-    """API ricerca singolo acquirente."""
-    token = request.headers.get("token")
-    if not token:
-        return jsonify({"message": "Please log in."}), 401
-    else:
-        authenticated = AuthToken.query.filter(AuthToken.token == token).first()
-        if authenticated in ["", None] or authenticated.expires_at < datetime.now():
-            return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
-        else:
-            buyer = User.query.filter_by(id=buyer_id).first()
-            if buyer:
-                return jsonify(buyer.to_dict()), 200
-            else:
-                return jsonify(error=f'Buyer not found with id: {buyer_id}'), 404
+	"""API ricerca singolo acquirente."""
+	token = request.headers.get("token")
+	if not token:
+		return jsonify({"message": "Please log in."}), 401
+	else:
+		authenticated = AuthToken.query.filter(AuthToken.token == token).first()
+		if authenticated in ["", None] or authenticated.expires_at < datetime.now():
+			return jsonify({"message": "You don't have a valid authentication token, please log in."}), 401
+		else:
+			buyer = User.query.filter_by(id=buyer_id).first()
+			if buyer:
+				return jsonify(buyer.to_dict()), 200
+			else:
+				return jsonify(error=f'Buyer not found with id: {buyer_id}'), 404

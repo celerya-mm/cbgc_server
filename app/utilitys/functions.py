@@ -242,25 +242,20 @@ def dict_group_by(_dict, group_d, group_f=None, year=False):  # group_d deve ess
 	"""Raggruppa un DF per la richiesta passata (group)."""
 	# crea DF
 	df = pd.DataFrame.from_records(_dict)
-	# print("LENN_DF:", len(df))
 	if year:
 		# filtra DF al massimo cinque anni indietro
 		current_year = datetime.now().year
 		past_year = current_year - 5
-		# print(current_year, past_year)
 		df = df.loc[df[group_d] >= past_year]
-	# print("LEN_DF_FILTERED:", len(df))
 
 	if group_f:  #
 		# raggruppa il DF
 		df = df.groupby([group_d, group_f]).size().reset_index()
 		df.rename(columns={0: 'number'}, inplace=True)
-		# print(df[:10])
 		dct = df.to_dict("records")
 	else:
 		# raggruppa il DF
 		df = df.groupby(by=group_d).size().reset_index()
 		df.rename(columns={0: 'number'}, inplace=True)
-		# print(df[:10])
 		dct = df.to_dict("records")
 	return dct

@@ -35,7 +35,7 @@ def cert_dna_view():
 	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
-	# Estraggo la lista degli utenti amministratori
+	# Estraggo la lista dei certificati DNA
 	_list = CertificateDna.query.all()
 	_list = [r.to_dict() for r in _list]
 
@@ -55,7 +55,6 @@ def cert_dna_create(h_id, f_id, h_set):
 	form = FormCertDnaCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		# print("DNA_FORM_DATA", json.dumps(form_data, indent=2))
 
 		new_data = CertificateDna(
 			dna_cert_id=form_data["dna_cert_id"].strip(),
@@ -65,7 +64,7 @@ def cert_dna_create(h_id, f_id, h_set):
 			farmer_id=int(f_id.split(" - ")[0]),
 			note=form_data["note"].strip()
 		)
-		# print("NEW_DATA:", json.dumps(new_data.to_dict(), indent=2))
+
 		try:
 			CertificateDna.create(new_data)
 			flash("CERTIFICATO DNA creato correttamente.")
@@ -130,11 +129,9 @@ def cert_dna_update(_id):
 		from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
 
 		new_data = json.loads(json.dumps(request.form))
-		# print("USER_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
 
 		previous_data = _cert.to_dict()
 		previous_data.pop("updated_at")
-		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
 		if new_data["head_id"] not in list_head():
 			flash(f'Attenzione non è presente nessun Capo con ID: {new_data["head_id"]}')
@@ -188,14 +185,8 @@ def cert_dna_update(_id):
 			"Modification": f"Update Certificate DNA whit id: {_id}",
 			"Previous_data": previous_data
 		}
-		# print("EVENT:", json.dumps(_event, indent=2))
-
 		_event = event_create(_event, cert_dna_id=_id)
-		if _event is True:
-			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"].split(" - ")[0]))
-		else:
-			flash(_event)
-			return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"].split(" - ")[0]))
+		return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"].split(" - ")[0]))
 	else:
 		# recupera Capo
 		_head = Head.query.get(_cert.head_id)
@@ -215,7 +206,5 @@ def cert_dna_update(_id):
 			'created_at': _cert.created_at,
 			'updated_at': _cert.updated_at,
 		}
-		# print("DNA_UPDATE:", json.dumps(form.to_dict(), indent=2))
-
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)

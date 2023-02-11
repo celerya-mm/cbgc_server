@@ -147,14 +147,8 @@ def admin_update(_id):
 			"Modification": f"Update account Administrator whit id: {_id}",
 			"Previous_data": previous_data
 		}
-
 		_event = event_create(_event, admin_id=_id)
-		if _event is True:
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-		else:
-			flash(_event)
-			return redirect(url_for(HISTORY_FOR, _id=_id))
-
+		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
 		# recupero i dati
 		admin = Administrator.query.get(_id)
@@ -209,19 +203,13 @@ def admin_update_password(_id):
 			administrator.updated_at = datetime.now()
 
 			Administrator.update()
+			db.session.close()
 			flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
 			_event = {
 				"username": session["username"],
 				"Modification": "Password changed"
 			}
-
-			db.session.close()
-
 			_event = event_create(_event, admin_id=_id)
-			if _event is True:
-				return redirect(url_for('logout'))
-			else:
-				flash(_event)
-				return redirect(url_for('logout'))
+			return redirect(url_for('logout'))
 	else:
 		return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
