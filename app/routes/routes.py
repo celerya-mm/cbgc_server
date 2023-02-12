@@ -1,9 +1,9 @@
-from flask import current_app as app, flash, redirect, render_template, url_for, request, jsonify
+from flask import current_app as app, flash, redirect, render_template, url_for, request, jsonify, make_response
 
 from ..app import session
 
 from ..forms.forms import FormLogin
-from ..utilitys.functions import admin_log_in, buyer_log_in
+from ..utilitys.functions import admin_log_in, buyer_log_in, token_buyer_validate
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -37,10 +37,8 @@ def login_buyer(cert_nr):
 			session['cert_nr'] = cert_nr
 			session["token_login"] = data["token"]
 			session["username"] = form.username.data
-			if cert_nr not in ["", "None", None]:
-				return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
-			else:
-				return redirect(url_for('cert_cons_buyer_view'))
+
+			return redirect(url_for('cookie_consent', cert_nr=cert_nr))
 		else:
 			flash("Invalid username or password. Please try again!", category="alert")
 			return render_template("buyer/buyer_login.html", form=form, cert_nr=cert_nr)
@@ -62,6 +60,34 @@ def logout_buyer(cert_nr):
 	session.clear()
 	flash("Log-Out effettuato.")
 	return redirect(url_for('login_buyer', cert_nr=cert_nr))
+
+
+@app.route("/cookie_consent/<cert_nr>/", methods=["GET", "POST"])
+@token_buyer_validate
+def cookie_consent(cert_nr):
+	if request.method == "POST":
+		response = make_response(render_template("cookie_consent.html"))
+		response.set_cookie("functional_cookies_consent", "accepted")
+
+		if cert_nr not in ["", "None", None]:
+			return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
+		else:
+			return redirect(url_for('cert_cons_buyer_view'))
+	else:
+		functional_cookies_consent = request.cookies.get("functional_cookies_consent")
+		if functional_cookies_consent == "accepted":
+			if cert_nr not in ["", "None", None]:
+				return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
+			else:
+				return redirect(url_for('cert_cons_buyer_view'))
+		else:
+			return render_template("cookie_consent.html", cert_nr=cert_nr)
+
+
+@app.route("/privacy_policy/<cert_nr>/", methods=["GET", "POST"])
+@token_buyer_validate
+def privacy_policy(cert_nr):
+	return render_template("privacy_policy.html", cert_nr=cert_nr)
 
 
 @app.route('/cache-me')

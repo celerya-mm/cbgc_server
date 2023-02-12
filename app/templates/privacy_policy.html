@@ -1,0 +1,39 @@
+{% extends '_base_buyer_login.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+	<div class="row no-gutters justify-content-center">
+		<h5 class="card-title">Privacy Policy</h5>
+		<br>
+		<th>La presente Privacy Policy descrive come utilizziamo i cookie sul nostro servizio/applicazione web.</th>
+		<br><br>
+		<th style="text-align: left !important;">
+			I cookie utilizzati sono esclusivamente di tipo funzionale e sono essenziali per il corretto funzionamento
+			del nostro sito web.
+			<br><br>
+			Ad esempio, i cookie funzionali possono essere utilizzati per mantenere l'utente connesso durante la
+			navigazione sul sito, per migliorare la velocità e la sicurezza del sito, per personalizzare la
+			visualizzazione del sito e per fornire informazioni statistiche anonime sull'utilizzo del sito.
+			<br><br>
+			L'utente può accettare o rifiutare l'utilizzo dei cookie funzionali sulla nostra applicazione web tramite la
+			pagina di
+			consenso all'utilizzo dei cookie visualizzata dopo avere eseguito la login.
+			<br><br>
+			Se l'utente accetta l'utilizzo dei cookie funzionali, verrà impostato un cookie sul suo dispositivo che
+			indica il suo consenso.
+			<br>
+			Se l'utente rifiuta l'utilizzo dei cookie funzionali, verrà reindirizzato alla pagina di login e tutti i
+			dati della sessione verranno cancellati.
+			<br><br>
+			Per ulteriori informazioni sulle nostre politiche sulla privacy, non esitate a contattarci.
+		</th>
+		<form method="post">
+			<br>
+			<a title="Torna a visualizzazione certificati" href="{{ url_for('cert_cons_buyer_view')}}"
+			   style="color: #ED6666;">
+				Back
+			</a>
+		</form>
+	</div>
+</div>
+{% endblock %}

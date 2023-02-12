@@ -549,13 +549,14 @@ def cert_cons_buyer_view():
 	"""Visualizzo informazioni Capi."""
 	if "username" in session:
 		user = User.query.filter_by(username=session["username"]).first()
-		db.session.close()
 		certificates = [cert for buyer in user.buyers for cert in buyer.cons_certs]
 		for cert in certificates:
 			cert.certificate_date = date_to_str(cert.certificate_date)
 			cert.certificate_nr = cert.certificate_nr.replace("/", "_")
+			db.session.close()
 		return render_template(BUYER_VIEW_HTML, form=certificates, history=BUYER_HISTORY_FOR)
 	else:
+		db.session.close()
 		flash("Devi effettuare la login.")
 		return redirect(url_for("logout_buyer"))
 

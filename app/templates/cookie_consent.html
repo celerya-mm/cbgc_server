@@ -1,0 +1,23 @@
+{% extends '_base_buyer_login.html' %}
+
+{% block content %}
+<div class="container text-center mt-2">
+    <div class="row no-gutters justify-content-center">
+		<h5 class="card-title">Consenso utilizzo cookies</h5>
+		<br>
+		<th>Il nostro sito utilizza solo cookies funzionali essenziali per il corretto funzionamento del nostro servizio.</th>
+		<br>
+		<th>Se non accetti l'utilizzo di questi cookie non potremo offrirti questo servizio.</th>
+		<form method="post">
+			<br>
+			<input type="submit" value="Accetto"
+				   style="color: #2B4692; background-color: transparent; text-decoration: underline #2B4692; border: 0px;">
+			<br><br>
+			<a title="Rifiuto utilizzo cookies" href="{{ url_for('logout_buyer', cert_nr=cert_nr) }}"
+			   style="color: #ED6666;">
+                Rifiuto
+            </a>
+		</form>
+	</div>
+</div>
+{% endblock %}

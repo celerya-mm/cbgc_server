@@ -1,16 +1,16 @@
 import json
 from datetime import datetime, date
-from functools import wraps, partial
+from functools import wraps
 
 import pandas as pd
 import requests
 from dateutil.relativedelta import relativedelta
-from flask import flash, url_for, redirect
+from flask import url_for, redirect
 from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-from ..app import session, db
+from ..app import session
 from ..models.tokens import AuthToken
 from ..var_ambient import variables as var
 

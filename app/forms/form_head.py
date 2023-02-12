@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
@@ -35,7 +33,7 @@ class FormHeadCreate(FlaskForm):
 	headset = StringField(
 		'Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)], default="IT00")
 
-	birth_date = DateField('Data Nascita', format='%Y-%m-%d', default=datetime.now())
+	birth_date = DateField('Data Nascita', format='%Y-%m-%d')
 
 	castration_date = DateField('Castrazione', format='%Y-%m-%d', validators=[Optional()])
 	slaughter_date = DateField('Macellazione', format='%Y-%m-%d', validators=[Optional()])
