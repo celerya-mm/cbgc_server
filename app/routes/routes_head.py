@@ -164,8 +164,6 @@ def head_view_history(_id):
 		if _s and _s not in slaug_list:
 			slaug_list.append(_s.to_dict())
 
-	# print("LISTA_BUYERS:", json.dumps(buyer_list, indent=2))
-	# print("LISTA_SLAUGHTERHOUSES:", json.dumps(slaug_list, indent=2))
 	db.session.close()
 	return render_template(
 		HISTORY_HTML, form=_head, history_list=history_list, h_len=len(history_list), view=VIEW_FOR,

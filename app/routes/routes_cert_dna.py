@@ -15,7 +15,7 @@ VIEW = "/cert_dna/view/"
 VIEW_FOR = "cert_dna_view"
 VIEW_HTML = "cert_dna/cert_dna_view.html"
 
-CREATE = "/cert_dna/create/<int:h_id>/<int:f_id>/<h_set>/"
+CREATE = "/cert_dna/create/<int:h_id>/<f_id>/<h_set>/"
 CREATE_FOR = "cert_dna_create"
 CREATE_HTML = "cert_dna/cert_dna_create.html"
 

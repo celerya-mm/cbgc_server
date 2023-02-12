@@ -20,7 +20,7 @@ VIEW = "/cert_cons/view/"
 VIEW_FOR = "cert_cons_view"
 VIEW_HTML = "cert_cons/cert_cons_view.html"
 
-CREATE = "/cert_cons/create/<int:h_id>/<int:f_id>/<h_set>/"
+CREATE = "/cert_cons/create/<int:h_id>/<f_id>/<h_set>/"
 CREATE_FOR = "cert_cons_create"
 CREATE_HTML = "cert_cons/cert_cons_create.html"
 
