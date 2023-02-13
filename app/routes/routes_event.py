@@ -172,7 +172,7 @@ def event_restore(_id, id_record, table, view_for):
 			data = EventDB.query.get(_id)
 			data = data.to_dict()
 			data = data["event"]["Previous_data"]
-			updated_at = data["updated_at"]
+			updated_at = data["created_at"]
 			data["updated_at"] = date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")
 			data.pop("id")
 
