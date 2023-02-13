@@ -45,7 +45,7 @@ def token_buyer_validate(func):
 
 	@wraps(func)
 	def wrap(*args, **kwargs):
-		if session is not None and "token_login" in session.keys():
+		if "token_login" in session.keys():
 			# controlla validità token
 			authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
 			if authenticated is None:

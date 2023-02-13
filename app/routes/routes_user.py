@@ -246,7 +246,7 @@ def reset_psw_user(_id):
 
 @app.route('/reset_psw_user/token/<_token>/')
 def reset_psw_user_token(_token):
-	_token = db.session.query(AuthToken).filter_by(token=_token).first()
+	_token = AuthToken.query.filter_by(token=_token).first()
 	db.session.close()
 	if datetime.now() > _token.expires_at:
 		return "Il token è scaduto ripeti la procedura di ripristino password."

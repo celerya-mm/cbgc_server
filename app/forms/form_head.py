@@ -31,7 +31,7 @@ def list_farmer():
 class FormHeadCreate(FlaskForm):
 	"""Form inserimento dati Capo."""
 	headset = StringField(
-		'Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)], default="IT00")
+		'Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)], default="IT00499")
 
 	birth_date = DateField('Data Nascita', format='%Y-%m-%d')
 

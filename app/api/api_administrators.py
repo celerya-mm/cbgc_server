@@ -2,7 +2,6 @@ from datetime import datetime
 
 from flask import request, jsonify, make_response, current_app as app
 
-from app.app import db
 from app.models.accounts import Administrator
 from app.models.tokens import AuthToken
 from app.utilitys.functions_accounts import (is_valid_email, __save_auth_token, __generate_auth_token, psw_contain_usr,
@@ -110,7 +109,7 @@ def administrator_login():
 
 	if _admin not in [None, ""]:
 		record = len(_admin.auth_tokens) - 1
-		if record > 0 and _admin.auth_tokens[record].expires_at > datetime.now():
+		if record and _admin.auth_tokens[record].expires_at > datetime.now():
 			token = _admin.auth_tokens[record].token
 			data = {
 				'status': 'success',
