@@ -53,29 +53,33 @@ def cert_dna_create(h_id, f_id, h_set):
 	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 
 	form = FormCertDnaCreate()
+
 	if form.validate_on_submit():
-		form_data = json.loads(json.dumps(request.form))
-
-		new_data = CertificateDna(
-			dna_cert_id=form_data["dna_cert_id"].strip(),
-			dna_cert_date=form_data["dna_cert_date"],
-			veterinarian=form_data["veterinarian"].strip(),
-			head_id=int(h_id),
-			farmer_id=int(f_id.split(" - ")[0]),
-			note=form_data["note"].strip()
-		)
-
 		try:
+			form_data = json.loads(json.dumps(request.form))
+
+			new_data = CertificateDna(
+				dna_cert_id=form_data["dna_cert_id"].strip(),
+				dna_cert_date=form_data["dna_cert_date"],
+				veterinarian=form_data["veterinarian"].strip(),
+				head_id=h_id,
+				farmer_id=int(f_id.split(" - ")[0]),
+				note=form_data["note"].strip()
+			)
+
 			CertificateDna.create(new_data)
 			flash("CERTIFICATO DNA creato correttamente.")
-			return redirect(url_for(VIEW_FOR))
+			return redirect(url_for(HEAD_HISTORY, _id=h_id))
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY)
 	else:
+		print('Not submitted...')
 		h_set = f"{int(h_id)} - {h_set}"
+		form.head_id.data = h_set
+		form.farmer_id.data = f_id
 		return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY)
 
 
@@ -118,7 +122,7 @@ def cert_dna_view_history(_id):
 @app.route(UPDATE, methods=["GET", "POST"])
 @token_admin_validate
 def cert_dna_update(_id):
-	"""Aggiorna dati Utente."""
+	"""Aggiorna dati Certificato DNA."""
 	from ..routes.routes_event import event_create
 
 	form = FormCertDnaUpdate()
