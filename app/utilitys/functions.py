@@ -105,7 +105,7 @@ def admin_log_in(form):
 	try:
 		print("RESPONSE:", response.text)
 		_resp = json.loads(response.text)
-		return _resp["data"]["token"]
+		return _resp["data"]
 	except Exception as err:
 		print(f"ERRORE_RISPOSTA_SERVER: {err}")
 		return False
@@ -120,7 +120,6 @@ def buyer_log_in(form):
 	try:
 		print("RESPONSE:", response.text)
 		_resp = json.loads(response.text)
-		# dati = json.loads(response.text)
 		return _resp["data"]
 	except Exception as err:
 		print(f"ERRORE_RISPOSTA_SERVER: {err}")

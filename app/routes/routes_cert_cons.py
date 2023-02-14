@@ -24,7 +24,7 @@ CREATE = "/cert_cons/create/<int:h_id>/<f_id>/<h_set>/"
 CREATE_FOR = "cert_cons_create"
 CREATE_HTML = "cert_cons/cert_cons_create.html"
 
-HISTORY = "/cert_cons/view/history/<int:_id>"
+HISTORY = "/cert_cons/view/history/<int:_id>/"
 HISTORY_FOR = "cert_cons_view_history"
 HISTORY_HTML = "cert_cons/cert_cons_view_history.html"
 
@@ -35,7 +35,7 @@ UPDATE_HTML = "cert_cons/cert_cons_update.html"
 GENERATE = "/cert_cons/generate/<int:_id>"
 GENERATE_FOR = "cert_cons_generate"
 
-DOWNLOAD = "/cert_cons/download/<int:_id>"
+DOWNLOAD = "/cert_cons/download/<int:_id>/"
 DOWNLOAD_FOR = "cert_cons_download"
 
 DOWNLOAD_LINK = "/cert_cons/download_link/<_link>/"
@@ -45,7 +45,7 @@ DOWNLOAD_LINK_HTML = "cert_cons/cert_cons_download_link.html"
 SAVE = "/cert_cons/save/<_link>/"
 SAVE_FOR = "cert_cons_save"
 
-BUYER_HISTORY = "/cert_cons/buyer/view/history/<cert_nr>"
+BUYER_HISTORY = "/cert_cons/buyer/view/history/<cert_nr>/"
 BUYER_HISTORY_FOR = "cert_cons_buyer_view_history"
 BUYER_HISTORY_HTML = "cert_cons/cert_cons_buyer_view_history.html"
 

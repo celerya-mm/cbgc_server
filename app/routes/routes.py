@@ -12,12 +12,17 @@ def login():
 	form = FormLogin()
 	if form.validate_on_submit():
 		# print(f"USER: {form.username.data}")
-		token = admin_log_in(form)
-		if token:
+		data = admin_log_in(form)
+		if data:
 			session.permanent = False
-			session["token_login"] = token
-			session["username"] = form.username.data
-			return redirect(url_for('cert_cons_view'))
+			session["token_login"] = data["token"]
+			session["username"] = data["username"]
+
+			if data['psw_changed'] is True:
+				return redirect(url_for('cert_cons_view'))
+			else:
+				flash('Devi cambiare la password che ti è stata assegnata.')
+				return redirect(url_for('admin_update_password', _id=data['id']))
 		else:
 			flash("Invalid username or password. Please try again!", category="alert")
 			return render_template("login.html", form=form)
@@ -36,8 +41,8 @@ def login_buyer(cert_nr):
 			session.permanent = False
 			session['cert_nr'] = cert_nr
 			session["token_login"] = data["token"]
-			session["username"] = form.username.data
-
+			session["username"] = data["username"]
+			session['user'] = data
 			return redirect(url_for('cookie_consent', cert_nr=cert_nr))
 		else:
 			flash("Invalid username or password. Please try again!", category="alert")
@@ -69,17 +74,25 @@ def cookie_consent(cert_nr):
 		response = make_response(render_template("cookie_consent.html"))
 		response.set_cookie("functional_cookies_consent", "accepted")
 
-		if cert_nr not in ["", "None", None]:
-			return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
-		else:
-			return redirect(url_for('cert_cons_buyer_view'))
-	else:
-		functional_cookies_consent = request.cookies.get("functional_cookies_consent")
-		if functional_cookies_consent == "accepted":
+		if session['user']['psw_changed'] is True:
 			if cert_nr not in ["", "None", None]:
 				return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
 			else:
 				return redirect(url_for('cert_cons_buyer_view'))
+		else:
+			flash('Devi cambiare la password che ti è stata assegnata.')
+			return redirect(url_for('buyer_reset_password', _id=session['user']['id']))
+	else:
+		functional_cookies_consent = request.cookies.get("functional_cookies_consent")
+		if functional_cookies_consent == "accepted":
+			if session['user']['psw_changed'] is True:
+				if cert_nr not in ["", "None", None]:
+					return redirect(url_for('cert_cons_buyer_view_history', cert_nr=cert_nr))
+				else:
+					return redirect(url_for('cert_cons_buyer_view'))
+			else:
+				flash('Devi cambiare la password che ti è stata assegnata.')
+				return redirect(url_for('buyer_reset_password', _id=session['user']['id']))
 		else:
 			return render_template("cookie_consent.html", cert_nr=cert_nr)
 

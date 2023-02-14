@@ -27,7 +27,9 @@ def buyer_login():
 				'data': {
 					'token': token,
 					'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
-					'buyer_id': _user.id
+					'id': _user.id,
+					'username': _user.username,
+					'psw_changed': _user.psw_changed
 				}
 			}
 			response = make_response(jsonify(data), 201)
@@ -39,14 +41,16 @@ def buyer_login():
 				'data': {
 					'token': token,
 					'expiration': datetime.strftime(save.expires_at, "%Y-%m-%d %H:%M:%S"),
-					'buyer_id': _user.id
+					'id': _user.id,
+					'username': _user.username,
+					'psw_changed': _user.psw_changed
 				}
 			}
 			response = make_response(jsonify(data), 201)
 	else:
 		data = {
 			'01_status': 'failed',
-			'02_message': f"Login fallita, non è presente nessun acquirente con questi username e password."
+			'02_message': f"Login fallita, non è presente nessun acquirente con username e password inseriti."
 			              f"Contatta il Consorzio per farti assegnare un utente.",
 			'username': username
 		}

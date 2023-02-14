@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, validators
+from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from ..models.accounts import Administrator, User
@@ -33,6 +33,8 @@ class FormAdminSignup(FlaskForm):
 		DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
 		EqualTo('new_password_1', message='Le password non corrispondono.')
 	])
+
+	psw_changed = BooleanField('Password cambiata', default=False)
 
 	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
 	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
@@ -89,6 +91,8 @@ class FormUserSignup(FlaskForm):
 		DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
 		EqualTo('new_password_1',
 		        message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
+
+	psw_changed = BooleanField('Password cambiata', default=False)
 
 	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
 	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])

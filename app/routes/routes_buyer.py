@@ -397,6 +397,7 @@ def buyer_reset_password(_id):
 			from ..routes.routes_event import event_create
 
 			_user.password = new_password
+			_user.psw_changed = True
 			_user.updated_at = datetime.now()
 
 			User.update()

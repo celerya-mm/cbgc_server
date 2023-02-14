@@ -59,6 +59,7 @@ def user_create():
 			email=form_data["email"].strip(),
 			phone=form_data["phone"].strip(),
 			password=psw_hash(form_data["new_password_1"].replace(" ", "")),
+			psw_changed=form_data["psw_changed"],
 			note=form_data["note"].strip()
 		)
 		try:
@@ -175,7 +176,7 @@ def user_update(_id):
 
 @app.route(RESET_PSW, methods=["GET", "POST"])
 def user_reset_password(_id):
-	"""Aggiorna password Utente Servizio."""
+	"""Resetta password Utente Servizio dalla console di amministrazione."""
 	from ..routes.routes_event import event_create
 
 	form = FormPswReset()
@@ -189,16 +190,18 @@ def user_reset_password(_id):
 		if new_password == _user.password:
 			session.clear()
 			db.session.close()
-			flash("The 'New Password' inserted is equal to 'Registered Password'.")
+			flash("La nuova password inserita è uguale a quella registrata.")
 			return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 		else:
 			try:
 				_user.password = new_password
+				_user.psw_changed = False
 				_user.updated_at = datetime.now()
 				print(f"PASSWORD utente {_user.username}.")
 
 				User.update()
 				flash(f"PASSWORD utente {_user.username} resettata correttamente!")
+				flash(f"Comunica all'utente la nuova password e che dovrà cambiarla dopo essersi registrato al portale.")
 
 				_event = {
 					"executor": session["username"],
@@ -211,51 +214,3 @@ def user_reset_password(_id):
 				return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 	else:
 		return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
-
-
-@app.route('/reset_psw_user/<_id>/')
-def reset_psw_user(_id):
-	# estraggo dati utente
-	_user = User.query.get(_id)
-	_mail = _user.email
-
-	# creo un token con validità 15 min
-	_token = __generate_auth_token()
-
-	auth_token = AuthToken(
-		user_id=_id,
-		token=_token,
-		expires_at=calc_exp_token_reset_psw()
-	)
-
-	AuthToken.create(auth_token)
-
-	# imposto link
-	_link = f"{Config.LINK_URL}:62233/reset_psw_user_token/{_token}/"
-	_link = _link.replace("/:", ":")
-	try:
-		# imposto e invio la mail con il link per il reset
-		msg = Message(
-			'Password change request in Consorzio Bue Grasso account.',
-			sender="service@celerya.com",
-			recipients=[_mail]
-		)
-		msg.body = f"Follow this link for reset your password: \n\n{_link}\n\n" \
-		           f"The link expiry in 15 min."
-		mail.send(msg)
-		flash("Richiesta reset password inviata correttamente.")
-		return redirect(url_for(HISTORY_FOR, _id=_id))
-	except Exception as err:
-		flash(f"Richiesta reset password NON inviata: {err}.")
-		return redirect(url_for(HISTORY_FOR, _id=_id))
-
-
-@app.route('/reset_psw_user/token/<_token>/')
-def reset_psw_user_token(_token):
-	_token = AuthToken.query.filter_by(token=_token).first()
-	db.session.close()
-	if datetime.now() > _token.expires_at:
-		return "Il token è scaduto ripeti la procedura di ripristino password."
-	else:
-		_id = _token.user_id
-		return redirect(url_for(RESET_PSW_FOR, _id=_id, check=False))

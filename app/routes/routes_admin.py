@@ -64,6 +64,7 @@ def admin_create():
 			email=form_data["email"].strip(),
 			phone=form_data["phone"].strip(),
 			password=psw_hash(form_data["new_password_1"].replace(" ", "")),
+			psw_changed=form_data["psw_changed"],
 			note=form_data["note"].strip(),
 		)
 		try:
@@ -181,7 +182,6 @@ def admin_update_password(_id):
 	form = FormPswChange()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
-		_admin = json.loads(json.dumps(session["admin"]))
 
 		old_password = psw_hash(form_data["old_password"].replace(" ", "").strip())
 		# print("OLD:", old_password)
@@ -200,16 +200,19 @@ def admin_update_password(_id):
 			return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 		else:
 			administrator.password = new_password
+			administrator.psw_changed = True
 			administrator.updated_at = datetime.now()
 
 			Administrator.update()
 			db.session.close()
-			flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
+
 			_event = {
 				"username": session["username"],
 				"Modification": "Password changed"
 			}
 			_event = event_create(_event, admin_id=_id)
+
+			flash("PASSWORD aggiornata correttamente! Effettua una nuova Log-In.")
 			return redirect(url_for('logout'))
 	else:
 		return render_template(UPDATE_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)

@@ -33,6 +33,7 @@ def administrator_signup():
 						new_admin = Administrator(
 							username=username.strip(),
 							password=psw_hash(str(data_received['password'].replace(" ", ""))),
+							psw_changed=False,
 							name=data_received['name'].strip(),
 							last_name=data_received["last_name"].strip(),
 							phone=data_received['phone'].strip(),
@@ -102,10 +103,7 @@ def administrator_login():
 	username = data_received['username'].replace(" ", "")
 	password = data_received['password'].replace(" ", "")
 
-	_admin = Administrator.query.filter(
-		Administrator.username == username,
-		Administrator.password == psw_hash(str(password))
-	).first()
+	_admin = Administrator.query.filter_by(username=username, password=psw_hash(str(password))).first()
 
 	if _admin not in [None, ""]:
 		record = len(_admin.auth_tokens) - 1
@@ -116,7 +114,9 @@ def administrator_login():
 				'data': {
 					'token': token,
 					'expiration': datetime.strftime(_admin.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
-					'admin_id': _admin.id
+					'id': _admin.id,
+					'username': _admin.username,
+					'psw_changed':  _admin.psw_changed
 				}
 			}
 			response = make_response(jsonify(data), 201)
@@ -128,7 +128,9 @@ def administrator_login():
 				'data': {
 					'token': token,
 					'expiration': datetime.strftime(save.expires_at, "%Y-%m-%d %H:%M:%S"),
-					'admin_id': _admin.id
+					'id': _admin.id,
+					'username': _admin.username,
+					'psw_changed': _admin.psw_changed
 				}
 			}
 			response = make_response(jsonify(data), 201)

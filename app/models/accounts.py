@@ -16,6 +16,8 @@ class Administrator(db.Model):
 	username = db.Column(db.String(20), index=False, unique=True, nullable=False)
 	password = db.Column(db.String(64), index=False, unique=False, nullable=False)  # 64 char for hash code
 
+	psw_changed = db.Column(db.Boolean, index=False, nullable=True)
+
 	name = db.Column(db.String(50), index=False, unique=False, nullable=True)
 	last_name = db.Column(db.String(50), index=False, unique=False, nullable=True)
 	full_name = db.Column(db.String(101), index=False, unique=False, nullable=True)
@@ -37,12 +39,14 @@ class Administrator(db.Model):
 	def __str__(self):
 		return f'<AMMINISTRATORE ID: {self.id}; username: {self.username}>'
 
-	def __init__(self, username, password=None, name=None, last_name=None, phone=None, email=None, auth_tokens=None,
-	             events=None, note=None):
+	def __init__(self, username, password=None, psw_changed=None, name=None, last_name=None, phone=None, email=None,
+				 auth_tokens=None, events=None, note=None):
 		from ..utilitys.functions import mount_full_name
 
 		self.username = username
 		self.password = password
+
+		self.psw_changed = psw_changed
 
 		self.name = name
 		self.last_name = last_name
@@ -75,6 +79,8 @@ class Administrator(db.Model):
 			'id': self.id,
 			'username': self.username,
 
+			'psw_changed': self.psw_changed,
+
 			'phone': self.phone,
 			'email': self.email,
 
@@ -95,6 +101,8 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(20), index=False, unique=True, nullable=False)
 	password = db.Column(db.String(64), index=False, unique=False, nullable=False)  # 64 char for hash code
+
+	psw_changed = db.Column(db.Boolean, index=False, nullable=True)
 
 	syd_user = db.Column(db.String(20), index=False, unique=False, nullable=True)
 
@@ -120,12 +128,14 @@ class User(db.Model):
 	def __str__(self):
 		return '<UTENTE: {}>'.format(self.username)
 
-	def __init__(self, username, password=None, syd_user=None, name=None, last_name=None, phone=None, email=None,
-	             note=None, buyers=None, auth_tokens=None, events=None):
+	def __init__(self, username, password=None, psw_changed=None, syd_user=None, name=None, last_name=None, phone=None,
+				 email=None, note=None, buyers=None, auth_tokens=None, events=None):
 		from ..utilitys.functions import mount_full_name
 
 		self.username = username
 		self.password = password
+
+		self.psw_changed = psw_changed
 
 		self.syd_user = syd_user
 
@@ -160,6 +170,8 @@ class User(db.Model):
 		return {
 			'id': self.id,
 			'username': self.username,
+
+			'psw_changed': self.psw_changed,
 
 			'syd_user': self.syd_user,
 
