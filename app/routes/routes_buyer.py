@@ -319,12 +319,13 @@ def buyer_update(_id):
 def buyer_email_reset_psw(cert_nr):
 	form = FormUserResetPsw()
 	if form.validate_on_submit():
-		print("EMAIL:", form.email.data)
+		# print("EMAIL:", form.email.data)
 		try:
 			# estraggo dati utente
 			_user = db.session.query(User).filter_by(email=str(form.email.data)).first()
 		except Exception as err:
 			flash(f"Nessun utente assegnato alla email inserita: {str(form.email.data)}. Errore: {err}")
+			db.session.close()
 			return render_template("buyer/buyer_insert_email_reset_password.html", form=form, cert_nr=cert_nr)
 
 		# creo un token con validità 15 min
@@ -365,11 +366,12 @@ def buyer_email_reset_psw(cert_nr):
 @app.route('/buyer/reset_psw_token/<_token>/')
 def buyer_reset_psw_token(_token):
 	_token = db.session.query(AuthToken).filter_by(token=_token).first()
-	db.session.close()
 	if datetime.now() > _token.expires_at:
+		db.session.close()
 		return "Il token è scaduto ripeti la procedura di ripristino password."
 	else:
 		_id = _token.user_id
+		db.session.close()
 		return redirect(url_for('buyer_reset_password', _id=_id))
 
 
@@ -401,11 +403,10 @@ def buyer_reset_password(_id):
 
 			_event = {
 				"executor": session["username"],
-				"username": _user["username"],
-				"Modification": "Password reset"
+				"Modification": f"Reset password for user {_user.username}"
 			}
 			_event = event_create(_event, user_id=_id)
-			flash(f"PASSWORD utente {_user['username']} resettata correttamente!")
+			flash(f"PASSWORD utente {_user.username} resettata correttamente!")
 			return redirect(url_for('login_buyer', cert_nr="None"))
 	else:
 		return render_template("buyer/buyer_reset_password.html", form=form, id=_id)

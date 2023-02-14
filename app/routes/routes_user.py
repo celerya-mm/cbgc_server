@@ -184,25 +184,31 @@ def user_reset_password(_id):
 		new_password = psw_hash(form_data["new_password_1"].replace(" ", "").strip())
 
 		_user = User.query.get(_id)
+		print(f"UTENTE {_user.username}.")
 
 		if new_password == _user.password:
 			session.clear()
+			db.session.close()
 			flash("The 'New Password' inserted is equal to 'Registered Password'.")
 			return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 		else:
-			_user.password = new_password
-			_user.updated_at = datetime.now()
+			try:
+				_user.password = new_password
+				_user.updated_at = datetime.now()
+				print(f"PASSWORD utente {_user.username}.")
 
-			User.update()
-			msg = f"PASSWORD utente {_user['username']} resettata correttamente!"
+				User.update()
+				flash(f"PASSWORD utente {_user.username} resettata correttamente!")
 
-			_event = {
-				"executor": session["username"],
-				"username": _user["username"],
-				"Modification": "Password reset"
-			}
-			_event = event_create(_event, user_id=_id)
-			return msg
+				_event = {
+					"executor": session["username"],
+					"Modification": f"Password reset for user: {_user.username}"
+				}
+				_event = event_create(_event, user_id=_id)
+				return redirect(url_for(HISTORY_FOR, _id=_id))
+			except Exception as err:
+				flash(f'ERRORE: {err}')
+				return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 	else:
 		return render_template(RESET_PSW_HTML, form=form, id=_id, history=HISTORY_FOR)
 
