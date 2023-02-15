@@ -2,153 +2,169 @@
 
 {% block content %}
 <div class="container text-center mt-2">
-    <div class="row no-gutters justify-content-center">
-        <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Annulla"
-               href="{{ url_for(view) }}">
-                <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
-            </a>
-            Aggiungi ACQUIRENTE al Consorzio:
-        </h5>
-        <div class="col-md-12">
-            <form enctype="multipart/form-data" method="POST">
-                {{ form.csrf_token }}
-                <br>
-                <div class="form-group">
-                    {{ form.buyer_name.label }}
-                    {{ form.buyer_name(class="form-control") }}
-                    {% if form.buyer_name.errors %}
-                    {% for error in form.buyer_name.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    <br>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                <div class="row no-gutters justify-content-center">
-                    <div class="col-md-6 order-first">
-                        <br>
-                        <div class="form-group">
-                            {{ form.buyer_type.label }}
-                            {{ form.buyer_type(class="form-control", style="text-align: center;") }}
-                            {% if form.buyer_type.errors %}
-                            {% for error in form.buyer_type.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.email.label }}
-                            {{ form.email(class="form-control") }}
-                            {% if form.email.errors %}
-                            {% for error in form.email.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.phone.label }}
-                            {{ form.phone(class="form-control") }}
-                            {% if form.phone.errors %}
-                            {% for error in form.phone.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.affiliation_status.label }}
-                            {{ form.affiliation_status(class="form-control", style="text-align: center;") }}
-                            {% if form.affiliation_status.errors %}
-                            {% for error in form.affiliation_status.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                    </div>
-
-                    <div class="col-md-6 order-second">
-                        <br>
-                        <div class="form-group">
-                            {{ form.address.label }}
-                            {{ form.address(class="form-control") }}
-                            {% if form.address.errors %}
-                            {% for error in form.address.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.cap.label }}
-                            {{ form.cap(class="form-control") }}
-                            {% if form.cap.errors %}
-                            {% for error in form.cap.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.city.label }}
-                            {{ form.city(class="form-control") }}
-                            {% if form.city.errors %}
-                            {% for error in form.city.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.affiliation_start_date.label }}
-                            {{ form.affiliation_start_date(class="form-control") }}
-                            {% if form.affiliation_start_date.errors %}
-                            {% for error in form.affiliation_start_date.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        <br>
-                        <div class="form-group">
-                            {{ form.user_id.label }}
-                            {{ form.user_id(class="form-control", style="text-align: center;") }}
-                            {% if form.user_id.errors %}
-                            {% for error in form.user_id.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            <br>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    {{ form.note.label }}
-                    {{ form.note(class="form-control") }}
-                    {% if form.note.errors %}
-                    {% for error in form.note.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    <br>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                <br>
-                <button id="button" class="btn btn-update" type="submit" title="Salva" value="x">
-                    <img class="icon-simple" src="{{ url_for('static', filename='icons/save.svg') }}"
-                         alt=""/>
-                </button>
-                <br>
-            </form>
-        </div>
-    </div>
+	<div class="row no-gutters justify-content-center">
+		<h5 class="card-title">
+			<a class="btn btn-update" href="{{ url_for(view) }}" title="Annulla"
+			   type="button">
+				<img alt="" class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}"/>
+			</a>
+			Aggiungi ACQUIRENTE al Consorzio:
+		</h5>
+		<div class="col-md-12 shadow rounded" style="border: solid 2px #ED6666 !important;">
+			<form enctype="multipart/form-data" method="POST">
+				{{ form.csrf_token }}
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-12 order-first">
+						<div class="form-group">
+							{{ form.buyer_name.label(style="font-size: 1.2rem;") }}
+							{{ form.buyer_name(class="form-control emphasis") }}
+							{% if form.buyer_name.errors %}
+							{% for error in form.buyer_name.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-4 order-first">
+						<div class="form-group">
+							{{ form.buyer_type.label(style="font-size: 1.2rem;") }}
+							{{ form.buyer_type(class="form-control emphasis", style="text-align: center;") }}
+							{% if form.buyer_type.errors %}
+							{% for error in form.buyer_type.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-second">
+						<div class="form-group">
+							{{ form.email.label(style="font-size: 1.2rem;") }}
+							{{ form.email(class="form-control") }}
+							{% if form.email.errors %}
+							{% for error in form.email.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-third">
+						<div class="form-group">
+							{{ form.phone.label(style="font-size: 1.2rem;") }}
+							{{ form.phone(class="form-control") }}
+							{% if form.phone.errors %}
+							{% for error in form.phone.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-4 order-first">
+						<div class="form-group">
+							{{ form.affiliation_status.label(style="font-size: 1.2rem;") }}
+							{{ form.affiliation_status(class="form-control", style="text-align: center;") }}
+							{% if form.affiliation_status.errors %}
+							{% for error in form.affiliation_status.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-second">
+						<div class="form-group">
+							{{ form.affiliation_start_date.label(style="font-size: 1.2rem;") }}
+							{{ form.affiliation_start_date(class="form-control") }}
+							{% if form.affiliation_start_date.errors %}
+							{% for error in form.affiliation_start_date.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-third">
+						<div class="form-group">
+							{{ form.user_id.label(style="font-size: 1.2rem;") }}
+							{{ form.user_id(class="form-control", style="text-align: center;") }}
+							{% if form.user_id.errors %}
+							{% for error in form.user_id.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="col-md-5 order-first">
+						<div class="form-group">
+							{{ form.address.label(style="font-size: 1.2rem;") }}
+							{{ form.address(class="form-control") }}
+							{% if form.address.errors %}
+							{% for error in form.address.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-3 order-second">
+						<div class="form-group">
+							{{ form.cap.label(style="font-size: 1.2rem;") }}
+							{{ form.cap(class="form-control") }}
+							{% if form.cap.errors %}
+							{% for error in form.cap.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-md-4 order-third">
+						<div class="form-group">
+							{{ form.city.label(style="font-size: 1.2rem;") }}
+							{{ form.city(class="form-control") }}
+							{% if form.city.errors %}
+							{% for error in form.city.errors %}
+							<span class="text-danger">{{ error }}</span>
+							<br>
+							{% endfor %}
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				<div class="row no-gutters justify-content-center rounded"
+					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
+					<div class="form-group">
+						{{ form.note.label(style="font-size: 1.2rem;") }}
+						{{ form.note(class="form-control") }}
+						{% if form.note.errors %}
+						{% for error in form.note.errors %}
+						<span class="text-danger">{{ error }}</span>
+						<br>
+						{% endfor %}
+						{% endif %}
+					</div>
+				</div>
+				<button class="btn btn-update" id="button" title="Salva" type="submit" value="x">
+					<img alt="" class="icon-simple"
+						 src="{{ url_for('static', filename='icons/save.svg') }}"/>
+				</button>
+				<br>
+			</form>
+		</div>
+	</div>
 </div>
 {% endblock %}

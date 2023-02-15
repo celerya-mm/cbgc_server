@@ -15,6 +15,10 @@
                href="{{ url_for(update, _id=form.id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/pencil_red.svg') }}" alt=""/>
             </a>
+			<a class="btn btn-update" type="button" title="Crea nuovo Capo"
+			   href="{{ url_for(head_create, f_id=form.id) }}">
+				<img class="icon-simple" src="{{ url_for('static', filename='icons/head-fill.svg') }}" alt=""/>
+			</a>
         </h5>
         <h5>
             Stato Affiliazione

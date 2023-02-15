@@ -9,7 +9,7 @@ from ..forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate, list_hea
 from ..models.certificates_dna import CertificateDna
 from ..models.farmers import Farmer
 from ..models.heads import Head
-from ..utilitys.functions import token_admin_validate, year_extract, str_to_date
+from ..utilitys.functions import token_admin_validate, year_extract, str_to_date, not_empty
 
 VIEW = "/cert_dna/view/"
 VIEW_FOR = "cert_dna_view"
@@ -61,10 +61,10 @@ def cert_dna_create(h_id, f_id, h_set):
 			new_data = CertificateDna(
 				dna_cert_id=form_data["dna_cert_id"].strip(),
 				dna_cert_date=form_data["dna_cert_date"],
-				veterinarian=form_data["veterinarian"].strip(),
+				veterinarian=not_empty(form_data["veterinarian"].strip()),
 				head_id=h_id,
 				farmer_id=int(f_id.split(" - ")[0]),
-				note=form_data["note"].strip()
+				note=not_empty(form_data["note"].strip())
 			)
 
 			CertificateDna.create(new_data)
@@ -76,10 +76,7 @@ def cert_dna_create(h_id, f_id, h_set):
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY)
 	else:
-		print('Not submitted...')
 		h_set = f"{int(h_id)} - {h_set}"
-		form.head_id.data = h_set
-		form.farmer_id.data = f_id
 		return render_template(CREATE_HTML, form=form, f_id=f_id, h_set=h_set, h_id=h_id, head_history=HEAD_HISTORY)
 
 
@@ -101,10 +98,14 @@ def cert_dna_view_history(_id):
 	# estraggo capo
 	_head = Head.query.get(cert_dna.head_id)
 	_head = _head.to_dict()
+	h_id = int(_head['id'])
+	_cert_dna['head_id'] = f"{_head['id']} - {_head['headset']}"
 
 	# estraggo allevatore
 	_farmer = Farmer.query.get(cert_dna.farmer_id)
 	_farmer = _farmer.to_dict()
+	f_id = int(_farmer['id'])
+	_cert_dna['farmer_id'] = f"{_farmer['id']} - {_farmer['farmer_name']}"
 
 	# Estraggo la storia delle modifiche
 	history_list = cert_dna.events
@@ -114,8 +115,7 @@ def cert_dna_view_history(_id):
 	db.session.close()
 	return render_template(
 		HISTORY_HTML, form=_cert_dna, history_list=history_list, h_len=len_history, view=VIEW_FOR, update=UPDATE_FOR,
-		head=_head, view_head=HEAD_HISTORY, _id=_id, farmer=_farmer, view_farmer=FARMER_HISTORY,
-		event_history=EVENT_HISTORY
+		head=h_id, view_head=HEAD_HISTORY, _id=_id, farmer=f_id, view_farmer=FARMER_HISTORY, event_history=EVENT_HISTORY
 	)
 
 
@@ -164,9 +164,9 @@ def cert_dna_update(_id):
 		_cert.dna_cert_year = year_extract(new_data["dna_cert_date"])
 		_cert.dna_cert_nr = f'{new_data["dna_cert_id"]}/{_cert.dna_cert_year}'
 
-		_cert.veterinarian = new_data["veterinarian"]
+		_cert.veterinarian = not_empty(new_data["veterinarian"].strip())
 
-		_cert.note = new_data["note"]
+		_cert.note = not_empty(new_data["note"].strip())
 		_cert.updated_at = datetime.now()
 
 		# print("NEW_DATA:", new_data)

@@ -40,8 +40,8 @@ class FormCertDnaCreate(FlaskForm):
 		validators=[DataRequired("Campo obbligatorio!")]
 	)
 
-	head_id = SelectField("Capo", choices=list_head(), validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
-	farmer_id = SelectField("Allevatore", choices=list_farmer(), validators=[DataRequired("Campo obbligatorio!")])
+	# head_id = SelectField("Capo", choices=list_head(), validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
+	# farmer_id = SelectField("Allevatore", choices=list_farmer(), validators=[DataRequired("Campo obbligatorio!")])
 
 	veterinarian = StringField('Veterinario', validators=[Length(max=50), Optional()])
 	note = StringField('Note Record', validators=[Length(max=255), Optional()])

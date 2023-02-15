@@ -16,7 +16,7 @@
 				{{ form.csrf_token }}
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-					<div class="col-md-3 order-first">
+					<div class="col-md-5 order-first">
 						{{ form.dna_cert_id.label(style="font-size: 1.2rem;") }}
 						<p class="comment">Inserisci il numero del certificato senza il riferimento all'anno
 							"/20XX".</p>
@@ -32,7 +32,7 @@
 				</div>
 				<div class="row no-gutters justify-content-center rounded"
 					 style="background-color: #DEDEDE; padding-top: 10px; padding-bottom: 10px;">
-					<div class="col-md-3 order-second">
+					<div class="col-md-3 order-first">
 						<div class="form-group">
 							{{ form.dna_cert_date.label(style="font-size: 1.2rem;") }}
 							{{ form.dna_cert_date(class="form-control") }}

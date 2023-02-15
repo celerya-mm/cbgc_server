@@ -52,6 +52,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto">
+					<!--  Certificati Consorzio-->
                     <li class="nav-item">
                         <a class="nav-item nav-link {% if request.path == '/cert_cons/view/' %} active {% endif %}"
                            title="Certificati Consorzio" href="{{ url_for('cert_cons_view') }}">
@@ -63,6 +64,7 @@
                             Certif.
                         </a>
                     </li>
+					<!--  Capi Consorzio-->
                     <li class="nav-item">
                         <a class="nav-item nav-link {% if request.path == '/head/view/' %} active {% endif %}"
                            title="Capi" href="{{ url_for('head_view') }}">
@@ -74,6 +76,7 @@
                             Capi
                         </a>
                     </li>
+					<!--  Allevatori Consorzio-->
                     <li class="nav-item">
                         <a class="nav-item nav-link {% if request.path == '/farmer/view/' %} active {% endif %}"
                            title="Allevatori" href="{{ url_for('farmer_view') }}">
@@ -85,6 +88,7 @@
                             Allev.
                         </a>
                     </li>
+					<!--  Acquirenti Consorzio-->
                     <li class="nav-item">
                         <a class="nav-item nav-link {% if request.path == '/buyer/view/' %} active {% endif %}"
                            title="Acquirenti" href="{{ url_for('buyer_view') }}">
@@ -96,6 +100,7 @@
                             Acquir.
                         </a>
                     </li>
+					<!--  Macelli Consorzio-->
                     <li class="nav-item">
                         <a class="nav-item nav-link {% if request.path == '/slaughterhouse/view/' %} active {% endif %}"
                            title="Macelli" href="{{ url_for('slaughterhouse_view') }}">
@@ -107,6 +112,7 @@
                             Macelli
                         </a>
                     </li>
+					<!--  Certificati DNA-->
                     <li class="nav-item">
                         <a class="nav-item nav-link {% if request.path == '/cert_dna/view/' %} active {% endif %}"
                            title="Certificati DNA" href="{{ url_for('cert_dna_view') }}">

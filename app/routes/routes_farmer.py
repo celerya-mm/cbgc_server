@@ -134,7 +134,7 @@ def farmer_create():
 def farmer_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
 	from ..routes.routes_cert_cons import HISTORY_FOR as CONS_HISTORY
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY, CREATE_FOR as HEAD_CREATE
 	from ..routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY
 	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
@@ -163,7 +163,7 @@ def farmer_view_history(_id):
 		HISTORY_HTML, form=_farmer, view=VIEW_FOR, update=UPDATE_FOR,
 		history_list=history_list, h_len=len(history_list), event_history=EVENT_HISTORY,
 		cons_list=cons_list, len_cons=len(cons_list), cons_history=CONS_HISTORY,
-		head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY,
+		head_list=head_list, len_heads=len(head_list), head_history=HEAD_HISTORY, head_create=HEAD_CREATE,
 		dna_list=dna_list, len_dna=len(dna_list), dna_history=DNA_HISTORY
 	)
 

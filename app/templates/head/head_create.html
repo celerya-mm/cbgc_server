@@ -4,13 +4,17 @@
 <div class="container text-center mt-2">
     <div class="row no-gutters justify-content-center">
         <h5 class="card-title">
-            <a class="btn btn-update" type="button" title="Annulla"
+			<a class="btn btn-update" type="button" title="Lista Capi"
                href="{{ url_for(view) }}">
+                <img class="icon-simple" src="{{ url_for('static', filename='icons/list_blue.svg') }}" alt=""/>
+            </a>
+			<a class="btn btn-update" type="button" title="Torna a Allevatore"
+               href="{{ url_for(farmer, _id=f_id) }}">
                 <img class="icon-simple" src="{{ url_for('static', filename='icons/arrow_circle_left.svg') }}" alt=""/>
             </a>
             Aggiungi CAPO al Consorzio:
         </h5>
-        <div class="col-md-12">
+        <div class="col-md-12 shadow rounded" style="border: solid 2px #ED6666 !important;">
             <form enctype="multipart/form-data" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">

@@ -39,7 +39,7 @@ class FormHeadCreate(FlaskForm):
 	slaughter_date = DateField('Macellazione', format='%Y-%m-%d', validators=[Optional()])
 	sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
-	farmer_id = SelectField("Allevatore", choices=list_farmer(), default="-")
+	farmer_id = SelectField("Allevatore", choices=list_farmer())
 
 	note = StringField('Note', validators=[Length(max=255)])
 

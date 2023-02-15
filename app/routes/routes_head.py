@@ -16,7 +16,7 @@ VIEW = "/head/view/"
 VIEW_FOR = "head_view"
 VIEW_HTML = "head/head_view.html"
 
-CREATE = "/head/create/"
+CREATE = "/head/create/<int:f_id>/"
 CREATE_FOR = "head_create"
 CREATE_HTML = "head/head_create.html"
 
@@ -93,19 +93,21 @@ def head_view():
 
 @app.route(CREATE, methods=["GET", "POST"])
 @token_admin_validate
-def head_create():
+def head_create(f_id):
 	"""Creazione Capo Consorzio."""
+	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+
 	form = FormHeadCreate()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		new_head = Head(
 			headset=form_data["headset"],
-			birth_date=not_empty(form_data["birth_date"]),
-			castration_date=not_empty(form_data["castration_date"]),
-			slaughter_date=not_empty(form_data["slaughter_date"]),
-			sale_date=not_empty(form_data["sale_date"]),
-			farmer_id=not_empty(form_data["farmer_id"].split(" - ")[0]),
-			note=form_data["note"].strip()
+			birth_date=str_to_date(form_data["birth_date"]),
+			castration_date=str_to_date(form_data["castration_date"]),
+			slaughter_date=str_to_date(form_data["slaughter_date"]),
+			sale_date=str_to_date(form_data["sale_date"]),
+			farmer_id=form_data["farmer_id"].split(" - ")[0],
+			note=not_empty(form_data["note"].strip())
 		)
 
 		try:
@@ -118,7 +120,10 @@ def head_create():
 			flash(f"ERRORE: {str(err.orig)}")
 			return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
 	else:
-		return render_template(CREATE_HTML, form=form, view=VIEW_FOR)
+		_farmer = Farmer.query.get(f_id)
+		form.farmer_id.data = f"{_farmer.id} - {_farmer.farmer_name}"
+		db.session.close()
+		return render_template(CREATE_HTML, form=form, view=VIEW_FOR, farmer=FARMER_HISTORY, f_id=f_id)
 
 
 @app.route(HISTORY, methods=["GET", "POST"])
