@@ -22,17 +22,17 @@ class AuthToken(db.Model):
 	# Columns
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	token = db.Column(db.String(36), nullable=False, unique=True)
-	admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id'), nullable=True)
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+	admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id', ondelete='CASCADE'), nullable=True)
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
 
 	created_at = db.Column(db.DateTime, index=False, nullable=False)
 	expires_at = db.Column(db.DateTime, index=False, nullable=False)
 
 	def __repr__(self):
-		return f'<AuthToken: {self.token}>'
+		return f'<AuthToken: {self.id} - {self.token}>'
 
 	def __str__(self):
-		return f'<AuthToken: {self.token}>'
+		return f'<AuthToken: {self.id} - {self.token}>'
 
 	def __init__(self, token, admin_id=None, user_id=None, expires_at=calc_expiration_token()):
 		self.token = token

@@ -12,14 +12,14 @@ class EventDB(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     event = db.Column(JSONB, index=True, unique=True, nullable=False)
 
-    admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id'), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=True)
-    buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id'), nullable=True)
-    slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id'), nullable=True)
-    head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=True)
-    cert_cons_id = db.Column(db.Integer, db.ForeignKey('certificates_cons.id'), nullable=True)
-    cert_dna_id = db.Column(db.Integer, db.ForeignKey('certificates_dna.id'), nullable=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('administrators.id', ondelete='CASCADE'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+    farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id', ondelete='CASCADE'), nullable=True)
+    buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id', ondelete='CASCADE'), nullable=True)
+    slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id', ondelete='CASCADE'), nullable=True)
+    head_id = db.Column(db.Integer, db.ForeignKey('heads.id', ondelete='CASCADE'), nullable=True)
+    cert_cons_id = db.Column(db.Integer, db.ForeignKey('certificates_cons.id', ondelete='CASCADE'), nullable=True)
+    cert_dna_id = db.Column(db.Integer, db.ForeignKey('certificates_dna.id', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, index=False, nullable=False)
 

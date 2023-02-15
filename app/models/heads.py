@@ -43,10 +43,10 @@ class Head(db.Model):
 
 	farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=True)
 
-	dna_cert = db.relationship('CertificateDna', backref='head', lazy=True)
-	cons_cert = db.relationship('CertificateCons', backref='head', lazy=True)
+	dna_cert = db.relationship('CertificateDna', backref='head', lazy='dynamic')
+	cons_cert = db.relationship('CertificateCons', backref='head', lazy='dynamic')
 
-	events = db.relationship('EventDB', backref='head', lazy=True)
+	events = db.relationship('EventDB', backref='head', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

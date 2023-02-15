@@ -20,10 +20,10 @@ class CertificateDna(db.Model):
 
     veterinarian = db.Column(db.String(50), index=False, unique=False, nullable=True)
 
-    head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False, unique=True)
+    head_id = db.Column(db.Integer, db.ForeignKey('heads.id', ondelete='CASCADE'), nullable=False, unique=True)
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False, unique=False)
 
-    events = db.relationship('EventDB', backref='cert_dna', lazy=True)
+    events = db.relationship('EventDB', backref='cert_dna', lazy='dynamic')
 
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

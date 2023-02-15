@@ -31,8 +31,8 @@ class Buyer(db.Model):
 
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
-	cons_certs = db.relationship('CertificateCons', backref='buyer', lazy=True)
-	events = db.relationship('EventDB', backref='buyer', lazy=True)
+	cons_certs = db.relationship('CertificateCons', backref='buyer', lazy='dynamic')
+	events = db.relationship('EventDB', backref='buyer', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

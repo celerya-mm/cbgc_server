@@ -74,12 +74,12 @@ class CertificateCons(db.Model):
     invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
     invoice_status = db.Column(db.String(20), index=False, unique=False, nullable=True)
 
-    head_id = db.Column(db.Integer, db.ForeignKey('heads.id'), nullable=False)
+    head_id = db.Column(db.Integer, db.ForeignKey('heads.id', ondelete='CASCADE'), nullable=False)
     buyer_id = db.Column(db.Integer, db.ForeignKey('buyers.id'), nullable=True)
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=False)
     slaughterhouse_id = db.Column(db.Integer, db.ForeignKey('slaughterhouses.id'), nullable=True)
 
-    events = db.relationship('EventDB', backref='cert_cons', lazy=True)
+    events = db.relationship('EventDB', backref='cert_cons', lazy='dynamic')
 
     note_certificate = db.Column(db.String(255), index=False, unique=False, nullable=True)
     note = db.Column(db.String(255), index=False, unique=False, nullable=True)

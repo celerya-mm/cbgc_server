@@ -31,11 +31,11 @@ class Farmer(db.Model):
 	stable_productive_orientation = db.Column(db.String(25), index=False, unique=False, nullable=True)
 	stable_breeding_methods = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	heads = db.relationship('Head', backref='farmer', lazy=True)
-	dna_certs = db.relationship('CertificateDna', backref='farmer', lazy=True)
-	cons_certs = db.relationship('CertificateCons', backref='farmer', lazy=True)
+	heads = db.relationship('Head', backref='farmer', lazy='dynamic')
+	dna_certs = db.relationship('CertificateDna', backref='farmer', lazy='dynamic')
+	cons_certs = db.relationship('CertificateCons', backref='farmer', lazy='dynamic')
 
-	events = db.relationship('EventDB', backref='farmer', lazy=True)
+	events = db.relationship('EventDB', backref='farmer', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

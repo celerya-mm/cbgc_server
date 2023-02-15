@@ -113,9 +113,9 @@ class User(db.Model):
 	email = db.Column(db.String(80), index=False, unique=True, nullable=True)
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	buyers = db.relationship('Buyer', backref='user', lazy=True)
-	auth_tokens = db.relationship('AuthToken', backref='user', lazy=True)
-	events = db.relationship('EventDB', backref='user', lazy=True)
+	buyers = db.relationship('Buyer', backref='user', lazy='dynamic')
+	auth_tokens = db.relationship('AuthToken', backref='user', lazy='dynamic')
+	events = db.relationship('EventDB', backref='user', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 

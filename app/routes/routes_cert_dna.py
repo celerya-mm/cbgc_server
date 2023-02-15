@@ -197,7 +197,7 @@ def cert_dna_update(_id):
 		# recupera Allevatore
 		_farmer = Farmer.query.get(_cert.farmer_id)
 
-		form.dna_cert_id.data = _id
+		form.dna_cert_id.data = _cert.dna_cert_id
 		form.dna_cert_date.data = _cert.dna_cert_date
 		form.veterinarian.data = _cert.veterinarian
 

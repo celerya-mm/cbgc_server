@@ -26,9 +26,9 @@ class Slaughterhouse(db.Model):
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
-	cons_cert = db.relationship('CertificateCons', backref='slaughterhouse', lazy=True)
+	cons_cert = db.relationship('CertificateCons', backref='slaughterhouse', lazy='dynamic')
 
-	events = db.relationship('EventDB', backref='slaughterhouse', lazy=True)
+	events = db.relationship('EventDB', backref='slaughterhouse', lazy='dynamic')
 
 	created_at = db.Column(db.DateTime, index=False, nullable=False)
 	updated_at = db.Column(db.DateTime, index=False, nullable=False)

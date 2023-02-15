@@ -107,6 +107,7 @@ def administrator_login():
 
 	if _admin not in [None, ""]:
 		record = len(_admin.auth_tokens) - 1
+		# print('MAX_TOKEN:', _admin.auth_tokens[record], 'LIST:', _admin.auth_tokens)
 		if record and _admin.auth_tokens[record].expires_at > datetime.now():
 			token = _admin.auth_tokens[record].token
 			data = {

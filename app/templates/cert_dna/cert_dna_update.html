@@ -62,7 +62,7 @@
                         <br>
                         <div class="form-group">
                             {{ form.farmer_id.label }}
-                            {{ form.farmer_id(class="form-control", style="text-align: center;") }}
+                            {{ form.farmer_id(class="form-control emphasis", style="text-align: center;") }}
                             {% if form.farmer_id.errors %}
                             {% for error in form.farmer_id.errors %}
                             <span class="text-danger">{{ error }}</span>
