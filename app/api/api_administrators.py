@@ -106,15 +106,14 @@ def administrator_login():
 	_admin = Administrator.query.filter_by(username=username, password=psw_hash(str(password))).first()
 
 	if _admin not in [None, ""]:
-		record = len(_admin.auth_tokens) - 1
-		# print('MAX_TOKEN:', _admin.auth_tokens[record], 'LIST:', _admin.auth_tokens)
-		if record and _admin.auth_tokens[record].expires_at > datetime.now():
-			token = _admin.auth_tokens[record].token
+		record = _admin.auth_tokens.first()
+		# print('MAX_TOKEN:', record)
+		if record and record.expires_at > datetime.now():
 			data = {
 				'status': 'success',
 				'data': {
-					'token': token,
-					'expiration': datetime.strftime(_admin.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
+					'token': record.token,
+					'expiration': datetime.strftime(record.expires_at, "%Y-%m-%d %H:%M:%S"),
 					'id': _admin.id,
 					'username': _admin.username,
 					'psw_changed':  _admin.psw_changed

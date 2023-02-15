@@ -88,6 +88,7 @@
                 </span>
                 </p>
             </div>
+			{% if form.event.Previous_data %}
             <div class="form-group">
                 <p class="json-key">Previous Data:</p>
                 {% for key, value in form.event.Previous_data.items() %}
@@ -99,6 +100,7 @@
                 </p>
                 {% endfor %}
             </div>
+			{% endif %}
         </div>
     </div>
     <div class="container text-center mt-2 mx-auto" style="margin: 0px;">
@@ -173,10 +175,6 @@
             }
         });
     });
-
-
-
-
 
 </script>
 {% endblock %}

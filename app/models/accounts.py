@@ -25,8 +25,8 @@ class Administrator(db.Model):
 	email = db.Column(db.String(80), index=False, unique=True, nullable=True)
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	auth_tokens = db.relationship('AuthToken', backref='administrator', lazy=True)
-	events = db.relationship('EventDB', backref='administrator', lazy=True)
+	auth_tokens = db.relationship('AuthToken', backref='administrator', order_by='AuthToken.id.desc()', lazy="dynamic")
+	events = db.relationship('EventDB', backref='administrator', lazy="dynamic")
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)
 
@@ -114,7 +114,7 @@ class User(db.Model):
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
 	buyers = db.relationship('Buyer', backref='user', lazy='dynamic')
-	auth_tokens = db.relationship('AuthToken', backref='user', lazy='dynamic')
+	auth_tokens = db.relationship('AuthToken', backref='user', order_by='AuthToken.id.desc()', lazy="dynamic")
 	events = db.relationship('EventDB', backref='user', lazy='dynamic')
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

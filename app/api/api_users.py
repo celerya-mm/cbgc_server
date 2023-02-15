@@ -98,21 +98,19 @@ def authenticate_user():
     username = data_received['username'].replace(" ", "")
     password = data_received['password'].replace(" ", "")
 
-    _user = User.query.filter(
-        User.username == username,
-        User.password == hashlib.sha256(str(password).encode('utf-8')).hexdigest()
+    _user = User.query.filter_by(
+        username=username, password=hashlib.sha256(str(password).encode('utf-8')).hexdigest()
     ).first()
 
     try:
         if _user not in [None, ""]:
-            record = len(_user.auth_tokens) - 1
-            if record > 0 and _user.auth_tokens[record].expires_at > datetime.now():
-                token = _user.auth_tokens[record].token
+            record = _user.auth_tokens.first()
+            if record and record.expires_at > datetime.now():
                 data = {
                     'status': 'success',
                     'data': {
-                        'token': token,
-                        'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
+                        'token': record.token,
+                        'expiration': datetime.strftime(record.expires_at, "%Y-%m-%d %H:%M:%S"),
                         'user_id': _user.id
                     }
                 }

@@ -19,14 +19,13 @@ def buyer_login():
 	_user = User.query.filter_by(username=username, password=psw_hash(str(password))).first()
 
 	if _user not in [None, ""]:
-		record = len(_user.auth_tokens) - 1
-		if record > 0 and _user.auth_tokens[record].expires_at > datetime.now():
-			token = _user.auth_tokens[record].token
+		record = _user.auth_tokens.first()
+		if record and record.expires_at > datetime.now():
 			data = {
 				'status': 'success',
 				'data': {
-					'token': token,
-					'expiration': datetime.strftime(_user.auth_tokens[record].expires_at, "%Y-%m-%d %H:%M:%S"),
+					'token': record.token,
+					'expiration': datetime.strftime(record.expires_at, "%Y-%m-%d %H:%M:%S"),
 					'id': _user.id,
 					'username': _user.username,
 					'psw_changed': _user.psw_changed
