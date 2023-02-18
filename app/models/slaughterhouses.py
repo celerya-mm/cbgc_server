@@ -73,8 +73,9 @@ class Slaughterhouse(db.Model):
 		db.session.add(self)
 		db.session.commit()
 
-	def update():  # noqa
+	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
+		Slaughterhouse.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
 	def to_dict(self):

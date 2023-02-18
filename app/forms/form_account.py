@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from ..models.accounts import Administrator, User
+from ..utilitys.functions import not_empty
 from ..utilitys.functions_accounts import psw_verify, psw_contain_usr
 
 
@@ -34,7 +37,7 @@ class FormAdminSignup(FlaskForm):
 		EqualTo('new_password_1', message='Le password non corrispondono.')
 	])
 
-	psw_changed = BooleanField('Password cambiata', default=False)
+	psw_changed = BooleanField('Password cambiata')
 
 	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
 	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
@@ -83,7 +86,7 @@ class FormUserSignup(FlaskForm):
 		'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
 	)
 
-	syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
+	# syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
 
 	new_password_1 = PasswordField('Nuova Password', validators=[
 		DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
@@ -92,7 +95,7 @@ class FormUserSignup(FlaskForm):
 		EqualTo('new_password_1',
 		        message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
 
-	psw_changed = BooleanField('Password cambiata', default=False)
+	psw_changed = BooleanField('Password cambiata')
 
 	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
 	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
@@ -139,7 +142,7 @@ class FormAccountUpdate(FlaskForm):
 	"""Form di modifica dati account escluso password ed e-mail"""
 	username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
 
-	syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
+	# syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
 
 	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
 	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
@@ -159,15 +162,21 @@ class FormAccountUpdate(FlaskForm):
 
 	def to_dict(self):
 		"""Converte form in dict."""
+		name = self.name.data.strip().replace(" ", "")
+		last_name = self.last_name.data.strip().replace("  ", " ")
 		return {
-			'username': self.username.data,
-			'name': self.name.data,
-			'syd_user': self.syd_user.data,
-			'last_name': self.last_name.data,
-			'full_name': F"{self.name.data} {self.last_name.data}",
-			'email': self.email.data,
-			'phone': self.phone.data,
-			'note': self.note.data,
+			'username': self.username.data.strip().replace(" ", ""),
+			# 'syd_user': self.syd_user.data.strip().replace(' ', ''),
+
+			'name': name,
+			'last_name': last_name,
+			'full_name': f'{name} {last_name}',
+
+			'email': self.email.data.strip().replace(" ", ""),
+			'phone': not_empty(self.phone.data),
+
+			'note': not_empty(self.note.data),
+			'updated_at': datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
 		}
 
 

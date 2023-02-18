@@ -68,8 +68,9 @@ class Administrator(db.Model):
 		db.session.add(self)
 		db.session.commit()
 
-	def update():  # noqa
+	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
+		Administrator.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
 	def to_dict(self):
@@ -160,8 +161,9 @@ class User(db.Model):
 		db.session.add(self)
 		db.session.commit()
 
-	def update():  # noqa
+	def update(_id, data):  # noqa
 		"""Salva le modifiche a un record."""
+		User.query.filter_by(id=_id).update(data)
 		db.session.commit()
 
 	def to_dict(self):

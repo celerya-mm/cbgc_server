@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -8,9 +7,9 @@ from ..app import db, session
 from ..forms.form_head import FormHeadCreate, FormHeadUpdate
 from ..models.buyers import Buyer
 from ..models.farmers import Farmer
-from ..models.heads import Head, verify_castration
+from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import not_empty, str_to_date, year_extract, dict_group_by, token_admin_validate
+from ..utilitys.functions import not_empty, str_to_date, dict_group_by, token_admin_validate
 
 VIEW = "/head/view/"
 VIEW_FOR = "head_view"
@@ -188,40 +187,19 @@ def head_update(_id):
 	from ..routes.routes_cert_dna import CREATE_FOR as DNA_CREATE_FOR
 	from ..routes.routes_event import event_create
 
-	form = FormHeadUpdate()
 	# recupero i dati del record
 	head = Head.query.get(int(_id))
+	form = FormHeadUpdate(obj=head)
 
 	if form.validate_on_submit():
-		new_data = json.loads(json.dumps(request.form))
+		new_data = FormHeadUpdate(request.form).to_dict()
+		# print("NEW_DATA:", json.dumps(new_data, indent=2))
 
 		previous_data = head.to_dict()
 		previous_data.pop("updated_at")
 
-		head.headset = new_data["headset"].strip()
-
-		head.birth_date = str_to_date(new_data["birth_date"])
-		head.birth_year = year_extract(new_data["birth_date"])
-
-		head.castration_date = not_empty(new_data["castration_date"])
-		head.castration_compliance = verify_castration(new_data["birth_date"], new_data["castration_date"])
-
-		head.slaughter_date = not_empty(new_data["slaughter_date"])
-
-		head.sale_date = not_empty(new_data["sale_date"])
-		head.sale_year = year_extract(new_data["sale_date"])
-
-		if new_data["farmer_id"] not in ["", "-", None]:
-			head.farmer_id = int(new_data["farmer_id"].split(" - ")[0])
-		else:
-			head.farmer_id = None
-
-		head.note = not_empty(new_data["note"])
-		head.updated_at = datetime.now()
-
-		# print("NEW_DATA:", new_data)
 		try:
-			Head.update()
+			Head.update(_id, new_data)
 			flash("CAPO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -243,17 +221,8 @@ def head_update(_id):
 		_event = event_create(_event, head_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		form.headset.data = head.headset
-
-		form.birth_date.data = str_to_date(head.birth_date)
-		form.castration_date.data = str_to_date(head.castration_date)
-		form.slaughter_date.data = str_to_date(head.slaughter_date)
-		form.sale_date.data = str_to_date(head.sale_date)
-
 		farmer = Farmer.query.get(head.farmer_id)
 		form.farmer_id.data = f"{farmer.id} - {farmer.farmer_name}"
-
-		form.note.data = head.note
 
 		_info = {
 			'created_at': head.created_at,

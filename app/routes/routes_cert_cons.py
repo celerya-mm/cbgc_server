@@ -8,12 +8,12 @@ from ..app import db, session, Config
 from ..forms.form_cert_cons import FormCertConsCreate, FormCertConsUpdate, FormCertConsUpdateBuyer
 from ..models.accounts import User
 from ..models.buyers import Buyer
-from ..models.certificates_cons import CertificateCons, mount_code, year_cert_calc_update
+from ..models.certificates_cons import CertificateCons
 from ..models.farmers import Farmer
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import (not_empty, token_admin_validate, token_buyer_validate, str_to_date, calc_age,
-                                  status_true_false, status_si_no, date_to_str, dict_group_by)
+from ..utilitys.functions import (token_admin_validate, token_buyer_validate, calc_age, status_si_no, date_to_str,
+								  dict_group_by)
 from ..utilitys.functions_certificates import generate_qr_code, byte_to_pdf, html_to_pdf, pdf_to_byte
 
 VIEW = "/cert_cons/view/"
@@ -230,79 +230,21 @@ def cert_cons_update(_id):
 	"""Aggiorna dati Capo."""
 	from ..routes.routes_event import event_create
 
-	form = FormCertConsUpdate()
 	# recupero i dati del record
 	cert = CertificateCons.query.get(int(_id))
+	form = FormCertConsUpdate(obj=cert)
 
 	if form.validate_on_submit():
 		try:
-			new_data = json.loads(json.dumps(request.form))
-			# print("HEAD_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+			new_data = FormCertConsUpdate(request.form).to_dict()
+			# print("NEW_DATA:", json.dumps(new_data, indent=2))
 
 			previous_data = cert.to_dict()
 			previous_data.pop("updated_at")
 			# print("HEAD_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
 
-			cert.certificate_id = new_data["certificate_id"]
-			cert.certificate_var = new_data["certificate_var"]
-			cert.certificate_year = year_cert_calc_update(new_data["certificate_date"])
-			cert.certificate_nr = mount_code(
-				new_data["certificate_id"], cert.certificate_year, new_data["certificate_var"]
-			)
-
-			cert.emitted = status_true_false(new_data["emitted"])
-
-			cert.cockade_id = not_empty(new_data["cockade_id"])
-			cert.cockade_nr = mount_code(new_data["cockade_id"], cert.certificate_year, new_data["cockade_var"])
-
-			cert.certificate_date = str_to_date(new_data["certificate_date"])
-
-			cert.sale_type = not_empty(new_data["sale_type"])
-			cert.sale_quantity = not_empty(new_data["sale_quantity"])
-			cert.sale_rest = not_empty(new_data["sale_rest"])
-
-			cert.head_category = not_empty(new_data["head_category"])
-
-			if new_data["head_age"] in ["", None, 0]:
-				head = Head.query.get(int(cert.head_id))
-				cert.head_age = calc_age(head.birth_date, head.slaughter_date)
-			else:
-				cert.head_age = not_empty(new_data["head_age"])
-
-			cert.batch_number = not_empty(new_data["batch_number"])
-
-			cert.invoice_nr = not_empty(new_data["invoice_nr"])
-			cert.invoice_date = str_to_date(new_data["invoice_date"])
-			cert.invoice_status = not_empty(new_data["invoice_status"])
-
-			if new_data["head_id"] not in ["", "-", None]:
-				cert.head_id = int(new_data["head_id"].split(" - ")[0])
-			else:
-				cert.head_id = None
-
-			if new_data["buyer_id"] not in ["", "-", None]:
-				cert.buyer_id = int(new_data["buyer_id"].split(" - ")[0])
-			else:
-				cert.buyer_id = None
-
-			if new_data["farmer_id"] not in ["", "-", None]:
-				cert.farmer_id = int(new_data["farmer_id"].split(" - ")[0])
-			else:
-				cert.farmer_id = None
-
-			if new_data["slaughterhouse_id"] not in ["", "-", None]:
-				cert.slaughterhouse_id = int(new_data["slaughterhouse_id"].split(" - ")[0])
-			else:
-				cert.slaughterhouse_id = None
-
-			cert.note_certificate = not_empty(new_data["note_certificate"])
-			cert.note = not_empty(new_data["note"])
-
-			cert.updated_at = datetime.datetime.now()
-
-			# print("CERT_NEW_DATA:", new_data)
 			try:
-				CertificateCons.update()
+				CertificateCons.update(_id, new_data)
 				flash("CERTIFICATO CONSORZIO aggiornato correttamente.")
 			except IntegrityError as err:
 				db.session.rollback()
@@ -330,46 +272,22 @@ def cert_cons_update(_id):
 	else:
 		# recupero il record precedente
 		max_id = db.session.query(db.func.max(CertificateCons.id)).scalar()
+
 		prev_cert = CertificateCons.query.get(max_id)
 		prev_cert = prev_cert.certificate_nr
-
-		# print("HEAD_FIND:", head, type(data))
-
-		form.certificate_id.data = cert.certificate_id
-		form.certificate_var.data = cert.certificate_var
-		form.certificate_date.data = str_to_date(cert.certificate_date)
-		form.certificate_year.data = cert.certificate_year
+		# print("CERT_PREV:", prev_cert)
 
 		form.emitted.data = status_si_no(cert.emitted)
-
-		form.cockade_id.data = cert.cockade_id
-		form.cockade_var.data = cert.cockade_var
-
-		form.sale_type.data = cert.sale_type
-		form.sale_quantity.data = cert.sale_quantity
-		form.sale_rest.data = cert.sale_rest
-
-		form.head_category.data = cert.invoice_nr
-
-		if cert.head_age in ["", None, 0]:
-			head = Head.query.get(int(cert.head_id))
-			form.head_age.data = calc_age(head.birth_date, head.slaughter_date)
-		else:
-			form.head_age.data = cert.head_age
 
 		if form.head_age.data >= 46:
 			form.head_category.data = "Bue"
 		else:
 			form.head_category.data = "Manzo"
 
-		form.batch_number.data = cert.batch_number
-
-		form.invoice_nr.data = cert.invoice_nr
-		form.invoice_date.data = str_to_date(cert.invoice_date)
-		form.invoice_status.data = cert.invoice_status
-
 		head = Head.query.get(cert.head_id)
 		form.head_id.data = f"{head.id} - {head.headset}"
+		if form.head_age.data in ["", None, 0]:
+			form.head_age.data = calc_age(head.birth_date, head.slaughter_date)
 
 		farmer = Farmer.query.get(cert.farmer_id)
 		form.farmer_id.data = f"{farmer.id} - {farmer.farmer_name}"
@@ -380,9 +298,6 @@ def cert_cons_update(_id):
 		if cert.slaughterhouse_id:
 			slaugh = Slaughterhouse.query.get(cert.slaughterhouse_id)
 			form.slaughterhouse_id.data = f"{slaugh.id} - {slaugh.slaughterhouse}"
-
-		form.note_certificate.data = cert.note_certificate
-		form.note.data = cert.note
 
 		db.session.close()
 
@@ -433,10 +348,7 @@ def cert_cons_generate(_id):
 			flash(f"ERRORE: {err}")
 			return redirect(url_for(HISTORY_FOR, _id=_id))
 
-		if cert.note_certificate in ["", None]:
-			note = ""
-		else:
-			note = cert.note_certificate
+		note = cert.note_certificate if cert.note_certificate in ["", None] else ""
 
 		if slaugh.slaughterhouse_code:
 			slaughter = f"{slaugh.slaughterhouse_code} - {slaugh.slaughterhouse}"
@@ -479,9 +391,9 @@ def cert_cons_generate(_id):
 			cert.certificate_pdf = pdf_str
 			cert.emitted = True
 			try:
-				CertificateCons.update()
+				CertificateCons.update(_id, cert)
 				flash("CERTIFICATO CREATO correttamente.")
-				previous_data["certificate_pdf"] = "Campo troppo lungo, rimosso i dati." \
+				previous_data["certificate_pdf"] = "Contenuto troppo lungo, rimossi i dati." \
 				                                   "Conterrebbe il certificato pdf convertito in byte."
 			except IntegrityError as err:
 				db.session.rollback()
@@ -624,7 +536,7 @@ def cert_cons_buyer_update(_id):
 			cert.updated_at = datetime.datetime.now()
 
 			try:
-				CertificateCons.update()
+				CertificateCons.update(_id, cert)
 				flash(f"QUANTITA' RIMANENTE Attestato {cert.certificate_nr} aggiornata correttamente.")
 			except IntegrityError as err:
 				db.session.rollback()

@@ -1,6 +1,5 @@
 import json
 import re
-from datetime import datetime
 import folium
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -8,8 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from ..app import db, session
 from ..forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
 from ..models.farmers import Farmer
-from ..utilitys.functions import (token_admin_validate, status_true_false, str_to_date, status_si_no,
-                                  address_mount, not_empty)
+from ..utilitys.functions import token_admin_validate, status_true_false
 
 VIEW = "/farmer/view/"
 VIEW_FOR = "farmer_view"
@@ -174,43 +172,20 @@ def farmer_update(_id):
 	"""Aggiorna dati Allevatore."""
 	from ..routes.routes_event import event_create
 
-	form = FormFarmerUpdate()
 	# recupero i dati del record
 	farmer = Farmer.query.get(_id)
+	form = FormFarmerUpdate(obj=farmer)
 
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
-		new_data = json.loads(json.dumps(request.form))
+		new_data = FormFarmerUpdate(request.form).to_dict()
+		# print("NEW_DATA:", json.dumps(new_data, indent=2)
 
 		previous_data = farmer.to_dict()
 		previous_data.pop("updated_at")
 
-		farmer.farmer_name = new_data["farmer_name"].strip().replace("  ", " ")
-
-		farmer.email = not_empty(new_data["email"])
-		farmer.phone = not_empty(new_data["phone"].strip())
-
-		farmer.address = new_data["address"].strip()
-		farmer.cap = new_data["cap"].strip()
-		farmer.city = new_data["city"].strip()
-		farmer.full_address = address_mount(new_data["address"], new_data["cap"], new_data["city"])
-		farmer.coordinates = new_data["coordinates"].strip()
-
-		farmer.affiliation_start_date = str_to_date(new_data["affiliation_start_date"])
-		farmer.affiliation_end_date = str_to_date(new_data["affiliation_end_date"])
-		farmer.affiliation_status = status_true_false(new_data["affiliation_status"])
-
-		farmer.stable_code = not_empty(new_data["stable_code"])
-		farmer.stable_type = not_empty(new_data["stable_type"])
-		farmer.stable_productive_orientation = not_empty(new_data["stable_productive_orientation"])
-		farmer.stable_breeding_methods = not_empty(new_data["stable_breeding_methods"])
-
-		farmer.note = not_empty(new_data["note"])
-
-		farmer.updated_at = datetime.now()
-
 		try:
-			Farmer.update()
+			Farmer.update(_id, new_data)
 			flash("ALLEVATORE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -231,27 +206,6 @@ def farmer_update(_id):
 		_event = event_create(_event, farmer_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		form.farmer_name.data = farmer.farmer_name
-		form.email.data = farmer.email
-		form.phone.data = farmer.phone
-
-		form.address.data = farmer.address
-		form.cap.data = farmer.cap
-		form.city.data = farmer.city
-		form.coordinates.data = farmer.coordinates
-
-		form.stable_code.data = farmer.stable_code
-		form.stable_type.data = farmer.stable_type
-
-		form.stable_productive_orientation.data = farmer.stable_productive_orientation
-		form.stable_breeding_methods.data = farmer.stable_breeding_methods
-
-		form.affiliation_start_date.data = str_to_date(farmer.affiliation_start_date)
-		form.affiliation_end_date.data = str_to_date(farmer.affiliation_end_date)
-		form.affiliation_status.data = status_si_no(farmer.affiliation_status)
-
-		form.note.data = farmer.note
-
 		_info = {
 			'created_at': farmer.created_at,
 			'updated_at': farmer.updated_at,

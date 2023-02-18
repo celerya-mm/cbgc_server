@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
@@ -91,23 +93,24 @@ class FormSlaughterhouseUpdate(FlaskForm):
 
 	def to_dict(self):
 		"""Converte form in dict."""
-		from ..utilitys.functions import date_to_str, status_si_no, address_mount
+		from ..utilitys.functions import date_to_str, status_true_false, address_mount, not_empty
 		return {
-			'slaughterhouse': self.slaughterhouse.data,
-			'slaughterhouse_code': self.slaughterhouse_code.data,
+			'slaughterhouse': self.slaughterhouse.data.strip(),
+			'slaughterhouse_code': self.slaughterhouse_code.data.strip(),
 
-			'email': self.email.data,
-			'phone': self.phone.data,
+			'email': not_empty(self.email.data),
+			'phone': not_empty(self.phone.data),
 
-			'address': self.address.data,
-			'cap': self.cap.data,
-			'city': self.city.data,
+			'address': not_empty(self.address.data),
+			'cap': not_empty(self.cap.data),
+			'city': not_empty(self.city.data),
 			'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
-			'coordinates': self.coordinates.data,
+			'coordinates': not_empty(self.coordinates.data),
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
 			'affiliation_end_date': date_to_str(self.affiliation_end_date.data),
-			'affiliation_status': status_si_no(self.affiliation_status.data),
+			'affiliation_status': status_true_false(self.affiliation_status.data),
 
-			'note': self.note.data,
+			'note': not_empty(self.note.data),
+			'updated_at': date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S")
 		}

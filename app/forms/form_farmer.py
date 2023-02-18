@@ -99,27 +99,28 @@ class FormFarmerUpdate(FlaskForm):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from ..utilitys.functions import date_to_str, status_si_no, address_mount
+		from ..utilitys.functions import date_to_str, status_true_false, address_mount, not_empty
 		return {
 			'farmer_name': self.farmer_name.data,
 
-			'email': self.email.data,
-			'phone': self.phone.data,
+			'email': not_empty(self.email.data),
+			'phone': not_empty(self.phone.data),
 
-			'address': self.address.data,
-			'cap': self.cap.data,
-			'city': self.city.data,
+			'address': self.address.data.strip(),
+			'cap': self.cap.data.strip(),
+			'city': self.city.data.strip(),
 			'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
-			'coordinates': self.coordinates.data,
+			'coordinates': not_empty(self.coordinates.data),
 
-			'stable_code': self.stable_code.data,
-			'stable_type': self.stable_type.data,
-			'stable_productive_orientation': self.stable_productive_orientation.data,
-			'stable_breeding_methods': self.stable_breeding_methods.data,
+			'stable_code': not_empty(self.stable_code.data),
+			'stable_type': not_empty(self.stable_type.data),
+			'stable_productive_orientation': not_empty(self.stable_productive_orientation.data),
+			'stable_breeding_methods': not_empty(self.stable_breeding_methods.data),
 
 			'affiliation_start_date': date_to_str(self.affiliation_start_date.data),
-			'affiliation_end_date': date_to_str(self.affiliation_end_date),
-			'affiliation_status': status_si_no(self.affiliation_status.data),
+			'affiliation_end_date': date_to_str(self.affiliation_end_date.data),
+			'affiliation_status': status_true_false(self.affiliation_status.data),
 
-			'note': self.note.data,
+			'note': not_empty(self.note.data.strip()),
+			'updated_at': date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S")
 		}

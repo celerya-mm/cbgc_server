@@ -4,13 +4,12 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session, Message, mail, Config
+from ..app import db, session
 from ..forms.form_account import FormAccountUpdate, FormUserSignup
 from ..forms.forms import FormPswReset
 from ..models.accounts import User
-from ..models.tokens import calc_exp_token_reset_psw, AuthToken
-from ..utilitys.functions import token_admin_validate, not_empty
-from ..utilitys.functions_accounts import psw_hash, __generate_auth_token
+from ..utilitys.functions import token_admin_validate
+from ..utilitys.functions_accounts import psw_hash
 
 VIEW = "/user/view/"
 VIEW_FOR = "user_view"
@@ -117,28 +116,19 @@ def user_update(_id):
 	"""Aggiorna dati Utente."""
 	from ..routes.routes_event import event_create
 
-	form = FormAccountUpdate()
 	# recupero i dati
 	user = User.query.get(_id)
+	form = FormAccountUpdate(obj=user)
 
 	if form.validate_on_submit():
-		new_data = json.loads(json.dumps(request.form))
+		new_data = FormAccountUpdate(request.form).to_dict()
+		# print("NEW_DATA:", json.dumps(new_data, indent=2))
 
 		previous_data = user.to_dict()
 		previous_data.pop("updated_at")
 
-		user.username = new_data["username"].strip().replace(" ", "")
-		user.name = new_data["name"].strip()
-		user.last_name = new_data["last_name"].strip()
-		user.full_name = f'{new_data["name"]} {new_data["last_name"]}'
-
-		user.email = new_data["email"].strip().replace(" ", "")
-		user.phone = new_data["phone"].strip()
-
-		user.note = not_empty(new_data["note"].strip().replace("  ", ""))
-		user.updated_at = datetime.now()
 		try:
-			User.update()
+			User.update(_id, new_data)
 			flash("UTENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -159,13 +149,6 @@ def user_update(_id):
 		_event = event_create(_event, user_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		form.username.data = user.username
-		form.name.data = user.name
-		form.last_name.data = user.last_name
-		form.email.data = user.email
-		form.phone.data = user.phone
-		form.note.data = user.note
-
 		_info = {
 			'created_at': user.created_at,
 			'updated_at': user.updated_at,
@@ -185,7 +168,7 @@ def user_reset_password(_id):
 		new_password = psw_hash(form_data["new_password_1"].replace(" ", "").strip())
 
 		_user = User.query.get(_id)
-		print(f"UTENTE {_user.username}.")
+		# print(f"UTENTE {_user.username}.")
 
 		if new_password == _user.password:
 			session.clear()
@@ -197,9 +180,9 @@ def user_reset_password(_id):
 				_user.password = new_password
 				_user.psw_changed = False
 				_user.updated_at = datetime.now()
-				print(f"PASSWORD utente {_user.username}.")
+				# print(f"PASSWORD utente {_user.username}.")
 
-				User.update()
+				User.update(_id, _user)
 				flash(f"PASSWORD utente {_user.username} resettata correttamente!")
 				flash(f"Comunica all'utente la nuova password e che dovrà cambiarla dopo essersi registrato al portale.")
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
@@ -112,7 +114,8 @@ class FormHeadUpdate(FlaskForm):
 			'sale_date': date_to_str(self.sale_date.data),
 			'sale_year': year_extract(self.sale_date.data),
 
-			'farmer_id': self.farmer_id.data,
+			'farmer_id': int(self.farmer_id.data.split(" - ")[0]),
 
 			'note': self.note.data,
+			'updated_at': date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S")
 		}

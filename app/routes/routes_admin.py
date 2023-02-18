@@ -44,8 +44,10 @@ def admin_view():
 	# Estraggo la lista degli utenti amministratori
 	_list = Administrator.query.all()
 	_list = [r.to_dict() for r in _list]
-	return render_template(VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR,
-	                       update_psw=UPDATE_PSW_FOR, history=HISTORY_FOR)
+	return render_template(
+		VIEW_HTML, admin=_admin, form=_list, create=CREATE_FOR, update=UPDATE_FOR, update_psw=UPDATE_PSW_FOR,
+		history=HISTORY_FOR
+	)
 
 
 @app.route(CREATE, methods=["GET", "POST"])
@@ -108,37 +110,29 @@ def admin_update(_id):
 	"""Aggiorna Utente Amministratore."""
 	from ..routes.routes_event import event_create
 
-	form = FormAccountUpdate()
-	if form.validate_on_submit():
-		new_data = json.loads(json.dumps(request.form))
-		# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
+	# recupero i dati
+	admin = Administrator.query.get(_id)
+	form = FormAccountUpdate(obj=admin)
 
-		administrator = Administrator.query.get(_id)
-
-		previous_data = administrator.to_dict()
-		previous_data.pop("updated_at")
-		# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-
-		administrator.name = new_data["name"]
-		administrator.last_name = new_data["last_name"]
-		administrator.full_name = f'{new_data["name"]} {new_data["last_name"]}'
-		administrator.phone = new_data["phone"]
-		administrator.email = new_data["email"]
-
-		administrator.note = not_empty(new_data["note"])
-		administrator.updated_at = datetime.now()
-
-		# print("NEW_DATA:", new_data)
+	if request.method == 'POST' and form.validate():
 		try:
-			Administrator.update()
+			new_data = FormAccountUpdate(request.form).to_dict()
+			# print("FORM_DATA_PASS:", json.dumps(new_data, indent=2))
+
+			previous_data = admin.to_dict()
+			previous_data.pop("updated_at")
+			# print("PREVIOUS_DATA", json.dumps(previous_data, indent=2))
+
+			Administrator.update(_id, new_data)
 			flash("UTENTE aggiornato correttamente.")
+
 		except IntegrityError as err:
 			db.session.rollback()
 			db.session.close()
 			flash(f"ERRORE: {str(err.orig)}")
 			_info = {
-				'created_at': administrator.created_at,
-				'updated_at': administrator.updated_at,
+				'created_at': admin.created_at,
+				'updated_at': admin.updated_at,
 			}
 			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 
@@ -151,18 +145,6 @@ def admin_update(_id):
 		_event = event_create(_event, admin_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		# recupero i dati
-		admin = Administrator.query.get(_id)
-		# print("ADMIN:", admin)
-		# print("ADMIN_FIND:", json.dumps(admin.to_dict(), indent=2))
-
-		form.username.data = admin.username
-		form.name.data = admin.name
-		form.last_name.data = admin.last_name
-		form.email.data = admin.email
-		form.phone.data = admin.phone
-		form.note.data = admin.note
-
 		_info = {
 			'created_at': admin.created_at,
 			'updated_at': admin.updated_at,

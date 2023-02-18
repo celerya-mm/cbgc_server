@@ -139,9 +139,6 @@ def buyer_create():
 		form_data = json.loads(json.dumps(request.form))
 		# print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
 
-		user_id = Buyer.query.filter_by(username=form_data["user_id"]).first()
-		# print("USER_ID:", user_find.id)
-
 		new_buyer = Buyer(
 			buyer_name=form_data["buyer_name"].strip(),
 			buyer_type=form_data["buyer_type"].strip(),
@@ -153,7 +150,7 @@ def buyer_create():
 			city=form_data["city"].strip(),
 			affiliation_start_date=form_data["affiliation_start_date"],
 			affiliation_status=status_true_false(form_data["affiliation_status"]),
-			user_id=user_id.id,
+			user_id=form_data["user_id"].split(' - ')[0] if form_data["user_id"] not in ['', None] else None,
 			note=form_data["note"].strip()
 		)
 
@@ -199,7 +196,7 @@ def buyer_view_history(_id):
 	# estraggo i certificati del consorzio e i capi acquistati
 	cons_list = buyer.cons_certs
 	head_list = []
-	if len(cons_list) > 0:
+	if cons_list:
 		cons_list = [cert.to_dict() for cert in cons_list]
 		for cert in cons_list:
 			_h = Head.query.get(cert["head_id"])
@@ -224,45 +221,20 @@ def buyer_update(_id):
 	"""Aggiorna dati Acquirente."""
 	from ..routes.routes_event import event_create
 
-	form = FormBuyerUpdate()
 	# recupero i dati del record
 	buyer = Buyer.query.get(_id)
+	form = FormBuyerUpdate(obj=buyer)
 
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
-		new_data = json.loads(json.dumps(request.form))
-		# print("BUYER_UPDATE_FORM_DATA_PASS:", json.dumps(form_data, indent=2))
+		new_data = FormBuyerUpdate(request.form).to_dict()
+		# print("BUYER_UPDATE_FORM_DATA_PASS:", json.dumps(new_data, indent=2))
 
 		previous_data = buyer.to_dict()
 		previous_data.pop("updated_at")
 		# print("BUYER_PREVIOUS_DATA", json.dumps(previous_data, indent=2))
-
-		buyer.buyer_name = new_data["buyer_name"]
-		buyer.buyer_type = new_data["buyer_type"]
-
-		buyer.email = not_empty(new_data["email"])
-		buyer.phone = not_empty(new_data["phone"])
-
-		buyer.address = new_data["address"]
-		buyer.cap = new_data["cap"]
-		buyer.city = new_data["city"]
-		buyer.full_address = address_mount(new_data["address"], new_data["cap"], new_data["city"])
-		buyer.coordinates = new_data["coordinates"]
-
-		buyer.affiliation_start_date = str_to_date(new_data["affiliation_start_date"])
-		buyer.affiliation_end_date = str_to_date(new_data["affiliation_end_date"])
-		buyer.affiliation_status = status_true_false(new_data["affiliation_status"])
-
-		if new_data["user_id"] not in ["", "-", None]:
-			buyer.user_id = int(new_data["user_id"].split(" - ")[0])
-		else:
-			buyer.user_id = None
-
-		buyer.note = not_empty(new_data["note"])
-		buyer.updated_at = datetime.now()
-		# print("NEW_DATA:", new_data)
 		try:
-			Buyer.update()
+			Buyer.update(_id, new_data)
 			flash("ACQUIRENTE aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -284,33 +256,16 @@ def buyer_update(_id):
 		_event = event_create(_event, buyer_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		form.buyer_name.data = buyer.buyer_name
-		form.buyer_type.data = buyer.buyer_type
-
-		form.email.data = buyer.email
-		form.phone.data = buyer.phone
-
-		form.address.data = buyer.address
-		form.cap.data = buyer.cap
-		form.city.data = buyer.city
-		form.coordinates.data = buyer.coordinates
-
-		form.affiliation_start_date.data = str_to_date(buyer.affiliation_start_date)
-		form.affiliation_end_date.data = str_to_date(buyer.affiliation_end_date)
-		form.affiliation_status.data = status_si_no(buyer.affiliation_status)
-
 		if buyer.user_id not in ["", None]:
 			_user = User.query.get(buyer.user_id)
 			form.user_id.data = str(buyer.user_id) + " - " + _user.username
-
-		form.note.data = buyer.note
+		# print("BUYER_:", form)
+		# print("BUYER_FORM:", json.dumps(form.to_dict(form), indent=2))
 
 		_info = {
 			'created_at': buyer.created_at,
 			'updated_at': buyer.updated_at,
 		}
-		# print("BUYER_:", form)
-		# print("BUYER_FORM:", json.dumps(form.to_dict(form), indent=2))
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 

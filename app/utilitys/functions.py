@@ -78,20 +78,24 @@ def token_admin_validate(func):
 			authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
 			if authenticated is None:
 				print("AUTHORIZATION_CHECK_FAIL_2")
-				return redirect(url_for('logout'))
+				msg = f"Non è stato passato un token valido, ripetere la login."
+				return redirect(url_for('logout', msg=msg))
 			elif authenticated.expires_at < datetime.now():
 				print("AUTHORIZATION_CHECK_FAIL_3")
-				return redirect(url_for('logout'))
+				msg = f"Il token è scaduto: {authenticated.expires_at}, ripetere la login."
+				return redirect(url_for('logout', msg=msg))
 			elif authenticated.admin_id in ["", None]:
 				print("AUTHORIZATION_CHECK_FAIL_4")
-				return redirect(url_for('logout'))
+				msg = f"Non è stato registrato nessun utente, effettuare la login."
+				return redirect(url_for('logout', msg=msg))
 			else:
 				print("AUTHORIZATION_CHECK_PASS")
 				# esegue la funzione
 				return func(*args, **kwargs)
 		else:
 			print("AUTHORIZATION_CHECK_FAIL_1")
-			return redirect(url_for('logout'))
+			msg = f'Per accedere devi prima effettuare la login.'
+			return redirect(url_for('logout', msg=msg))
 
 	return wrap
 
@@ -129,19 +133,19 @@ def buyer_log_in(form):
 def address_mount(address, cap, city):
 	"""Monta indirizzo completo."""
 	if address and cap and city:
-		full_address = f"{address} - {cap} - {city}"
+		full_address = f"{address.strip()} - {cap.strip()} - {city.strip()}"
 	elif address and cap:
-		full_address = f"{address} - {cap}"
+		full_address = f"{address.strip()} - {cap.strip()}"
 	elif address and city:
-		full_address = f"{address} - {city}"
+		full_address = f"{address.strip()} - {city.strip()}"
 	elif cap and city:
-		full_address = f"{cap} - {city}"
+		full_address = f"{cap.strip()} - {city.strip()}"
 	elif address:
-		full_address = address
+		full_address = address.strip()
 	elif city:
-		full_address = city
+		full_address = city.strip()
 	elif cap:
-		full_address = cap
+		full_address = cap.strip()
 	else:
 		full_address = None
 
@@ -184,9 +188,9 @@ def str_to_date(_str, _form="%Y-%m-%d"):
 
 def date_to_str(_date, _form="%Y-%m-%d"):
 	"""Converte datetime in stringa."""
-	if _date in [None, ""]:
+	if _date in [None, "None", "nan", ""]:
 		return None
-	elif _date not in [None, "None", "nan", ""] and isinstance(_date, datetime) or isinstance(_date, date):
+	elif isinstance(_date, datetime) or isinstance(_date, date):
 		return datetime.strftime(_date, _form)
 	else:
 		return _date

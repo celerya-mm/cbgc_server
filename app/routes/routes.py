@@ -1,9 +1,14 @@
+from datetime import datetime
+from uuid import uuid4
+
 from flask import current_app as app, flash, redirect, render_template, url_for, request, jsonify, make_response
 
-from ..app import session
+from ..app import session, db
 
+from ..models.accounts import Administrator
 from ..forms.forms import FormLogin
-from ..utilitys.functions import admin_log_in, buyer_log_in, token_buyer_validate
+from ..utilitys.functions import buyer_log_in, token_buyer_validate
+from ..utilitys.functions_accounts import psw_hash, __save_auth_token
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -11,18 +16,29 @@ def login():
 	"""Effettua la log-in."""
 	form = FormLogin()
 	if form.validate_on_submit():
-		# print(f"USER: {form.username.data}")
-		data = admin_log_in(form)
-		if data:
-			session.permanent = False
-			session["token_login"] = data["token"]
-			session["username"] = data["username"]
+		_admin = Administrator.query.filter_by(
+			username=form.username.data, password=psw_hash(str(form.password.data))
+		).first()
 
-			if data['psw_changed'] is True:
+		if _admin:
+			_tokens = _admin.auth_tokens.first()
+			if _tokens and _tokens.expires_at > datetime.now():
+				token = _tokens.token
+			else:
+				token = uuid4()
+				_auth_token = __save_auth_token(token, _admin.id)
+
+			session.permanent = False
+			session["token_login"] = token
+			session["username"] = _admin.username
+			session["user"] = _admin.to_dict()
+
+			db.session.close()
+			if _admin.psw_changed is True:
 				return redirect(url_for('cert_cons_view'))
 			else:
 				flash('Devi cambiare la password che ti è stata assegnata.')
-				return redirect(url_for('admin_update_password', _id=data['id']))
+				return redirect(url_for('admin_update_password', _id=_admin.id))
 		else:
 			flash("Invalid username or password. Please try again!", category="alert")
 			return render_template("login.html", form=form)
@@ -52,10 +68,12 @@ def login_buyer(cert_nr):
 
 
 @app.route("/logout/")
-def logout():
+def logout(msg=None):
 	"""Effettua il log-out ed elimina i dati della sessione."""
-	session.clear()
+	if msg:
+		flash(msg)
 	flash("Log-Out effettuato.")
+	session.clear()
 	return redirect(url_for('login'))
 
 

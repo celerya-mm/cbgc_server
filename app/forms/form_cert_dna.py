@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, SelectField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
@@ -40,8 +42,8 @@ class FormCertDnaCreate(FlaskForm):
 		validators=[DataRequired("Campo obbligatorio!")]
 	)
 
-	# head_id = SelectField("Capo", choices=list_head(), validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
-	# farmer_id = SelectField("Allevatore", choices=list_farmer(), validators=[DataRequired("Campo obbligatorio!")])
+	head_id = SelectField("Capo", choices=list_head(), validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
+	farmer_id = SelectField("Allevatore", choices=list_farmer(), validators=[DataRequired("Campo obbligatorio!")])
 
 	veterinarian = StringField('Veterinario', validators=[Length(max=50), Optional()])
 	note = StringField('Note Record', validators=[Length(max=255), Optional()])
@@ -120,20 +122,21 @@ class FormCertDnaUpdate(FlaskForm):
 
 	def to_dict(self):
 		"""Converte form in dict."""
-		from ..utilitys.functions import date_to_str, year_extract
+		from ..utilitys.functions import date_to_str, year_extract, not_empty
 
 		year = year_extract(self.dna_cert_date.data)
 
 		return {
+			'head_id': int(self.head_id.data.split(" - ")[0]),
+			'farmer_id': int(self.farmer_id.data.split(" - ")[0]),
+
 			'dna_cert_id': self.dna_cert_id.data,
 			'dna_cert_date': date_to_str(self.dna_cert_date.data),
 			'dna_cert_year': year,
-			'dna_cert_nr': f"{self.dna_cert_id.data}/{year}",
+			'dna_cert_nr': f"{self.dna_cert_id.data}/{str(year)}",
 
-			'veterinarian': self.veterinarian.data,
+			'veterinarian': not_empty(self.veterinarian.data),
 
-			'head_id:': self.head_id.data,
-			'farmer_id': self.farmer_id.data,
-
-			'note': self.note.data
+			'note': not_empty(self.note.data.strip()),
+			'updated_at': datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")
 		}

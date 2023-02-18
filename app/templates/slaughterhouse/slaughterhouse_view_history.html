@@ -18,7 +18,7 @@
         </h5>
         <h5>
             Stato Affiliazione
-            {% if form.affiliation_status == True %}
+            {% if form.affiliation_status == True or form.affiliation_status == "SI" %}
             <img src="{{ url_for('static', filename='icons/check_OK.svg') }}" alt="">
             {% else %}
             <img src="{{ url_for('static', filename='icons/check_KO.svg') }}" alt="">
@@ -26,16 +26,16 @@
         </h5>
         <div class="form-group">
             {% if form.affiliation_status != True and form.affiliation_status != "SI"%}
-            {% if form.affiliation_end_date == "vuoto" or form.affiliation_end_date == "None" %}
-            <span class="text-danger">
-                ATTENZIONE: manca la data di cessazione affiliazione.</span>
-            {% endif %}
+				{% if form.affiliation_end_date == "" or form.affiliation_end_date == None %}
+				<span class="text-danger">
+					ATTENZIONE: manca la data di cessazione affiliazione.</span>
+				{% endif %}
             {% endif %}
             {% if form.affiliation_status == True or form.affiliation_status == "SI"%}
-            {% if form.affiliation_end_date != "vuoto" and form.affiliation_end_date != "None" %}
-            <span class="text-danger">
-                ATTENZIONE: è presente la data di Fine Affiliazione ma lo stato è ancora "SI".</span>
-            {% endif %}
+				{% if form.affiliation_end_date != "" and form.affiliation_end_date != None %}
+				<span class="text-danger">
+					ATTENZIONE: è presente la data di Fine Affiliazione ma lo stato è ancora "SI".</span>
+				{% endif %}
             {% endif %}
         </div>
     </div>

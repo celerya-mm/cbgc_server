@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -8,8 +7,7 @@ from ..app import db, session
 from ..forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterhouseUpdate
 from ..models.heads import Head
 from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import (token_admin_validate, str_to_date, status_si_no, status_true_false,
-                                  address_mount, not_empty)
+from ..utilitys.functions import token_admin_validate, status_si_no
 
 VIEW = "/slaughterhouse/view/"
 VIEW_FOR = "slaughterhouse_view"
@@ -116,37 +114,19 @@ def slaughterhouse_update(_id):
 	"""Aggiorna dati Allevatore."""
 	from ..routes.routes_event import event_create
 
-	form = FormSlaughterhouseUpdate()
 	# recupero i dati del record
 	slaughterhouse = Slaughterhouse.query.get(int(_id))
+	form = FormSlaughterhouseUpdate(obj=slaughterhouse)
 
 	if form.validate_on_submit():
-		new_data = json.loads(json.dumps(request.form))
+		new_data = FormSlaughterhouseUpdate(request.form).to_dict()
+		# print("NEW_DATA:", json.dumps(new_data, indent=2))
 
 		previous_data = slaughterhouse.to_dict()
 		previous_data.pop("updated_at")
 
-		slaughterhouse.slaughterhouse = new_data["slaughterhouse"].strip()
-		slaughterhouse.slaughterhouse_code = new_data["slaughterhouse_code"].strip()
-
-		slaughterhouse.email = not_empty(new_data["email"].strip())
-		slaughterhouse.phone = not_empty(new_data["phone"].strip())
-
-		slaughterhouse.address = not_empty(new_data["address"].strip())
-		slaughterhouse.cap = not_empty(new_data["cap"].strip())
-		slaughterhouse.city = not_empty(new_data["city"].strip())
-		slaughterhouse.full_address = address_mount(new_data["address"], new_data["cap"], new_data["city"])
-		slaughterhouse.coordinates = not_empty(new_data["coordinates"].strip())
-
-		slaughterhouse.affiliation_start_date = str_to_date(new_data["affiliation_start_date"])
-		slaughterhouse.affiliation_end_date = str_to_date(new_data["affiliation_end_date"])
-		slaughterhouse.affiliation_status = status_true_false(new_data["affiliation_status"])
-
-		slaughterhouse.note = not_empty(new_data["note"])
-		slaughterhouse.updated_at = datetime.now()
-
 		try:
-			Slaughterhouse.update()
+			Slaughterhouse.update(_id, new_data)
 			flash("MACELLO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -167,22 +147,7 @@ def slaughterhouse_update(_id):
 		_event = event_create(_event, slaughterhouse_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
-		form.slaughterhouse.data = slaughterhouse.slaughterhouse
-		form.slaughterhouse_code.data = slaughterhouse.slaughterhouse_code
-
-		form.email.data = slaughterhouse.email
-		form.phone.data = slaughterhouse.phone
-
-		form.address.data = slaughterhouse.address
-		form.cap.data = slaughterhouse.cap
-		form.city.data = slaughterhouse.city
-		form.coordinates.data = slaughterhouse.coordinates
-
-		form.affiliation_start_date.data = str_to_date(slaughterhouse.affiliation_start_date)
-		form.affiliation_end_date.data = str_to_date(slaughterhouse.affiliation_end_date)
 		form.affiliation_status.data = status_si_no(slaughterhouse.affiliation_status)
-
-		form.note.data = slaughterhouse.note
 
 		_info = {
 			'created_at': slaughterhouse.created_at,

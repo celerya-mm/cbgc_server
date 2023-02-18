@@ -1,15 +1,14 @@
 import json
-from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
 from ..app import db, session
-from ..forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate, list_head, list_farmer
+from ..forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate
 from ..models.certificates_dna import CertificateDna
 from ..models.farmers import Farmer
 from ..models.heads import Head
-from ..utilitys.functions import token_admin_validate, year_extract, str_to_date, not_empty
+from ..utilitys.functions import token_admin_validate, not_empty
 
 VIEW = "/cert_dna/view/"
 VIEW_FOR = "cert_dna_view"
@@ -125,53 +124,21 @@ def cert_dna_update(_id):
 	"""Aggiorna dati Certificato DNA."""
 	from ..routes.routes_event import event_create
 
-	form = FormCertDnaUpdate()
 	# recupero i dati
 	_cert = CertificateDna.query.get(_id)
+	form = FormCertDnaUpdate(obj=_cert)
 
 	if form.validate_on_submit():
 		from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
 
-		new_data = json.loads(json.dumps(request.form))
+		new_data = FormCertDnaUpdate(request.form).to_dict()
+		print("NEW_DATA:", json.dumps(new_data, indent=2))
 
 		previous_data = _cert.to_dict()
 		previous_data.pop("updated_at")
 
-		if new_data["head_id"] not in list_head():
-			flash(f'Attenzione non è presente nessun Capo con ID: {new_data["head_id"]}')
-			_info = {
-				'created_at': _cert.created_at,
-				'updated_at': _cert.updated_at,
-			}
-			db.session.close()
-			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, h_id=_id)
-		else:
-			_cert.head_id = new_data["head_id"].split(" - ")[0]
-
-		if new_data["farmer_id"] not in list_farmer():
-			flash(f'Attenzione non è presente nessun Allevatore con ID: {new_data["farmer_id"]}')
-			_info = {
-				'created_at': _cert.created_at,
-				'updated_at': _cert.updated_at,
-			}
-			db.session.close()
-			return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR, h_id=_id)
-		else:
-			_cert.farmer_id = new_data["farmer_id"].split(" - ")[0]
-
-		_cert.dna_cert_id = new_data["dna_cert_id"]
-		_cert.dna_cert_date = str_to_date(new_data["dna_cert_date"])
-		_cert.dna_cert_year = year_extract(new_data["dna_cert_date"])
-		_cert.dna_cert_nr = f'{new_data["dna_cert_id"]}/{_cert.dna_cert_year}'
-
-		_cert.veterinarian = not_empty(new_data["veterinarian"].strip())
-
-		_cert.note = not_empty(new_data["note"].strip())
-		_cert.updated_at = datetime.now()
-
-		# print("NEW_DATA:", new_data)
 		try:
-			CertificateDna.update()
+			CertificateDna.update(_id, new_data)
 			flash("CERTIFICATO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -190,21 +157,15 @@ def cert_dna_update(_id):
 			"Previous_data": previous_data
 		}
 		_event = event_create(_event, cert_dna_id=_id)
-		return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"].split(" - ")[0]))
+		return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))
 	else:
 		# recupera Capo
 		_head = Head.query.get(_cert.head_id)
 		# recupera Allevatore
 		_farmer = Farmer.query.get(_cert.farmer_id)
 
-		form.dna_cert_id.data = _cert.dna_cert_id
-		form.dna_cert_date.data = _cert.dna_cert_date
-		form.veterinarian.data = _cert.veterinarian
-
 		form.head_id.data = f"{_head.id} - {_head.headset}"
 		form.farmer_id.data = f"{_farmer.id} - {_farmer.farmer_name}"
-
-		form.note.data = _cert.note
 
 		_info = {
 			'created_at': _cert.created_at,

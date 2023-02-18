@@ -9,11 +9,11 @@ from .events_db import EventDB  # noqa
 def mount_code(_id, year, var=None):
     """Monta il codice del certificato"""
     if _id and year and var:
-        code = f"{_id}{var}/{year}"
+        code = f"{_id}{var}/{str(year)}"
     elif _id in ["", None]:
         code = None
     else:
-        code = f"{_id}/{year}"
+        code = f"{_id}/{str(year)}"
     return code
 
 
@@ -148,8 +148,9 @@ class CertificateCons(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def update():  # noqa
+    def update(_id, data):  # noqa
         """Salva le modifiche a un record."""
+        CertificateCons.query.filter_by(id=_id).update(data)
         db.session.commit()
 
     def to_dict(self):
