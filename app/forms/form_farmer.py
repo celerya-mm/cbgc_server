@@ -4,17 +4,21 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from ..models.certificates_cons import CertificateCons  # noqa
-from ..models.certificates_dna import CertificateDna  # noqa
-from ..models.farmers import Farmer
-from ..models.heads import Head  # noqa
+from app.models.certificates_cons import CertificateCons  # noqa
+from app.models.certificates_dna import CertificateDna  # noqa
+from app.models.farmers import Farmer
+from app.models.heads import Head  # noqa
 
 
 def list_farmer():
-	records = Farmer.query.all()
-	_list = [x.to_dict() for x in records]
-	_list = [d["farmer_name"] for d in _list if "farmer_name" in d]
-	return _list
+	try:
+		records = Farmer.query.all()
+		_list = [x.to_dict() for x in records]
+		_list = [d["farmer_name"] for d in _list if "farmer_name" in d]
+		return _list
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 class FormFarmerCreate(FlaskForm):

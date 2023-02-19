@@ -6,17 +6,16 @@ import folium
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session, Message, mail, Config
-from ..forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
-from ..forms.form_account import FormUserResetPsw
-from ..forms.forms import FormPswReset
-from ..models.accounts import User
-from ..models.buyers import Buyer
-from ..models.heads import Head
-from ..models.tokens import AuthToken, calc_exp_token_reset_psw
-from ..utilitys.functions import (status_si_no, status_true_false, str_to_date, token_admin_validate, address_mount,
-                                  not_empty)
-from ..utilitys.functions_accounts import __generate_auth_token, psw_hash
+from app.app import db, session, Message, mail, Config
+from app.forms.form_buyer import FormBuyerCreate, FormBuyerUpdate
+from app.forms.form_account import FormUserResetPsw
+from app.forms.forms import FormPswReset
+from app.models.accounts import User
+from app.models.buyers import Buyer
+from app.models.heads import Head
+from app.models.tokens import AuthToken, calc_exp_token_reset_psw
+from app.utilitys.functions import status_true_false, token_admin_validate
+from app.utilitys.functions_accounts import __generate_auth_token, psw_hash
 
 VIEW = "/buyer/view/"
 VIEW_FOR = "buyer_view"
@@ -134,7 +133,7 @@ def buyer_view():
 @token_admin_validate
 def buyer_create():
 	"""Creazione Acquirente Consorzio."""
-	form = FormBuyerCreate()
+	form = FormBuyerCreate.new()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		# print("BUYER_FORM_DATA", json.dumps(form_data, indent=2))
@@ -171,10 +170,10 @@ def buyer_create():
 @token_admin_validate
 def buyer_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_user import HISTORY_FOR as USER_HISTORY
-	from ..routes.routes_cert_cons import HISTORY_FOR as CONS_HISTORY
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_user import HISTORY_FOR as USER_HISTORY
+	from app.routes.routes_cert_cons import HISTORY_FOR as CONS_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	# Interrogo il DB
 	buyer = Buyer.query.get(int(_id))
@@ -219,11 +218,11 @@ def buyer_view_history(_id):
 @token_admin_validate
 def buyer_update(_id):
 	"""Aggiorna dati Acquirente."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati del record
 	buyer = Buyer.query.get(_id)
-	form = FormBuyerUpdate(obj=buyer)
+	form = FormBuyerUpdate.new(obj=buyer)
 
 	if form.validate_on_submit():
 		# recupero i dati e li converto in dict
@@ -355,7 +354,7 @@ def buyer_reset_password(_id):
 			_user.psw_changed = True
 			_user.updated_at = datetime.now()
 
-			User.update()
+			User.update(_id, _user)
 
 			_event = {
 				"executor": session["username"],

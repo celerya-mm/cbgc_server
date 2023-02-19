@@ -4,12 +4,12 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..forms.form_account import FormAccountUpdate, FormUserSignup
-from ..forms.forms import FormPswReset
-from ..models.accounts import User
-from ..utilitys.functions import token_admin_validate
-from ..utilitys.functions_accounts import psw_hash
+from app.app import db, session
+from app.forms.form_account import FormAccountUpdate, FormUserSignup
+from app.forms.forms import FormPswReset
+from app.models.accounts import User
+from app.utilitys.functions import token_admin_validate
+from app.utilitys.functions_accounts import psw_hash
 
 VIEW = "/user/view/"
 VIEW_FOR = "user_view"
@@ -78,8 +78,8 @@ def user_create():
 @token_admin_validate
 def user_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	# Estraggo l' ID dell'utente corrente
 	session["id_user"] = _id
@@ -114,7 +114,7 @@ def user_view_history(_id):
 @token_admin_validate
 def user_update(_id):
 	"""Aggiorna dati Utente."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati
 	user = User.query.get(_id)
@@ -160,7 +160,7 @@ def user_update(_id):
 @app.route(RESET_PSW, methods=["GET", "POST"])
 def user_reset_password(_id):
 	"""Resetta password Utente Servizio dalla console di amministrazione."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	form = FormPswReset()
 	if form.validate_on_submit():

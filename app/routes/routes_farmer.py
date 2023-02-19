@@ -4,10 +4,10 @@ import folium
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
-from ..models.farmers import Farmer
-from ..utilitys.functions import token_admin_validate, status_true_false
+from app.app import db, session
+from app.forms.form_farmer import FormFarmerCreate, FormFarmerUpdate
+from app.models.farmers import Farmer
+from app.utilitys.functions import token_admin_validate, status_true_false
 
 VIEW = "/farmer/view/"
 VIEW_FOR = "farmer_view"
@@ -131,10 +131,10 @@ def farmer_create():
 @token_admin_validate
 def farmer_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_cert_cons import HISTORY_FOR as CONS_HISTORY
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY, CREATE_FOR as HEAD_CREATE
-	from ..routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_cert_cons import HISTORY_FOR as CONS_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY, CREATE_FOR as HEAD_CREATE
+	from app.routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	# Interrogo il DB
 	farmer = Farmer.query.get(int(_id))
@@ -170,7 +170,7 @@ def farmer_view_history(_id):
 @token_admin_validate
 def farmer_update(_id):
 	"""Aggiorna dati Allevatore."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati del record
 	farmer = Farmer.query.get(_id)

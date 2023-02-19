@@ -4,16 +4,20 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FloatField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
-from ..app import db
-from ..models.certificates_cons import CertificateCons, year_cert_calc, year_cert_calc_update, mount_code
+from app.app import db, cache
+from app.models.certificates_cons import CertificateCons, year_cert_calc, year_cert_calc_update, mount_code
 
 
 def list_cert():
-	records = CertificateCons.query.all()
-	_list = [x.to_dict() for x in records]
-	_list = [d["certificate_nr"] for d in _list]
-	db.session.close()
-	return _list
+	try:
+		records = CertificateCons.query.all()
+		_list = [x.to_dict() for x in records]
+		_list = [d["certificate_nr"] for d in _list]
+		db.session.close()
+		return _list
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 def list_farmer():
@@ -140,11 +144,11 @@ class FormCertConsCreate(FlaskForm):
 		], default="Da Emettere"
 	)
 
-	farmer_id = SelectField("Seleziona Allevatore", choices=list_farmer())
-	slaughterhouse_id = SelectField("Seleziona Macello", choices=list_slaughterhouses(), default="-")
-	buyer_id = SelectField("Seleziona Acquirente", choices=list_buyers(), default="-")
+	farmer_id = SelectField("Seleziona Allevatore")
+	slaughterhouse_id = SelectField("Seleziona Macello", default="-")
+	buyer_id = SelectField("Seleziona Acquirente", default="-")
 
-	head_id = SelectField("Seleziona Capo", choices=list_heads())
+	head_id = SelectField("Seleziona Capo")
 
 	note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
 	note = StringField('Note', validators=[Length(max=255)])
@@ -156,6 +160,17 @@ class FormCertConsCreate(FlaskForm):
 
 	def __str__(self):
 		return f'<CERT_CONSORZIO CREATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
+
+	@classmethod
+	def new(cls):
+		# Instantiate the form
+		form = cls()
+		# Update the choices
+		form.farmer_id.choices = list_farmer()
+		form.slaughterhouse_id.choices = list_slaughterhouses()
+		form.buyer_id.choices = list_buyers()
+		form.head_id.choices = list_heads()
+		return form
 
 	def validate_certificate_id(self, field):  # noqa
 		"""Valida campo certificato_id."""
@@ -253,10 +268,10 @@ class FormCertConsUpdate(FlaskForm):
 		]
 	)
 
-	head_id = SelectField("Sel. Capo", choices=list_heads())
-	farmer_id = SelectField("Sel. Allevatore", choices=list_farmer())
-	buyer_id = SelectField("Sel. Acquirente", choices=list_buyers())
-	slaughterhouse_id = SelectField("Sel. Macello", choices=list_slaughterhouses())
+	head_id = SelectField("Sel. Capo")
+	farmer_id = SelectField("Sel. Allevatore")
+	buyer_id = SelectField("Sel. Acquirente")
+	slaughterhouse_id = SelectField("Sel. Macello")
 
 	note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
 	note = StringField('Note', validators=[Length(max=255)])
@@ -268,6 +283,44 @@ class FormCertConsUpdate(FlaskForm):
 
 	def __str__(self):
 		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
+
+	@classmethod
+	def new(cls, obj):
+		# Instantiate the form
+		form = cls()
+
+		form.certificate_id.data = obj.certificate_id
+
+		form.certificate_var.data = obj.certificate_var
+		form.certificate_date.data = obj.certificate_date
+		form.certificate_year.data = obj.certificate_year
+
+		form.emitted.data = obj.emitted
+
+		form.cockade_id.data = obj.cockade_id
+		form.cockade_var.data = obj.cockade_var
+
+		form.sale_type.data = obj.sale_type
+		form.sale_quantity.data = obj.sale_quantity
+		form.sale_rest.data = obj.sale_rest
+
+		form.head_category.data = obj.head_category
+		form.head_age.data = obj.head_age
+		form.batch_number.data = obj.batch_number
+
+		form.invoice_nr.data = obj.invoice_nr
+		form.invoice_date.data = obj.invoice_date
+		form.invoice_status.data = obj.invoice_status
+
+		# Update the choices
+		form.farmer_id.choices = list_farmer()
+		form.slaughterhouse_id.choices = list_slaughterhouses()
+		form.buyer_id.choices = list_buyers()
+		form.head_id.choices = list_heads()
+
+		form.note_certificate.data = obj.note_certificate
+		form.note.data = obj.note
+		return form
 
 	def validate_invoice_status(self, field):  # noqa
 		"""Valida campo invoice_status."""

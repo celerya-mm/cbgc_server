@@ -4,8 +4,7 @@ from uuid import uuid4
 from email_validator import validate_email, EmailNotValidError
 from password_strength import PasswordPolicy
 
-from ..app import db
-from ..models.tokens import AuthToken
+from app.models.tokens import AuthToken
 
 
 def __generate_auth_token():

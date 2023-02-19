@@ -10,9 +10,9 @@ from jinja2.utils import htmlsafe_json_dumps
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-from ..app import session
-from ..models.tokens import AuthToken
-from ..var_ambient import variables as var
+from app.app import session
+from app.models.tokens import AuthToken
+from app.var_ambient import variables as var
 
 disable_warnings(InsecureRequestWarning)
 

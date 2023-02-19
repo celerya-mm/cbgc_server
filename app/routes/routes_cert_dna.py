@@ -3,12 +3,12 @@ import json
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate
-from ..models.certificates_dna import CertificateDna
-from ..models.farmers import Farmer
-from ..models.heads import Head
-from ..utilitys.functions import token_admin_validate, not_empty
+from app.app import db, session
+from app.forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate
+from app.models.certificates_dna import CertificateDna
+from app.models.farmers import Farmer
+from app.models.heads import Head
+from app.utilitys.functions import token_admin_validate, not_empty
 
 VIEW = "/cert_dna/view/"
 VIEW_FOR = "cert_dna_view"
@@ -31,8 +31,8 @@ UPDATE_HTML = "cert_dna/cert_dna_update.html"
 @token_admin_validate
 def cert_dna_view():
 	"""Visualizzo informazioni Certificato."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
 	# Estraggo la lista dei certificati DNA
 	_list = CertificateDna.query.all()
@@ -49,9 +49,9 @@ def cert_dna_view():
 @token_admin_validate
 def cert_dna_create(h_id, f_id, h_set):
 	"""Creazione Certificato DNA."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 
-	form = FormCertDnaCreate()
+	form = FormCertDnaCreate.new()
 
 	if form.validate_on_submit():
 		try:
@@ -83,9 +83,9 @@ def cert_dna_create(h_id, f_id, h_set):
 @token_admin_validate
 def cert_dna_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
 	# Estraggo l' ID dell'utente corrente
 	session["id_user"] = _id
@@ -122,11 +122,11 @@ def cert_dna_view_history(_id):
 @token_admin_validate
 def cert_dna_update(_id):
 	"""Aggiorna dati Certificato DNA."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati
 	_cert = CertificateDna.query.get(_id)
-	form = FormCertDnaUpdate(obj=_cert)
+	form = FormCertDnaUpdate.new(obj=_cert)
 
 	if form.validate_on_submit():
 		from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR

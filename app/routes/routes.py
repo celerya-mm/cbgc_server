@@ -3,12 +3,11 @@ from uuid import uuid4
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request, jsonify, make_response
 
-from ..app import session, db
-
-from ..models.accounts import Administrator
-from ..forms.forms import FormLogin
-from ..utilitys.functions import buyer_log_in, token_buyer_validate
-from ..utilitys.functions_accounts import psw_hash, __save_auth_token
+from app.app import session, db
+from app.forms.forms import FormLogin
+from app.models.accounts import Administrator
+from app.utilitys.functions import buyer_log_in, token_buyer_validate
+from app.utilitys.functions_accounts import psw_hash, __save_auth_token
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -70,10 +69,10 @@ def login_buyer(cert_nr):
 @app.route("/logout/")
 def logout(msg=None):
 	"""Effettua il log-out ed elimina i dati della sessione."""
+	session.clear()
 	if msg:
 		flash(msg)
 	flash("Log-Out effettuato.")
-	session.clear()
 	return redirect(url_for('login'))
 
 

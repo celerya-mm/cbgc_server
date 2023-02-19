@@ -6,7 +6,7 @@ import qrcode
 from flask import current_app as app, render_template
 
 from .functions import token_admin_validate
-from ..app import PATH_PROJECT as _path
+from app.app import PATH_PROJECT as _path
 
 # imposta path file's models docx (Windows)
 folders_models_docx = os.path.join(_path, "utilitys", "certificates_models_docx")

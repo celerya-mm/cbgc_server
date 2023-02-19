@@ -2,6 +2,7 @@ import os
 import secrets  # noqa
 
 from flask import Flask, session  # noqa
+from flask_caching import Cache
 from flask_mail import Mail, Message  # noqa
 from flask_migrate import Migrate
 from flask_misaka import Misaka
@@ -20,6 +21,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # carico parametri configurazione
 app.config.from_object(Config)
+
+# imposto la cache per l'app (simple_cache, time_out=180s)
+cache = Cache(app)
 
 # secret = secrets.token_urlsafe(32)
 app.secret_key = Config.SECRET_KEY

@@ -4,25 +4,34 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
-from ..models.accounts import Administrator, User
-from ..utilitys.functions import not_empty
-from ..utilitys.functions_accounts import psw_verify, psw_contain_usr
+from app.app import cache
+from app.models.accounts import Administrator, User
+from app.utilitys.functions import not_empty
+from app.utilitys.functions_accounts import psw_verify, psw_contain_usr
 
 
 def list_admin():
-	records = Administrator.query.all()
-	_list = [x.to_dict() for x in records]
-	_user = [d["username"] for d in _list if "username" in d]
-	_email = [d["email"] for d in _list if "email" in d]
-	return _user, _email
+	try:
+		records = Administrator.query.all()
+		_list = [x.to_dict() for x in records]
+		_user = [d["username"] for d in _list if "username" in d]
+		_email = [d["email"] for d in _list if "email" in d]
+		return _user, _email
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 def list_user():
-	records = User.query.all()
-	_list = [x.to_dict() for x in records]
-	_user = [d["username"] for d in _list if "username" in d]
-	_email = [d["email"] for d in _list if "email" in d]
-	return _user, _email
+	try:
+		records = User.query.all()
+		_list = [x.to_dict() for x in records]
+		_user = [d["username"] for d in _list if "username" in d]
+		_email = [d["email"] for d in _list if "email" in d]
+		return _user, _email
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 class FormAdminSignup(FlaskForm):
@@ -93,7 +102,7 @@ class FormUserSignup(FlaskForm):
 	new_password_2 = PasswordField('Conferma Password', validators=[
 		DataRequired("Campo obbligatorio!"), Length(min=8, max=64),
 		EqualTo('new_password_1',
-		        message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
+				message='Le due password inserite non corrispondono tra di loro. Riprova a inserirle!')])
 
 	psw_changed = BooleanField('Password cambiata')
 

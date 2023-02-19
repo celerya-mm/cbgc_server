@@ -4,12 +4,12 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..forms.form_account import FormAccountUpdate, FormAdminSignup
-from ..forms.forms import FormPswChange
-from ..models.accounts import Administrator
-from ..utilitys.functions import token_admin_validate, not_empty
-from ..utilitys.functions_accounts import psw_hash
+from app.app import db, session
+from app.forms.form_account import FormAccountUpdate, FormAdminSignup
+from app.forms.forms import FormPswChange
+from app.models.accounts import Administrator
+from app.utilitys.functions import token_admin_validate
+from app.utilitys.functions_accounts import psw_hash
 
 VIEW = "/admin/view/"
 VIEW_FOR = "admin_view"
@@ -86,7 +86,8 @@ def admin_create():
 def admin_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
 	print("ID:", _id)
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+
 	# Estraggo l'ID dell'utente amministratore corrente
 	session["id_admin"] = _id
 
@@ -108,7 +109,7 @@ def admin_view_history(_id):
 @token_admin_validate
 def admin_update(_id):
 	"""Aggiorna Utente Amministratore."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati
 	admin = Administrator.query.get(_id)
@@ -149,8 +150,6 @@ def admin_update(_id):
 			'created_at': admin.created_at,
 			'updated_at': admin.updated_at,
 		}
-		# print("ADMIN_UPDATE:", json.dumps(form.to_dict(form), indent=2))
-
 		db.session.close()
 		return render_template(UPDATE_HTML, form=form, id=_id, info=_info, history=HISTORY_FOR)
 
@@ -159,7 +158,7 @@ def admin_update(_id):
 @token_admin_validate
 def admin_update_password(_id):
 	"""Aggiorna password Utente Amministratore."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	form = FormPswChange()
 	if form.validate_on_submit():
@@ -185,8 +184,7 @@ def admin_update_password(_id):
 			administrator.psw_changed = True
 			administrator.updated_at = datetime.now()
 
-			Administrator.update()
-			db.session.close()
+			Administrator.update(_id, administrator)
 
 			_event = {
 				"username": session["username"],

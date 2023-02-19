@@ -4,17 +4,21 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from ..models.accounts import User
-from ..models.buyers import Buyer
-from ..models.certificates_cons import CertificateCons  # noqa
-from ..models.heads import Head  # noqa
+from app.models.accounts import User
+from app.models.buyers import Buyer
+from app.models.certificates_cons import CertificateCons  # noqa
+from app.models.heads import Head  # noqa
 
 
 def list_buyer():
-	records = Buyer.query.all()
-	_list = [x.to_dict() for x in records]
-	_list = [d["buyer_name"] for d in _list if "buyer_name" in d]
-	return _list
+	try:
+		records = Buyer.query.all()
+		_list = [x.to_dict() for x in records]
+		_list = [d["buyer_name"] for d in _list if "buyer_name" in d]
+		return _list
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 def list_user():
@@ -49,11 +53,19 @@ class FormBuyerCreate(FlaskForm):
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
 
-	user_id = SelectField("Assegna Utente", choices=list_user(), default="-", validators=[Optional()])
+	user_id = SelectField("Assegna Utente", default="-", validators=[Optional()])
 
 	note = StringField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("CREATE")
+
+	@classmethod
+	def new(cls):
+		# Instantiate the form
+		form = cls()
+		# Update the choices
+		form.user_id.choices = list_user()
+		return form
 
 	def __repr__(self):
 		return f'<BUYER CREATED - Rag. Sociale: {self.buyer_name.data}>'
@@ -91,11 +103,36 @@ class FormBuyerUpdate(FlaskForm):
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
 
-	user_id = SelectField("Utente Assegnato", choices=list_user(), validators=[Optional()])
+	user_id = SelectField("Utente Assegnato", validators=[Optional()])
 
 	note = StringField('Note', validators=[Length(max=255), Optional()])
 
 	submit = SubmitField("SAVE")
+
+	@classmethod
+	def new(cls, obj):
+		# Instantiate the form
+		form = cls()
+		form.buyer_name.data = obj.buyer_name
+		form.buyer_type.data = obj.buyer_type
+
+		form.email.data = obj.email
+		form.phone.data = obj.phone
+
+		form.address.data = obj.address
+		form.cap.data = obj.cap
+		form.city.data = obj.city
+		form.coordinates.data = obj.coordinates
+
+		form.affiliation_start_date.data = obj.affiliation_start_date
+		form.affiliation_end_date.data = obj.affiliation_end_date
+		form.affiliation_status.data = obj.affiliation_status
+
+		# Update the choices
+		form.user_id.choices = list_user()
+
+		form.note.data = obj.note
+		return form
 
 	def __repr__(self):
 		return f'<BUYER UPDATED - Rag. Sociale: {self.buyer_name.data}>'
@@ -107,7 +144,7 @@ class FormBuyerUpdate(FlaskForm):
 		"""Valida stato affiliazione in base alle date inserite."""
 		if field.data == "NO" and self.affiliation_end_date.data not in [None, ""]:
 			raise ValidationError("Attenzione lo Stato Affiliazione non può essere SI se è presente una data di "
-			                      "cessazione affiliazione.")
+								  "cessazione affiliazione.")
 
 	def validate_user_id(self, field):  # noqa
 		"""Valida campo farmer_id."""

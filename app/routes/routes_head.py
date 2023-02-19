@@ -3,13 +3,13 @@ import json
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..forms.form_head import FormHeadCreate, FormHeadUpdate
-from ..models.buyers import Buyer
-from ..models.farmers import Farmer
-from ..models.heads import Head
-from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import not_empty, str_to_date, dict_group_by, token_admin_validate
+from app.app import db, session
+from app.forms.form_head import FormHeadCreate, FormHeadUpdate
+from app.models.buyers import Buyer
+from app.models.farmers import Farmer
+from app.models.heads import Head
+from app.models.slaughterhouses import Slaughterhouse
+from app.utilitys.functions import not_empty, str_to_date, dict_group_by, token_admin_validate
 
 VIEW = "/head/view/"
 VIEW_FOR = "head_view"
@@ -32,7 +32,7 @@ UPDATE_HTML = "head/head_update.html"
 @token_admin_validate
 def head_view():
 	"""Visualizzo informazioni Capi."""
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
 	if request.method == 'POST':
 		birth_year = request.form.get('birth_year') or "*"
@@ -94,9 +94,9 @@ def head_view():
 @token_admin_validate
 def head_create(f_id):
 	"""Creazione Capo Consorzio."""
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
 
-	form = FormHeadCreate()
+	form = FormHeadCreate.new()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		new_head = Head(
@@ -129,12 +129,12 @@ def head_create(f_id):
 @token_admin_validate
 def head_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record del Capo."""
-	from ..routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY, CREATE_FOR as DNA_CREATE_FOR
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-	from ..routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY, CREATE_FOR as CONS_CREATE_FOR
-	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY, CREATE_FOR as DNA_CREATE_FOR
+	from app.routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY, CREATE_FOR as CONS_CREATE_FOR
+	from app.routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	head = Head.query.get(int(_id))
 	_head = head.to_dict()
@@ -184,12 +184,12 @@ def head_view_history(_id):
 @token_admin_validate
 def head_update(_id):
 	"""Aggiorna dati Capo."""
-	from ..routes.routes_cert_dna import CREATE_FOR as DNA_CREATE_FOR
-	from ..routes.routes_event import event_create
+	from app.routes.routes_cert_dna import CREATE_FOR as DNA_CREATE_FOR
+	from app.routes.routes_event import event_create
 
 	# recupero i dati del record
 	head = Head.query.get(int(_id))
-	form = FormHeadUpdate(obj=head)
+	form = FormHeadUpdate.new(obj=head)
 
 	if form.validate_on_submit():
 		new_data = FormHeadUpdate(request.form).to_dict()

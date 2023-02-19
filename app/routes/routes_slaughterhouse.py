@@ -3,11 +3,11 @@ import json
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterhouseUpdate
-from ..models.heads import Head
-from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import token_admin_validate, status_si_no
+from app.app import db, session
+from app.forms.form_slaughterhouse import FormSlaughterhouseCreate, FormSlaughterhouseUpdate
+from app.models.heads import Head
+from app.models.slaughterhouses import Slaughterhouse
+from app.utilitys.functions import token_admin_validate, status_si_no
 
 VIEW = "/slaughterhouse/view/"
 VIEW_FOR = "slaughterhouse_view"
@@ -75,10 +75,10 @@ def slaughterhouse_create():
 @token_admin_validate
 def slaughterhouse_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-	from ..routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	# Interrogo il DB
 	slaughterhouse = Slaughterhouse.query.filter_by(id=_id).first()
@@ -112,7 +112,7 @@ def slaughterhouse_view_history(_id):
 @token_admin_validate
 def slaughterhouse_update(_id):
 	"""Aggiorna dati Allevatore."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati del record
 	slaughterhouse = Slaughterhouse.query.get(int(_id))

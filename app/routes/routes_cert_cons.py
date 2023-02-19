@@ -4,17 +4,17 @@ import json
 from flask import current_app as app, flash, redirect, render_template, url_for, request, send_file
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session, Config
-from ..forms.form_cert_cons import FormCertConsCreate, FormCertConsUpdate, FormCertConsUpdateBuyer
-from ..models.accounts import User
-from ..models.buyers import Buyer
-from ..models.certificates_cons import CertificateCons
-from ..models.farmers import Farmer
-from ..models.heads import Head
-from ..models.slaughterhouses import Slaughterhouse
-from ..utilitys.functions import (token_admin_validate, token_buyer_validate, calc_age, status_si_no, date_to_str,
+from app.app import db, session, Config
+from app.forms.form_cert_cons import FormCertConsCreate, FormCertConsUpdate, FormCertConsUpdateBuyer
+from app.models.accounts import User
+from app.models.buyers import Buyer
+from app.models.certificates_cons import CertificateCons
+from app.models.farmers import Farmer
+from app.models.heads import Head
+from app.models.slaughterhouses import Slaughterhouse
+from app.utilitys.functions import (token_admin_validate, token_buyer_validate, calc_age, status_si_no, date_to_str,
 								  dict_group_by)
-from ..utilitys.functions_certificates import generate_qr_code, byte_to_pdf, html_to_pdf, pdf_to_byte
+from app.utilitys.functions_certificates import generate_qr_code, byte_to_pdf, html_to_pdf, pdf_to_byte
 
 VIEW = "/cert_cons/view/"
 VIEW_FOR = "cert_cons_view"
@@ -62,10 +62,10 @@ BUYER_UPDATE_HTML = "cert_cons/cert_cons_buyer_update.html"
 @token_admin_validate
 def cert_cons_view():
 	"""Visualizzo informazioni Capi."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
-	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
+	from app.routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
 
 	if request.method == 'POST':
 		year = request.form.get('year')
@@ -114,9 +114,9 @@ def cert_cons_view():
 @token_admin_validate
 def cert_cons_create(h_id, f_id, h_set):
 	"""Creazione Certificato Consorzio."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 
-	form = FormCertConsCreate()
+	form = FormCertConsCreate.new()
 	if form.validate_on_submit():
 		form_data = json.loads(json.dumps(request.form))
 		# print("HEAD_FORM_DATA", json.dumps(form_data, indent=2))
@@ -180,11 +180,11 @@ def cert_cons_create(h_id, f_id, h_set):
 @token_admin_validate
 def cert_cons_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record del Certificato."""
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
-	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
-	from ..routes.routes_event import HISTORY_FOR as EVENT_HISTORY
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
+	from app.routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY  # noqa
+	from app.routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY
+	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 
 	cert = CertificateCons.query.get(int(_id))
 	_cert = cert.to_dict()
@@ -228,11 +228,11 @@ def cert_cons_view_history(_id):
 @token_admin_validate
 def cert_cons_update(_id):
 	"""Aggiorna dati Capo."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	# recupero i dati del record
 	cert = CertificateCons.query.get(int(_id))
-	form = FormCertConsUpdate(obj=cert)
+	form = FormCertConsUpdate.new(obj=cert)
 
 	if form.validate_on_submit():
 		try:
@@ -312,7 +312,7 @@ def cert_cons_update(_id):
 @token_admin_validate
 def cert_cons_generate(_id):
 	"""Stampa il certificato in .pdf e carica come byte nel DB."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
 	cert = CertificateCons.query.get(int(_id))
 
@@ -519,11 +519,11 @@ def cert_cons_buyer_view_history(cert_nr):
 @token_buyer_validate
 def cert_cons_buyer_update(_id):
 	"""Aggiorna dati quantità residua in certificato."""
-	from ..routes.routes_event import event_create
+	from app.routes.routes_event import event_create
 
-	form = FormCertConsUpdateBuyer()
 	# recupero i dati del record
 	cert = CertificateCons.query.get(int(_id))
+	form = FormCertConsUpdateBuyer(obj=cert)
 
 	if form.validate_on_submit():
 		try:
@@ -563,8 +563,6 @@ def cert_cons_buyer_update(_id):
 			flash(err)
 			return redirect(url_for(BUYER_HISTORY_FOR, cert_nr=session["cert_nr"]))
 	else:
-		form.sale_rest.data = cert.sale_rest
-		form.prev.data = cert.sale_rest
 		session["cert_nr"] = cert.certificate_nr.replace("/", "_")
 
 		db.session.close()

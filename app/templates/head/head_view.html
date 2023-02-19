@@ -167,6 +167,7 @@
         });
     });
 
+
     // Impostazioni grafico ANNO NASCITA
     let birth_labels = JSON.parse({{ birth_labels | tojson }})
     // console.log("LABELS: ", birth_labels)
@@ -228,7 +229,7 @@
 
     // Impostazioni grafico ALLEVATORI
     let farmer_labels = JSON.parse({{ farmer_labels | tojson }})
-    console.log("LABELS: ", farmer_labels)
+    // console.log("LABELS: ", farmer_labels)
     let farmer_values = JSON.parse({{ farmer_values | tojson }})
     // console.log("VALUES: ", farmer_values)
     const data2 = {
@@ -254,7 +255,8 @@
     const ctx2 = document.getElementById('chart_farmers').getContext('2d');
     const myChart2 = new Chart(ctx2, config2);
 
-// Impostazioni grafico Conformità CASTRAZIONE
+
+	// Impostazioni grafico Conformità CASTRAZIONE
     let conf_labels = JSON.parse({{ conf_labels | tojson }})
     // console.log("LABELS: ", conf_labels)
     let conf_values = JSON.parse({{ conf_values | tojson }})
@@ -291,10 +293,5 @@
     };
     const ctx3 = document.getElementById('chart_conf').getContext('2d');
     const myChart3= new Chart(ctx3, config3);
-
-
-
-
-
 </script>
 {% endblock %}

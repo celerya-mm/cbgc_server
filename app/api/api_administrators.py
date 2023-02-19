@@ -2,10 +2,11 @@ from datetime import datetime
 
 from flask import request, jsonify, make_response, current_app as app
 
+from app.app import cache
 from app.models.accounts import Administrator
 from app.models.tokens import AuthToken
 from app.utilitys.functions_accounts import (is_valid_email, __save_auth_token, __generate_auth_token, psw_contain_usr,
-                                             psw_verify, psw_hash)
+											 psw_verify, psw_hash)
 
 
 @app.route('/api/admin_signup/', methods=['POST'])
@@ -97,6 +98,7 @@ def administrator_signup():
 
 
 @app.route('/api/admin_login/', methods=['POST'])
+@cache.cached(timeout=3600)  # cache per un minuto
 def administrator_login():
 	"""API login utente amministratore."""
 	data_received = request.get_json()
@@ -116,7 +118,7 @@ def administrator_login():
 					'expiration': datetime.strftime(record.expires_at, "%Y-%m-%d %H:%M:%S"),
 					'id': _admin.id,
 					'username': _admin.username,
-					'psw_changed':  _admin.psw_changed
+					'psw_changed': _admin.psw_changed
 				}
 			}
 			response = make_response(jsonify(data), 201)

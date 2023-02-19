@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, SelectField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
+from app.app import cache
 from app.models.farmers import Farmer
 from app.models.heads import Head
 
@@ -42,8 +43,8 @@ class FormCertDnaCreate(FlaskForm):
 		validators=[DataRequired("Campo obbligatorio!")]
 	)
 
-	head_id = SelectField("Capo", choices=list_head(), validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
-	farmer_id = SelectField("Allevatore", choices=list_farmer(), validators=[DataRequired("Campo obbligatorio!")])
+	head_id = SelectField("Capo", validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
+	farmer_id = SelectField("Allevatore", validators=[DataRequired("Campo obbligatorio!")])
 
 	veterinarian = StringField('Veterinario', validators=[Length(max=50), Optional()])
 	note = StringField('Note Record', validators=[Length(max=255), Optional()])
@@ -55,6 +56,16 @@ class FormCertDnaCreate(FlaskForm):
 
 	def __str__(self):
 		return f'<CERT_DNA - Nr: {self.dna_cert_id.data} del {self.dna_cert_date.data}>'
+
+	@classmethod
+	def new(cls):
+		# Instantiate the form
+		form = cls()
+
+		# Update the choices
+		form.farmer_id.choices = list_farmer()
+		form.head_id.choices = list_head()
+		return form
 
 	def validate_head_id(self, field):  # noqa
 		"""Valida campo farmer_id."""
@@ -95,8 +106,8 @@ class FormCertDnaUpdate(FlaskForm):
 		validators=[DataRequired("Campo obbligatorio!")]
 	)
 
-	head_id = SelectField("Capo", choices=list_head(), validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
-	farmer_id = SelectField("Allevatore", choices=list_farmer(), validators=[DataRequired("Campo obbligatorio!")])
+	head_id = SelectField("Capo", validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
+	farmer_id = SelectField("Allevatore", validators=[DataRequired("Campo obbligatorio!")])
 
 	veterinarian = StringField('Veterinario', validators=[Length(max=50), Optional()])
 	note = StringField('Note Record', validators=[Length(max=255), Optional()])
@@ -108,6 +119,22 @@ class FormCertDnaUpdate(FlaskForm):
 
 	def __str__(self):
 		return f'<CERT_DNA - Nr: {self.dna_cert_id.data} del {self.dna_cert_date.data}>'
+
+	@classmethod
+	def new(cls, obj):
+		# Instantiate the form
+		form = cls()
+
+		form.dna_cert_id.data = obj.dna_cert_id
+		form.dna_cert_date.data = obj.dna_cert_date
+
+		# Update the choices
+		form.farmer_id.choices = list_farmer()
+		form.head_id.choices = list_head()
+
+		form.veterinarian.data = obj.veterinarian
+		form.note.data = obj.note
+		return form
 
 	def validate_head_id(self, field):  # noqa
 		"""Valida campo farmer_id."""

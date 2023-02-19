@@ -4,17 +4,21 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
-from ..models.certificates_cons import CertificateCons  # noqa
-from ..models.certificates_dna import CertificateDna  # noqa
-from ..models.farmers import Farmer
-from ..models.heads import Head, verify_castration
+from app.models.certificates_cons import CertificateCons  # noqa
+from app.models.certificates_dna import CertificateDna  # noqa
+from app.models.farmers import Farmer
+from app.models.heads import Head, verify_castration
 
 
 def list_head():
-	records = Head.query.all()
-	_list = [x.to_dict() for x in records]
-	_list = [d["headset"] for d in _list if "headset" in d]
-	return _list
+	try:
+		records = Head.query.all()
+		_list = [x.to_dict() for x in records]
+		_list = [d["headset"] for d in _list if "headset" in d]
+		return _list
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 def list_farmer():
@@ -41,7 +45,7 @@ class FormHeadCreate(FlaskForm):
 	slaughter_date = DateField('Macellazione', format='%Y-%m-%d', validators=[Optional()])
 	sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
-	farmer_id = SelectField("Allevatore", choices=list_farmer())
+	farmer_id = SelectField("Allevatore")
 
 	note = StringField('Note', validators=[Length(max=255)])
 
@@ -52,6 +56,15 @@ class FormHeadCreate(FlaskForm):
 
 	def __str__(self):
 		return f'<HEAD CREATED - headset: {self.headset.data}>'
+
+	@classmethod
+	def new(cls):
+		# Instantiate the form
+		form = cls()
+
+		# Update the choices
+		form.farmer_id.choices = list_farmer()
+		return form
 
 	def validate_headset(self, field):  # noqa
 		"""Valida campo headset."""
@@ -75,7 +88,7 @@ class FormHeadUpdate(FlaskForm):
 	slaughter_date = DateField('Macellazione', format='%Y-%m-%d', validators=[Optional()])
 	sale_date = DateField('Vendita', format='%Y-%m-%d', validators=[Optional()])
 
-	farmer_id = SelectField("Allevatore", choices=list_farmer())
+	farmer_id = SelectField("Allevatore")
 
 	note = StringField('Note', validators=[Length(max=255)])
 
@@ -86,6 +99,24 @@ class FormHeadUpdate(FlaskForm):
 
 	def __str__(self):
 		return f'<HEAD UPDATED - headset: {self.headset.data}>'
+
+	@classmethod
+	def new(cls, obj):
+		# Instantiate the form
+		form = cls()
+
+		form.headset.data = obj.headset
+
+		form.birth_date.data = obj.birth_date
+		form.castration_date.data = obj.castration_date
+		form.slaughter_date.data = obj.slaughter_date
+		form.sale_date.data = obj.sale_date
+
+		# Update the choices
+		form.farmer_id.choices = list_farmer()
+
+		form.note.data = obj.note
+		return form
 
 	def validate_farmer_id(self, field):  # noqa
 		"""Valida campo farmer_id."""

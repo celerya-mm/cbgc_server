@@ -169,7 +169,7 @@
 
     // Impostazioni grafico ANNI
     let years_labels = JSON.parse({{ years_labels | tojson }})
-    console.log("LABELS: ", years_labels)
+    // console.log("LABELS: ", years_labels)
 
     let years_values = JSON.parse({{ years_values | tojson }})
     // console.log("VALUES: ", years_values)
@@ -202,7 +202,7 @@
 
     // Impostazioni grafico ALLEVATORI
     let farmers_labels = JSON.parse({{ farmers_labels | tojson }})
-    console.log("LABELS: ", farmers_labels)
+    // console.log("LABELS: ", farmers_labels)
 
     let farmers_values = JSON.parse({{ farmers_values | tojson }})
     // console.log("VALUES: ", farmers_values)
@@ -235,7 +235,7 @@
 
     // Impostazioni grafico ACQUIRENTI
     let buyers_labels = JSON.parse({{ buyers_labels | tojson }})
-    console.log("LABELS: ", buyers_labels)
+    // console.log("LABELS: ", buyers_labels)
 
     let buyers_values = JSON.parse({{ buyers_values | tojson }})
     // console.log("VALUES: ", buyers_values)
@@ -264,6 +264,5 @@
     };
     const ctx2 = document.getElementById('chart_buyers').getContext('2d');
     const myChart2 = new Chart(ctx2, config2);
-
 </script>
 {% endblock %}

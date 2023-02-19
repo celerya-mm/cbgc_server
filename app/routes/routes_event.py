@@ -4,17 +4,17 @@ from datetime import datetime
 from flask import current_app as app, flash, redirect, render_template, url_for
 from sqlalchemy.exc import IntegrityError
 
-from ..app import db, session
-from ..models.events_db import EventDB
+from app.app import db, session
+from app.models.events_db import EventDB
 
-from ..models.accounts import Administrator, User
-from ..models.farmers import Farmer
-from ..models.buyers import Buyer
-from ..models.slaughterhouses import Slaughterhouse
-from ..models.heads import Head
-from ..models.certificates_cons import CertificateCons
-from ..models.certificates_dna import CertificateDna
-from ..utilitys.functions import token_admin_validate, date_to_str
+from app.models.accounts import Administrator, User
+from app.models.farmers import Farmer
+from app.models.buyers import Buyer
+from app.models.slaughterhouses import Slaughterhouse
+from app.models.heads import Head
+from app.models.certificates_cons import CertificateCons
+from app.models.certificates_dna import CertificateDna
+from app.utilitys.functions import token_admin_validate, date_to_str
 
 HISTORY = "/event/view/history/<int:_id>/"
 HISTORY_FOR = "event_view_history"
@@ -62,14 +62,14 @@ def event_create(event, admin_id=None, user_id=None, farmer_id=None, buyer_id=No
 @token_admin_validate
 def event_view_history(_id):
 	"""Visualizzo la storia delle modifiche al record utente Administrator."""
-	from ..routes.routes_admin import HISTORY_FOR as ADMIN_HISTORY_FOR
-	from ..routes.routes_user import HISTORY_FOR as USER_HISTORY_FOR
-	from ..routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY_FOR
-	from ..routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY_FOR
-	from ..routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY_FOR
-	from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
-	from ..routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY_FOR
-	from ..routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY_FOR
+	from app.routes.routes_admin import HISTORY_FOR as ADMIN_HISTORY_FOR
+	from app.routes.routes_user import HISTORY_FOR as USER_HISTORY_FOR
+	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY_FOR
+	from app.routes.routes_buyer import HISTORY_FOR as BUYER_HISTORY_FOR
+	from app.routes.routes_slaughterhouse import HISTORY_FOR as SLAUG_HISTORY_FOR
+	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
+	from app.routes.routes_cert_cons import HISTORY_FOR as CERT_HISTORY_FOR
+	from app.routes.routes_cert_dna import HISTORY_FOR as DNA_HISTORY_FOR
 
 	# Estraggo l' ID dell'utente corrente
 	session["event_id"] = _id

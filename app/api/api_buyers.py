@@ -1,9 +1,7 @@
-import json
 from datetime import datetime
 
 from flask import request, jsonify, current_app as app, make_response
 
-from app.app import db
 from app.models.accounts import User
 from app.models.tokens import AuthToken
 from app.utilitys.functions_accounts import psw_hash, __generate_auth_token, __save_auth_token

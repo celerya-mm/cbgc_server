@@ -4,23 +4,31 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
-from ..models.certificates_cons import CertificateCons  # noqa
-from ..models.heads import Head  # noqa
-from ..models.slaughterhouses import Slaughterhouse
+from app.models.certificates_cons import CertificateCons  # noqa
+from app.models.heads import Head  # noqa
+from app.models.slaughterhouses import Slaughterhouse
 
 
 def list_slaughterhouse():
-	records = Slaughterhouse.query.all()
-	_list = [x.to_dict() for x in records]
-	_list = [d["slaughterhouse"] for d in _list if "slaughterhouse" in d]
-	return _list
+	try:
+		records = Slaughterhouse.query.all()
+		_list = [x.to_dict() for x in records]
+		_list = [d["slaughterhouse"] for d in _list if "slaughterhouse" in d]
+		return _list
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 def list_slaughterhouse_code():
-	records = Slaughterhouse.query.all()
-	_list = [x.to_dict() for x in records]
-	_list = [d["slaughterhouse_code"] for d in _list if "slaughterhouse_code" in d]
-	return _list
+	try:
+		records = Slaughterhouse.query.all()
+		_list = [x.to_dict() for x in records]
+		_list = [d["slaughterhouse_code"] for d in _list if "slaughterhouse_code" in d]
+		return _list
+	except Exception as err:
+		print('ERROR:', err)
+		return []
 
 
 class FormSlaughterhouseCreate(FlaskForm):
