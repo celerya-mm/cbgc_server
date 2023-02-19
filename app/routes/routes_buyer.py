@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 import folium
 
@@ -13,7 +13,7 @@ from app.forms.forms import FormPswReset
 from app.models.accounts import User
 from app.models.buyers import Buyer
 from app.models.heads import Head
-from app.models.tokens import AuthToken, calc_exp_token_reset_psw
+from app.models.tokens import AuthToken
 from app.utilitys.functions import status_true_false, token_admin_validate
 from app.utilitys.functions_accounts import __generate_auth_token, psw_hash
 
@@ -288,7 +288,7 @@ def buyer_email_reset_psw(cert_nr):
 		auth_token = AuthToken(
 			user_id=_user.id,
 			token=_token,
-			expires_at=calc_exp_token_reset_psw()
+			expires_at=datetime.now() + timedelta(minutes=15)
 		)
 
 		AuthToken.create(auth_token)

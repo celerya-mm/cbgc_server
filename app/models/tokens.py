@@ -3,19 +3,6 @@ from datetime import datetime, timedelta
 from ..app import db
 
 
-def calc_expiration_token():
-	"""Scadenza token per login gestionale."""
-	_exp = datetime.now() + timedelta(days=1)
-	_exp = _exp.replace(hour=0, minute=0, second=0, microsecond=0)
-	return _exp
-
-
-def calc_exp_token_reset_psw():
-	"""Imposta scadenza a 15 min."""
-	_exp = datetime.now() + timedelta(minutes=15)
-	return _exp
-
-
 class AuthToken(db.Model):
 	# Table
 	__tablename__ = 'auth_tokens'
@@ -34,7 +21,8 @@ class AuthToken(db.Model):
 	def __str__(self):
 		return f'<AuthToken: {self.id} - {self.token}>'
 
-	def __init__(self, token, admin_id=None, user_id=None, expires_at=calc_expiration_token()):
+	def __init__(self, token, admin_id=None, user_id=None,
+				 expires_at=(datetime.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)):
 		self.token = token
 		self.admin_id = admin_id or None
 		self.user_id = user_id or None
