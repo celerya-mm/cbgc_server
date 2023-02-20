@@ -279,15 +279,11 @@ def cert_cons_update(_id):
 
 		form.emitted.data = status_si_no(cert.emitted)
 
-		if form.head_age.data >= 46:
-			form.head_category.data = "Bue"
-		else:
-			form.head_category.data = "Manzo"
-
 		head = Head.query.get(cert.head_id)
 		form.head_id.data = f"{head.id} - {head.headset}"
 		if form.head_age.data in ["", None, 0]:
 			form.head_age.data = calc_age(head.birth_date, head.slaughter_date)
+			form.head_category.data = "Bue" if form.head_age.data >= 46 else "Manzo"
 
 		farmer = Farmer.query.get(cert.farmer_id)
 		form.farmer_id.data = f"{farmer.id} - {farmer.farmer_name}"
@@ -318,7 +314,7 @@ def cert_cons_generate(_id):
 
 	# genero QR-Code
 	nr_cert = str(cert.certificate_nr).replace("/", "_")
-	str_qr = f"{Config.LINK_URL}:62233/cert_cons/download_link/{nr_cert}/"
+	str_qr = f"{Config.LINK_URL}:{Config.PORT_URL}/cert_cons/download_link/{nr_cert}/"
 	# print("LINK_CERTIFICATO:", str_qr)
 
 	img_qrc = generate_qr_code(str_qr, cert.certificate_nr)

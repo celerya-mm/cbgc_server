@@ -16,7 +16,7 @@ from app.models.accounts import User
 from app.models.buyers import Buyer
 from app.models.heads import Head
 from app.models.auth_tokens import AuthToken
-from app.utilitys.functions import status_true_false, token_admin_validate
+from app.utilitys.functions import status_true_false, token_admin_validate, status_si_no
 from app.utilitys.functions_accounts import psw_hash
 
 VIEW = "/buyer/view/"
@@ -257,9 +257,11 @@ def buyer_update(_id):
 		_event = event_create(_event, buyer_id=_id)
 		return redirect(url_for(HISTORY_FOR, _id=_id))
 	else:
+		form.affiliation_status.data = status_si_no(buyer.affiliation_status)
+
 		if buyer.user_id not in ["", None]:
 			_user = User.query.get(buyer.user_id)
-			form.user_id.data = str(buyer.user_id) + " - " + _user.username
+			form.user_id.data = f'{str(buyer.user_id)} - {_user.username}'
 		# print("BUYER_:", form)
 		# print("BUYER_FORM:", json.dumps(form.to_dict(form), indent=2))
 

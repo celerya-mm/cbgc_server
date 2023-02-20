@@ -215,9 +215,7 @@ def status_true_false(_stat):
 
 def status_si_no(_str):
 	"""Verifica se il dato passato contiene True o False e li converte in SI o NO."""
-	if _str in ["SI", "si", "NO", "no"]:
-		return _str
-	elif _str is True:
+	if _str in ["SI", True]:
 		return "SI"
 	else:
 		return "NO"

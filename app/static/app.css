@@ -395,7 +395,8 @@ page[size="A4"] {
 
 .text-danger {
     font-family: 'Jost', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    line-height: 0.8rem;
 }
 
 th.sorting_asc,th.sorting_desc{

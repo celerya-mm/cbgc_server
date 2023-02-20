@@ -4,8 +4,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FloatField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
-from app.app import db, cache
+from app.app import db
 from app.models.certificates_cons import CertificateCons, year_cert_calc, year_cert_calc_update, mount_code
+from app.utilitys.functions import status_si_no
 
 
 def list_cert():
@@ -295,7 +296,7 @@ class FormCertConsUpdate(FlaskForm):
 		form.certificate_date.data = obj.certificate_date
 		form.certificate_year.data = obj.certificate_year
 
-		form.emitted.data = obj.emitted
+		form.emitted.choices = ["SI", "NO"]
 
 		form.cockade_id.data = obj.cockade_id
 		form.cockade_var.data = obj.cockade_var
@@ -304,7 +305,7 @@ class FormCertConsUpdate(FlaskForm):
 		form.sale_quantity.data = obj.sale_quantity
 		form.sale_rest.data = obj.sale_rest
 
-		form.head_category.data = obj.head_category
+		form.head_category.data = "Bue" if obj.head_age >= 46 else "Manzo"
 		form.head_age.data = obj.head_age
 		form.batch_number.data = obj.batch_number
 

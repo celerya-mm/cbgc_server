@@ -11,6 +11,7 @@ class Config:
 	SECRET_KEY = os.getenv('APP_SECRET_KEY', 'dev')
 	BASE_URL = os.getenv('APP_BASE_URL', '127.0.0.1')
 	LINK_URL = os.getenv('APP_URL_LINK')
+	PORT_URL = os.getenv('APP_URL_PORT')
 
 	CACHE_TYPE = os.getenv('CACHE_TYPE')
 	CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_DEFAULT_TIMEOUT')

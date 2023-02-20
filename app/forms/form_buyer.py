@@ -101,7 +101,7 @@ class FormBuyerUpdate(FlaskForm):
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
-	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
+	affiliation_status = SelectField("Affiliazione")
 
 	user_id = SelectField("Utente Assegnato", validators=[Optional()])
 
@@ -126,7 +126,7 @@ class FormBuyerUpdate(FlaskForm):
 
 		form.affiliation_start_date.data = obj.affiliation_start_date
 		form.affiliation_end_date.data = obj.affiliation_end_date
-		form.affiliation_status.data = obj.affiliation_status
+		form.affiliation_status.choices = ["SI", "NO"]
 
 		# Update the choices
 		form.user_id.choices = list_user()
