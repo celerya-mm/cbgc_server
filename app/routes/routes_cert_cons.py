@@ -319,7 +319,7 @@ def cert_cons_generate(_id):
 	# genero QR-Code
 	nr_cert = str(cert.certificate_nr).replace("/", "_")
 	str_qr = f"{Config.LINK_URL}:62233/cert_cons/download_link/{nr_cert}/"
-	print("LINK_CERTIFICATO:", str_qr)
+	# print("LINK_CERTIFICATO:", str_qr)
 
 	img_qrc = generate_qr_code(str_qr, cert.certificate_nr)
 	if img_qrc:
@@ -390,8 +390,9 @@ def cert_cons_generate(_id):
 			# assegno stringa in byte
 			cert.certificate_pdf = pdf_str
 			cert.emitted = True
+
 			try:
-				CertificateCons.update(_id, cert)
+				CertificateCons.update(_id, cert.to_dict())
 				flash("CERTIFICATO CREATO correttamente.")
 				previous_data["certificate_pdf"] = "Contenuto troppo lungo, rimossi i dati." \
 				                                   "Conterrebbe il certificato pdf convertito in byte."
@@ -536,7 +537,7 @@ def cert_cons_buyer_update(_id):
 			cert.updated_at = datetime.datetime.now()
 
 			try:
-				CertificateCons.update(_id, cert)
+				CertificateCons.update(_id, cert.to_dict())
 				flash(f"QUANTITA' RIMANENTE Attestato {cert.certificate_nr} aggiornata correttamente.")
 			except IntegrityError as err:
 				db.session.rollback()

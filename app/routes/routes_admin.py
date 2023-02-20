@@ -184,7 +184,7 @@ def admin_update_password(_id):
 			administrator.psw_changed = True
 			administrator.updated_at = datetime.now()
 
-			Administrator.update(_id, administrator)
+			Administrator.update(_id, administrator.to_dict())
 
 			_event = {
 				"username": session["username"],

@@ -182,7 +182,7 @@ def user_reset_password(_id):
 				_user.updated_at = datetime.now()
 				# print(f"PASSWORD utente {_user.username}.")
 
-				User.update(_id, _user)
+				User.update(_id, _user.to_dict())
 				flash(f"PASSWORD utente {_user.username} resettata correttamente!")
 				flash(f"Comunica all'utente la nuova password e che dovrà cambiarla dopo essersi registrato al portale.")
 
