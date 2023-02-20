@@ -47,6 +47,6 @@ with app.app_context():
 	from app.api import (api_administrators, api_buyers, api_certificates_cons, api_certificates_dna,  # noqa
 	                     api_farmers, api_heads, api_slaughterhouses, api_users)
 	from app.models import (accounts, buyers, certificates_dna, certificates_cons, events_db, farmers, heads,  # noqa
-	                        slaughterhouses, tokens)
+							slaughterhouses, auth_tokens)
 	from app.routes import (routes, routes_admin, routes_buyer, routes_head, routes_farmer, routes_event,  # noqa
 	                        routes_slaughterhouse, routes_user, routes_cert_dna, routes_cert_cons)

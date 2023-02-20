@@ -15,7 +15,7 @@ from app.forms.forms import FormPswReset
 from app.models.accounts import User
 from app.models.buyers import Buyer
 from app.models.heads import Head
-from app.models.tokens import AuthToken
+from app.models.auth_tokens import AuthToken
 from app.utilitys.functions import status_true_false, token_admin_validate
 from app.utilitys.functions_accounts import psw_hash
 

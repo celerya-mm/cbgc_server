@@ -3,7 +3,7 @@ from datetime import datetime
 from ..app import db
 
 # importazioni per relazioni "backref"
-from .tokens import AuthToken  # noqa
+from .auth_tokens import AuthToken  # noqa
 from .buyers import Buyer  # noqa
 from .events_db import EventDB  # noqa
 

@@ -3,7 +3,7 @@ import hashlib
 from email_validator import validate_email, EmailNotValidError
 from password_strength import PasswordPolicy
 
-from app.models.tokens import AuthToken
+from app.models.auth_tokens import AuthToken
 
 
 def __save_auth_token(token, admin_id=None, user_id=None):

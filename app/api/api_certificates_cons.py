@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import request, jsonify, current_app as app
 
 from app.models.certificates_cons import CertificateCons
-from app.models.tokens import AuthToken
+from app.models.auth_tokens import AuthToken
 
 
 @app.route('/api/certificates_cons/', methods=['GET'])

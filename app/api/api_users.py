@@ -5,7 +5,7 @@ from uuid import uuid4
 from flask import request, jsonify, make_response, current_app as app
 
 from app.models.accounts import User
-from app.models.tokens import AuthToken
+from app.models.auth_tokens import AuthToken
 from app.utilitys.functions_accounts import is_valid_email, __save_auth_token, psw_hash, psw_verify, psw_contain_usr
 
 

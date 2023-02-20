@@ -11,7 +11,7 @@ from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
 from app.app import session
-from app.models.tokens import AuthToken
+from app.models.auth_tokens import AuthToken
 from app.var_ambient import variables as var
 
 disable_warnings(InsecureRequestWarning)
