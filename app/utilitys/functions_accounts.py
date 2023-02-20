@@ -1,15 +1,9 @@
 import hashlib
-from uuid import uuid4
 
 from email_validator import validate_email, EmailNotValidError
 from password_strength import PasswordPolicy
 
 from app.models.tokens import AuthToken
-
-
-def __generate_auth_token():
-	"""Genero token UUID4."""
-	return str(uuid4())
 
 
 def __save_auth_token(token, admin_id=None, user_id=None):

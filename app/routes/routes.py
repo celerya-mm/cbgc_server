@@ -22,13 +22,13 @@ def login():
 		if _admin:
 			_tokens = _admin.auth_tokens.first()
 			if _tokens and _tokens.expires_at > datetime.now():
-				token = _tokens.token
+				token = str(_tokens.token)
 			else:
-				token = uuid4()
+				token = str(uuid4())
 				_auth_token = __save_auth_token(token, _admin.id)
 
 			session.permanent = False
-			session["token_login"] = token
+			session["token_login"] = str(token)
 			session["username"] = _admin.username
 			session["user"] = _admin.to_dict()
 
@@ -55,7 +55,7 @@ def login_buyer(cert_nr):
 		if data:
 			session.permanent = False
 			session['cert_nr'] = cert_nr
-			session["token_login"] = data["token"]
+			session["token_login"] = str(data["token"])
 			session["username"] = data["username"]
 			session['user'] = data
 			return redirect(url_for('cookie_consent', cert_nr=cert_nr))

@@ -1,12 +1,12 @@
 import hashlib
 from datetime import datetime
+from uuid import uuid4
 
 from flask import request, jsonify, make_response, current_app as app
 
 from app.models.accounts import User
 from app.models.tokens import AuthToken
-from app.utilitys.functions_accounts import (is_valid_email, __save_auth_token, __generate_auth_token, psw_hash,
-                                             psw_verify, psw_contain_usr)
+from app.utilitys.functions_accounts import is_valid_email, __save_auth_token, psw_hash, psw_verify, psw_contain_usr
 
 
 @app.route('/api/user_signup/', methods=['POST'])
@@ -115,7 +115,7 @@ def authenticate_user():
                 }
                 response = make_response(jsonify(data), 201)
             else:
-                token = __generate_auth_token()
+                token = str(uuid4())
                 save = __save_auth_token("", _user.id, token)
                 data = {
                     'status': 'success',

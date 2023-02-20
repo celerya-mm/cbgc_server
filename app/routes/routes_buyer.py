@@ -1,6 +1,8 @@
 import json
 from datetime import datetime, timedelta
 import re
+from uuid import uuid4
+
 import folium
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request
@@ -15,7 +17,7 @@ from app.models.buyers import Buyer
 from app.models.heads import Head
 from app.models.tokens import AuthToken
 from app.utilitys.functions import status_true_false, token_admin_validate
-from app.utilitys.functions_accounts import __generate_auth_token, psw_hash
+from app.utilitys.functions_accounts import psw_hash
 
 VIEW = "/buyer/view/"
 VIEW_FOR = "buyer_view"
@@ -283,7 +285,7 @@ def buyer_email_reset_psw(cert_nr):
 			return render_template("buyer/buyer_insert_email_reset_password.html", form=form, cert_nr=cert_nr)
 
 		# creo un token con validità 15 min
-		_token = __generate_auth_token()
+		_token = str(uuid4())
 
 		auth_token = AuthToken(
 			user_id=_user.id,

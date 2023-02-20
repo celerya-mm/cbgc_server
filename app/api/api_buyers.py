@@ -1,10 +1,11 @@
 from datetime import datetime
+from uuid import uuid4
 
 from flask import request, jsonify, current_app as app, make_response
 
 from app.models.accounts import User
 from app.models.tokens import AuthToken
-from app.utilitys.functions_accounts import psw_hash, __generate_auth_token, __save_auth_token
+from app.utilitys.functions_accounts import psw_hash, __save_auth_token
 
 
 @app.route('/api/buyer/login/', methods=['POST'])
@@ -22,7 +23,7 @@ def buyer_login():
 			data = {
 				'status': 'success',
 				'data': {
-					'token': record.token,
+					'token': str(record.token),
 					'expiration': datetime.strftime(record.expires_at, "%Y-%m-%d %H:%M:%S"),
 					'id': _user.id,
 					'username': _user.username,
@@ -31,7 +32,7 @@ def buyer_login():
 			}
 			response = make_response(jsonify(data), 201)
 		else:
-			token = __generate_auth_token()
+			token = str(uuid4())
 			save = __save_auth_token(token, user_id=_user.id)
 			data = {
 				'status': 'success',
@@ -46,9 +47,9 @@ def buyer_login():
 			response = make_response(jsonify(data), 201)
 	else:
 		data = {
-			'01_status': 'failed',
-			'02_message': f"Login fallita, non è presente nessun acquirente con username e password inseriti."
-			              f"Contatta il Consorzio per farti assegnare un utente.",
+			'status': 'failed',
+			'message': f"Login fallita, non è presente nessun acquirente con username e password inseriti."
+			           f"Contatta il Consorzio per farti assegnare un utente.",
 			'username': username
 		}
 		response = make_response(jsonify(data), 500)

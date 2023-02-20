@@ -1,12 +1,12 @@
 from datetime import datetime
+from uuid import uuid4
 
 from flask import request, jsonify, make_response, current_app as app
 
 from app.app import cache
 from app.models.accounts import Administrator
 from app.models.tokens import AuthToken
-from app.utilitys.functions_accounts import (is_valid_email, __save_auth_token, __generate_auth_token, psw_contain_usr,
-											 psw_verify, psw_hash)
+from app.utilitys.functions_accounts import is_valid_email, __save_auth_token, psw_contain_usr, psw_verify, psw_hash
 
 
 @app.route('/api/admin_signup/', methods=['POST'])
@@ -123,7 +123,7 @@ def administrator_login():
 			}
 			response = make_response(jsonify(data), 201)
 		else:
-			token = __generate_auth_token()
+			token = str(uuid4())
 			save = __save_auth_token(token, admin_id=_admin.id)
 			data = {
 				'status': 'success',
