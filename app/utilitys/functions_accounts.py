@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime, timedelta
 
 from email_validator import validate_email, EmailNotValidError
 from password_strength import PasswordPolicy
@@ -8,7 +9,12 @@ from app.models.auth_tokens import AuthToken
 
 def __save_auth_token(token, admin_id=None, user_id=None):
 	"""Salvo il token nel DB."""
-	auth_token = AuthToken(admin_id=admin_id, user_id=user_id, token=token)
+	if user_id:
+		expires_at = (datetime.now() + timedelta(minutes=15))
+	else:
+		expires_at = (datetime.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+	auth_token = AuthToken(admin_id=admin_id, user_id=user_id, token=token, expires_at=expires_at)
 	AuthToken.create(auth_token)
 	return auth_token
 

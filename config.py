@@ -1,7 +1,11 @@
 import os
 from dotenv import load_dotenv
 
+from flask_sqlalchemy import SQLAlchemy
+
 load_dotenv()
+
+db = SQLAlchemy()
 
 
 class Config:
@@ -11,7 +15,7 @@ class Config:
 	SECRET_KEY = os.getenv('APP_SECRET_KEY', 'dev')
 	BASE_URL = os.getenv('APP_BASE_URL', '127.0.0.1')
 	LINK_URL = os.getenv('APP_URL_LINK')
-	PORT_URL = os.getenv('APP_URL_PORT')
+	LINK_PORT = os.getenv('APP_URL_PORT')
 
 	CACHE_TYPE = os.getenv('CACHE_TYPE')
 	CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_DEFAULT_TIMEOUT')
@@ -34,7 +38,7 @@ class Config:
 	MAIL_USE_SSL = os.getenv('MAIL_USE_SSL')
 
 	# setup DB
-	SQLALCHEMY_TRACK_MODIFICATIONS = False
+	SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 	SQLALCHEMY_DATABASE_URI = 'postgresql://{username}:{password}@{host}:{port}/{db_name}'.format(
 		username=os.getenv('DB_USERNAME'),
 		password=os.getenv('DB_PASSWORD'),

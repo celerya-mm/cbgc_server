@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from ..app import db
 
@@ -21,8 +21,7 @@ class AuthToken(db.Model):
 	def __str__(self):
 		return f'<AuthToken: {self.id} - {self.token}>'
 
-	def __init__(self, token, admin_id=None, user_id=None,
-				 expires_at=(datetime.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)):
+	def __init__(self, token, admin_id=None, user_id=None, expires_at=None):
 		self.token = token
 		self.admin_id = admin_id or None
 		self.user_id = user_id or None

@@ -4,7 +4,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, SelectField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
-from app.app import cache
 from app.models.farmers import Farmer
 from app.models.heads import Head
 

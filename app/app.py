@@ -7,10 +7,10 @@ from flask_mail import Mail, Message  # noqa
 from flask_migrate import Migrate
 from flask_misaka import Misaka
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
+
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from config import Config
+from config import Config, db
 
 PATH_PROJECT = os.path.dirname(os.path.realpath(__file__))
 
@@ -22,7 +22,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 # carico parametri configurazione
 app.config.from_object(Config)
 
-# imposto la cache per l'app (simple_cache, time_out=180s)
+# imposto la cache per l'app (simple_cache, time_out=3600s)
 cache = Cache(app)
 
 # secret = secrets.token_urlsafe(32)
@@ -37,10 +37,10 @@ Misaka(app)
 # imposta sessione browser per server gunicorn
 Session(app)
 
-db = SQLAlchemy()
-migrate = Migrate(app, db)
-
+# impostazioni DB
 db.init_app(app)
+
+migrate = Migrate(app, db)
 migrate.init_app(app, db)
 
 with app.app_context():

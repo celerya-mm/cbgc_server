@@ -4,7 +4,6 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
-from app.app import cache
 from app.models.accounts import Administrator, User
 from app.utilitys.functions import not_empty
 from app.utilitys.functions_accounts import psw_verify, psw_contain_usr

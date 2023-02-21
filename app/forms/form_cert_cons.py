@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.app import db
 from app.models.certificates_cons import CertificateCons, year_cert_calc, year_cert_calc_update, mount_code
-from app.utilitys.functions import status_si_no
 
 
 def list_cert():
