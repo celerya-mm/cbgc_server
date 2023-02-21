@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from flask import request, jsonify, current_app as app, make_response
 
+from app.app import session
 from app.models.accounts import User
 from app.models.auth_tokens import AuthToken
 from app.utilitys.functions_accounts import psw_hash, __save_auth_token
@@ -11,6 +12,7 @@ from app.utilitys.functions_accounts import psw_hash, __save_auth_token
 @app.route('/api/buyer/login/', methods=['POST'])
 def buyer_login():
 	"""API login utente acquirente."""
+	session.clear()
 	data_received = request.get_json()
 	username = data_received['username'].replace(" ", "")
 	password = data_received['password'].replace(" ", "")

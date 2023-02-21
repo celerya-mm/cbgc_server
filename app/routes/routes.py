@@ -13,6 +13,7 @@ from app.utilitys.functions_accounts import psw_hash, __save_auth_token
 @app.route("/", methods=["GET", "POST"])
 def login():
 	"""Effettua la log-in."""
+	session.clear()
 	form = FormLogin()
 	if form.validate_on_submit():
 		_admin = Administrator.query.filter_by(
@@ -48,6 +49,7 @@ def login():
 @app.route("/buyer/login/<cert_nr>", methods=["GET", "POST"])
 def login_buyer(cert_nr):
 	"""Effettua la log-in."""
+	session.clear()
 	form = FormLogin()
 	if form.validate_on_submit():
 		# print(f"USER: {form.username.data}")

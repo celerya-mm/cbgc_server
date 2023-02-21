@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from flask import request, jsonify, make_response, current_app as app
 
-from app.app import cache
+from app.app import cache, session
 from app.models.accounts import Administrator
 from app.models.auth_tokens import AuthToken
 from app.utilitys.functions_accounts import is_valid_email, __save_auth_token, psw_contain_usr, psw_verify, psw_hash
@@ -101,6 +101,7 @@ def administrator_signup():
 @cache.cached(timeout=3600)  # cache per un minuto
 def administrator_login():
 	"""API login utente amministratore."""
+	session.clear()
 	data_received = request.get_json()
 	username = data_received['username'].replace(" ", "")
 	password = data_received['password'].replace(" ", "")
