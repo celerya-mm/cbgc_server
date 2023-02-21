@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from uuid import uuid4
 
@@ -13,12 +14,12 @@ from app.utilitys.functions_accounts import psw_hash, __save_auth_token
 @app.route("/", methods=["GET", "POST"])
 def login():
 	"""Effettua la log-in."""
-	session.clear()
 	form = FormLogin()
 	if form.validate_on_submit():
 		_admin = Administrator.query.filter_by(
 			username=form.username.data, password=psw_hash(str(form.password.data))
 		).first()
+		# print("ACCOUNT:", json.dumps(_admin.to_dict(), indent=2))
 
 		if _admin:
 			_tokens = _admin.auth_tokens.first()
@@ -35,21 +36,24 @@ def login():
 
 			db.session.close()
 			if _admin.psw_changed is True:
-				return redirect(url_for('cert_cons_view'))
+				print("LOG-IN: OK")
+				return redirect(url_for('farmer_view'))
 			else:
+				print("LOG-IN: OK")
 				flash('Devi cambiare la password che ti è stata assegnata.')
 				return redirect(url_for('admin_update_password', _id=_admin.id))
 		else:
+			print("LOG-IN: KO")
 			flash("Invalid username or password. Please try again!", category="alert")
 			return render_template("login.html", form=form)
 	else:
+		print("LOG-IN...")
 		return render_template("login.html", form=form)
 
 
 @app.route("/buyer/login/<cert_nr>", methods=["GET", "POST"])
 def login_buyer(cert_nr):
 	"""Effettua la log-in."""
-	session.clear()
 	form = FormLogin()
 	if form.validate_on_submit():
 		# print(f"USER: {form.username.data}")
