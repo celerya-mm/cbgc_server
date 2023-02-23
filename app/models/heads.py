@@ -29,16 +29,16 @@ class Head(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	headset = db.Column(db.String(14), index=False, unique=True, nullable=False)
 
-	birth_date = db.Column(db.DateTime, index=False, nullable=False)
+	birth_date = db.Column(db.Date, index=False, nullable=False)
 	birth_year = db.Column(db.Integer, index=False, nullable=False)
 
-	castration_date = db.Column(db.DateTime, index=False, nullable=True)
+	castration_date = db.Column(db.Date, index=False, nullable=True)
 	# True if (castration_date - castration_date) <= 8 month
 	castration_compliance = db.Column(db.Boolean, index=False, nullable=True)
 
-	slaughter_date = db.Column(db.DateTime, index=False, nullable=True)
+	slaughter_date = db.Column(db.Date, index=False, nullable=True)
 
-	sale_date = db.Column(db.DateTime, index=False, nullable=True)
+	sale_date = db.Column(db.Date, index=False, nullable=True)
 	sale_year = db.Column(db.Integer, index=False, nullable=True)
 
 	farmer_id = db.Column(db.Integer, db.ForeignKey('farmers.id'), nullable=True)

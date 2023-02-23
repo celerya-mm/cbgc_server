@@ -20,8 +20,8 @@ class Slaughterhouse(db.Model):
 	full_address = db.Column(db.String(55), index=False, unique=False, nullable=True)
 	coordinates = db.Column(db.String(100), index=False, unique=False, nullable=True)
 
-	affiliation_start_date = db.Column(db.DateTime, index=False, nullable=True)
-	affiliation_end_date = db.Column(db.DateTime, index=False, nullable=True)
+	affiliation_start_date = db.Column(db.Date, index=False, nullable=True)
+	affiliation_end_date = db.Column(db.Date, index=False, nullable=True)
 	affiliation_status = db.Column(db.Boolean, index=True, nullable=True)
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

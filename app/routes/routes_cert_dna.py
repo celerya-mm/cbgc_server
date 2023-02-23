@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from flask import current_app as app, flash, redirect, render_template, url_for, request
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +9,7 @@ from app.forms.form_cert_dna import FormCertDnaCreate, FormCertDnaUpdate
 from app.models.certificates_dna import CertificateDna
 from app.models.farmers import Farmer
 from app.models.heads import Head
-from app.utilitys.functions import token_admin_validate, not_empty
+from app.utilitys.functions import token_admin_validate, serialize_dict
 
 VIEW = "/cert_dna/view/"
 VIEW_FOR = "cert_dna_view"
@@ -51,19 +52,26 @@ def cert_dna_create(h_id, f_id, h_set):
 	"""Creazione Certificato DNA."""
 	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 
-	form = FormCertDnaCreate.new()
-
+	form = FormCertDnaCreate()
 	if form.validate_on_submit():
 		try:
-			form_data = json.loads(json.dumps(request.form))
+			form_data = FormCertDnaCreate(request.form).to_dict()
+			# print('CREATED:', json.dumps(form_data, indent=2, default=serialize_dict))
+
+			_time = datetime.now()
 
 			new_data = CertificateDna(
-				dna_cert_id=form_data["dna_cert_id"].strip(),
+				dna_cert_id=form_data["dna_cert_id"],
 				dna_cert_date=form_data["dna_cert_date"],
-				veterinarian=not_empty(form_data["veterinarian"].strip()),
+				dna_cert_year=form_data["dna_cert_year"],
+				dna_cert_nr=f'{form_data["dna_cert_id"]}/{form_data["dna_cert_year"]}',
+				dna_cert_pdf=None,
+				veterinarian=form_data["veterinarian"],
 				head_id=h_id,
-				farmer_id=int(f_id.split(" - ")[0]),
-				note=not_empty(form_data["note"].strip())
+				farmer_id=f_id.split(' - ')[0],
+				note=form_data["note"],
+				created_at=_time,
+				updated_at=_time
 			)
 
 			CertificateDna.create(new_data)
@@ -126,19 +134,20 @@ def cert_dna_update(_id):
 
 	# recupero i dati
 	_cert = CertificateDna.query.get(_id)
-	form = FormCertDnaUpdate.new(obj=_cert)
+	form = FormCertDnaUpdate.update(obj=_cert)
 
 	if form.validate_on_submit():
 		from ..routes.routes_head import HISTORY_FOR as HEAD_HISTORY_FOR
 
 		new_data = FormCertDnaUpdate(request.form).to_dict()
-		print("NEW_DATA:", json.dumps(new_data, indent=2))
+		# print("NEW_DATA:", json.dumps(new_data, indent=2))
 
 		previous_data = _cert.to_dict()
 		previous_data.pop("updated_at")
 
 		try:
 			CertificateDna.update(_id, new_data)
+			session.pop('farmer_id')
 			flash("CERTIFICATO aggiornato correttamente.")
 		except IntegrityError as err:
 			db.session.rollback()
@@ -166,6 +175,8 @@ def cert_dna_update(_id):
 
 		form.head_id.data = f"{_head.id} - {_head.headset}"
 		form.farmer_id.data = f"{_farmer.id} - {_farmer.farmer_name}"
+
+		session['farmer_id'] = int(_farmer.id)
 
 		_info = {
 			'created_at': _cert.created_at,

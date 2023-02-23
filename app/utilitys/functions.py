@@ -260,3 +260,13 @@ def dict_group_by(_dict, group_d, group_f=None, year=False):  # group_d deve ess
 		df.rename(columns={0: 'number'}, inplace=True)
 		dct = df.to_dict("records")
 	return dct
+
+
+def serialize_dict(obj):
+	"""Verifica presenza campi data e li converte in iso format."""
+	if isinstance(obj, datetime):
+		return obj.isoformat()
+	elif isinstance(obj, date):
+		return obj.isoformat()
+	else:
+		raise TypeError(f"{obj} is not JSON serializable")

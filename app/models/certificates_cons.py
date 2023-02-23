@@ -50,7 +50,7 @@ class CertificateCons(db.Model):
 
     certificate_id = db.Column(db.Integer, index=False, unique=False, nullable=False)
     certificate_var = db.Column(db.String(10), index=False, unique=False, nullable=True)
-    certificate_date = db.Column(db.DateTime, index=False, nullable=False)
+    certificate_date = db.Column(db.Date, index=False, nullable=False)
     certificate_year = db.Column(db.Integer, index=False, nullable=False, default=year_cert_calc())
 
     certificate_nr = db.Column(db.String(50), index=False, unique=True, nullable=False)
@@ -71,7 +71,7 @@ class CertificateCons(db.Model):
     batch_number = db.Column(db.String(50), index=False, unique=False, nullable=True)
 
     invoice_nr = db.Column(db.String(20), index=False, unique=False, nullable=True)
-    invoice_date = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+    invoice_date = db.Column(db.Date, index=False, unique=False, nullable=True)
     invoice_status = db.Column(db.String(20), index=False, unique=False, nullable=True)
 
     head_id = db.Column(db.Integer, db.ForeignKey('heads.id', ondelete='CASCADE'), nullable=False)
