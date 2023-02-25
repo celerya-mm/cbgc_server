@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, DateField
+from wtforms import StringField, SubmitField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
 from app.models.certificates_cons import CertificateCons  # noqa
@@ -17,7 +17,7 @@ def list_head():
 		_list = [d["headset"] for d in _list if "headset" in d]
 		return _list
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_HEAD:', err)
 		return []
 
 
@@ -29,7 +29,7 @@ def list_farmer():
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_FARMER', err)
 		pass
 	return _list
 
@@ -47,7 +47,7 @@ class FormHeadCreate(FlaskForm):
 
 	farmer_id = SelectField("Allevatore")
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -81,7 +81,7 @@ class FormHeadCreate(FlaskForm):
 
 class FormHeadUpdate(FlaskForm):
 	"""Form modifica dati Capo."""
-	headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=13, max=15)])
+	headset = StringField('Auricolare', validators=[DataRequired("Campo obbligatorio!"), Length(min=14, max=14)])
 
 	birth_date = DateField('Data Nascita', format='%Y-%m-%d')
 	castration_date = DateField('Castrazione', format='%Y-%m-%d', validators=[Optional()])
@@ -90,7 +90,7 @@ class FormHeadUpdate(FlaskForm):
 
 	farmer_id = SelectField("Allevatore")
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 
@@ -130,7 +130,7 @@ class FormHeadUpdate(FlaskForm):
 
 	def to_dict(self):
 		"""Converte form in dict."""
-		from ..utilitys.functions import date_to_str, year_extract
+		from ..utilitys.functions import date_to_str, year_extract, not_empty
 		return {
 			'headset': self.headset.data,
 
@@ -147,6 +147,6 @@ class FormHeadUpdate(FlaskForm):
 
 			'farmer_id': int(self.farmer_id.data.split(" - ")[0]),
 
-			'note': self.note.data,
+			'note': not_empty(self.note.data),
 			'updated_at': date_to_str(datetime.now(), "%Y-%m-%d %H:%M:%S")
 		}

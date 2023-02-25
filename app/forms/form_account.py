@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField
+from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from app.models.accounts import Administrator, User
@@ -17,7 +17,7 @@ def list_admin():
 		_email = [d["email"] for d in _list if "email" in d]
 		return _user, _email
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_ADMINISTRATORS:', err)
 		return []
 
 
@@ -29,14 +29,14 @@ def list_user():
 		_email = [d["email"] for d in _list if "email" in d]
 		return _user, _email
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_USERS:', err)
 		return []
 
 
 class FormAdminSignup(FlaskForm):
 	"""Form dati signup account Administrator."""
 	username = StringField(
-		'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default="")
+		'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=20)], default="")
 
 	new_password_1 = PasswordField('Nuova Password', validators=[
 		DataRequired("Campo obbligatorio!"), Length(min=8, max=64)])
@@ -47,13 +47,13 @@ class FormAdminSignup(FlaskForm):
 
 	psw_changed = BooleanField('Password cambiata')
 
-	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
-	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
+	name = StringField('Nome', validators=[Optional(), Length(min=3, max=50)])
+	last_name = StringField('Cognome', validators=[Optional(), Length(min=3, max=50)])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SIGNUP")
 
@@ -91,7 +91,7 @@ class FormAdminSignup(FlaskForm):
 class FormUserSignup(FlaskForm):
 	"""Form dati signup account Utente."""
 	username = StringField(
-		'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)], default=""
+		'Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=20)], default=""
 	)
 
 	# syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
@@ -105,13 +105,13 @@ class FormUserSignup(FlaskForm):
 
 	psw_changed = BooleanField('Password cambiata')
 
-	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
-	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
+	name = StringField('Nome', validators=[Optional(), Length(min=3, max=50)])
+	last_name = StringField('Cognome', validators=[Optional(), Length(min=3, max=50)])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()], default="+39 ")
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)], default="+39 ")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SIGNUP")
 
@@ -148,17 +148,17 @@ class FormUserSignup(FlaskForm):
 
 class FormAccountUpdate(FlaskForm):
 	"""Form di modifica dati account escluso password ed e-mail"""
-	username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=40)])
+	username = StringField('Username', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=20)])
 
 	# syd_user = StringField('User SYD', validators=[Length(min=3, max=25), Optional()])
 
-	name = StringField('Nome', validators=[Length(min=3, max=25), Optional()])
-	last_name = StringField('Cognome', validators=[Length(min=3, max=25), Optional()])
+	name = StringField('Nome', validators=[Optional(), Length(min=3, max=50)])
+	last_name = StringField('Cognome', validators=[Optional(), Length(min=3, max=50)])
 
 	email = EmailField('email', validators=[DataRequired("Campo obbligatorio!"), Email(), Length(max=80)])
-	phone = StringField('Telefono', validators=[Length(min=7, max=25), Optional()])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=25)])
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("MODIFICA")
 

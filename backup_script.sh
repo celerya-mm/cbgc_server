@@ -10,7 +10,7 @@
 
 ## aggiungere riga a crontab
 # vi /etc/config/crontab
-# 0 13 * * * /share/Multimedia/05_Documenti/Flask/cbgc_server/backup_script.sh
+# 0 13 * * * /share/Multimedia/05_Documenti/Flask/cbgc_server/backup_script.sh > /share/Multimedia/BK_PostgresDB/bue_grasso_web/backup_log.txt 2>&1
 
 ## riavviare il servizio crontab
 # crontab /etc/config/crontab && /etc/init.d/crond.sh restart

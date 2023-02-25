@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ..app import db
+from app.app import db
 
 # importazioni per relazioni "backref"
 from .heads import Head  # noqa

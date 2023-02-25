@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, SelectField
+from wtforms import StringField, SubmitField, DateField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.app import session
@@ -19,7 +19,7 @@ def list_head():
 				# print('HEAD:', f"{d['id']} - {d['headset']}")
 				_list.append(f"{str(d['id'])} - {d['headset']}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_HEAD:', err)
 		pass
 	return _list
 
@@ -32,7 +32,7 @@ def list_farmer():
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_FARMER:', err)
 		pass
 	return _list
 
@@ -45,8 +45,8 @@ class FormCertDnaCreate(FlaskForm):
 		validators=[DataRequired("Campo obbligatorio!")]
 	)
 
-	veterinarian = StringField('Veterinario', validators=[Length(max=50), Optional()])
-	note = StringField('Note Record', validators=[Length(max=255), Optional()])
+	veterinarian = StringField('Veterinario', validators=[Optional(), Length(max=50)])
+	note = StringField('Note Record', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -81,11 +81,11 @@ class FormCertDnaUpdate(FlaskForm):
 		validators=[DataRequired("Campo obbligatorio!")]
 	)
 
-	head_id = SelectField("Capo", validators=[DataRequired("Campo obbligatorio!"), Length(max=25)])
+	head_id = SelectField("Capo", validators=[DataRequired("Campo obbligatorio!")])
 	farmer_id = SelectField("Allevatore", validators=[DataRequired("Campo obbligatorio!")])
 
-	veterinarian = StringField('Veterinario', validators=[Length(max=50), Optional()])
-	note = StringField('Note Record', validators=[Length(max=255), Optional()])
+	veterinarian = StringField('Veterinario', validators=[Optional(), Length(max=50)])
+	note = TextAreaField('Note Record', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 

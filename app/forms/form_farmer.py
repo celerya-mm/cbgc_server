@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
+from wtforms import StringField, SubmitField, EmailField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.models.certificates_cons import CertificateCons  # noqa
@@ -17,7 +17,7 @@ def list_farmer():
 		_list = [d["farmer_name"] for d in _list if "farmer_name" in d]
 		return _list
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_FARMER:', err)
 		return []
 
 
@@ -27,25 +27,25 @@ class FormFarmerCreate(FlaskForm):
 		DataRequired("Campo obbligatorio!"),
 		Length(min=3, max=100)])
 
-	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
+	email = EmailField('Email', validators=[Optional(), Email(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=80)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=5, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
+	coordinates = StringField('Coordinate', validators=[Optional(), Length(max=100)])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 	affiliation_status = SelectField('Stato Affiliazione', choices=["SI", "NO"], default="SI")
 
-	stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
+	stable_code = StringField('Codice Stalla', validators=[Optional(), Length(min=3, max=25)])
 	stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"], default="Allevamento")
 	stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
 		"Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Carne")
 	stable_breeding_methods = SelectField("Modalità Allevamento", choices=[
 		"Estensivo", "Intensivo", "Transumante", "Brado"], default="Estensivo")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -66,15 +66,15 @@ class FormFarmerUpdate(FlaskForm):
 		DataRequired("Campo obbligatorio!"),
 		Length(min=3, max=100)])
 
-	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
+	email = EmailField('Email', validators=[Optional(), Email(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=80)])
 
-	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=5, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
+	coordinates = StringField('Coordinate', validators=[Optional(), Length(max=100)])
 
-	stable_code = StringField('Codice Stalla', validators=[Length(min=3, max=25), Optional()])
+	stable_code = StringField('Codice Stalla', validators=[Optional(), Length(min=3, max=25)])
 	stable_type = SelectField("Tipo Stalla", choices=["Allevamento", "Stalla di sosta"])
 	stable_productive_orientation = SelectField("Orientamento Produttivo", choices=[
 		"Da Latte", "Da Carne", "Da Latte e Da Carne"], default="Da Carne")
@@ -85,7 +85,7 @@ class FormFarmerUpdate(FlaskForm):
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
+from wtforms import StringField, SubmitField, EmailField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.models.accounts import User
@@ -14,10 +14,10 @@ def list_buyer():
 	try:
 		records = Buyer.query.all()
 		_list = [x.to_dict() for x in records]
-		_list = [d["buyer_name"] for d in _list if "buyer_name" in d]
+		_list = [d["buyer_name"].lower() for d in _list if "buyer_name" in d]
 		return _list
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_BUYERS:', err)
 		return []
 
 
@@ -29,7 +29,7 @@ def list_user():
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['username']}")
 	except Exception as err:
-		print(err)
+		print('ERROR_LIST_USER:', err)
 		pass
 	return _list
 
@@ -42,20 +42,20 @@ class FormBuyerCreate(FlaskForm):
 
 	buyer_type = SelectField("Tipo Acquirente", choices=["Macelleria", "Ristorante"], default="Ristorante")
 
-	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
+	email = EmailField('Email', validators=[Optional(), Email(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=80)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=5, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
+	coordinates = StringField('Coordinate', validators=[Optional(), Length(max=100)])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', default=datetime.now())
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="SI")
 
 	user_id = SelectField("Assegna Utente", default="-", validators=[Optional()])
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -75,7 +75,7 @@ class FormBuyerCreate(FlaskForm):
 
 	def validate_buyer_name(self, field):  # noqa
 		"""Valida Ragione Sociale."""
-		if field.data.strip() in list_buyer():
+		if field.data.strip().lower() in list_buyer():
 			raise ValidationError("E' già presente un ACQUIRENTE con la stessa Ragione Sociale.")
 
 	def validate_user_id(self, field):  # noqa
@@ -91,13 +91,13 @@ class FormBuyerUpdate(FlaskForm):
 	)
 	buyer_type = SelectField("Tipo Acquirente", choices=["-", "Macelleria", "Ristorante"])
 
-	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
+	email = EmailField('Email', validators=[Email(), Optional(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=80)])
 
-	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=5, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
+	coordinates = StringField('Coordinate', validators=[Optional(), Length(max=100)])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
@@ -105,7 +105,7 @@ class FormBuyerUpdate(FlaskForm):
 
 	user_id = SelectField("Utente Assegnato", validators=[Optional()])
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("SAVE")
 

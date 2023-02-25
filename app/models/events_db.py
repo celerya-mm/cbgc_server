@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.dialects.postgresql import JSONB
 
-from ..app import db
+from app.app import db
 
 
 class EventDB(db.Model):

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FloatField
+from wtforms import StringField, SubmitField, SelectField, DateField, IntegerField, FloatField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.app import db
@@ -16,7 +16,7 @@ def list_cert():
 		db.session.close()
 		return _list
 	except Exception as err:
-		print('ERROR:', err)
+		print('ERROR_LIST_CERTIFICATES:', err)
 		return []
 
 
@@ -32,7 +32,7 @@ def list_farmer():
 			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_FARMER:', err)
 		pass
 	return _list
 
@@ -49,7 +49,7 @@ def list_slaughterhouses():
 			_list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_SLAUGHTERHOUSE:', err)
 		pass
 	return _list
 
@@ -66,7 +66,7 @@ def list_buyers():
 			_list.append(f"{str(d['id'])} - {d['buyer_name']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_BUYERS:', err)
 		pass
 	return _list
 
@@ -83,7 +83,7 @@ def list_heads():
 			_list.append(f"{str(d['id'])} - {d['headset']}")
 	except Exception as err:
 		db.session.close()
-		print(err)
+		print('ERROR_LIST_HEAD:', err)
 		pass
 	return _list
 
@@ -112,7 +112,7 @@ class FormCertConsCreate(FlaskForm):
 	"""Form inserimento dati Certificato Consorzio."""
 	certificate_id = IntegerField('ID', validators=[DataRequired("Campo obbligatorio!")], default=calc_id())
 
-	certificate_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
+	certificate_var = StringField('Nota ID', validators=[Optional(), Length(max=10)])
 	certificate_date = DateField(
 		'Data', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d', default=datetime.now()
 	)
@@ -122,7 +122,7 @@ class FormCertConsCreate(FlaskForm):
 	emitted = SelectField("Emesso", choices=["SI", "NO"], default="NO")
 
 	cockade_id = IntegerField('ID Cocc.', validators=[Optional()], default=calc_id())
-	cockade_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
+	cockade_var = StringField('Nota ID', validators=[Optional(), Length(max=10)])
 
 	sale_type = SelectField(
 		"Tipo Vendita", validators=[DataRequired("Campo obbligatorio!")],
@@ -131,12 +131,12 @@ class FormCertConsCreate(FlaskForm):
 	sale_quantity = FloatField("Quantità (kg)", validators=[Optional()])
 
 	head_category = SelectField(
-		'Categoria', choices=["Bue", "Manzo"], validators=[Length(max=10), Optional()], default="Bue"
+		'Categoria', choices=["Bue", "Manzo"], validators=[Optional(), Length(max=10)], default="Bue"
 	)
 	head_age = IntegerField('Età', validators=[Optional()])
-	batch_number = StringField('Lotto NR', validators=[Length(max=20), Optional()])
+	batch_number = StringField('Lotto NR', validators=[Optional(), Length(max=20)])
 
-	invoice_nr = StringField('Fattura NR', validators=[Length(max=20), Optional()])
+	invoice_nr = StringField('Fattura NR', validators=[Optional(), Length(max=20)])
 	invoice_date = DateField('Fattura Data', format='%Y-%m-%d', validators=[Optional()])
 	invoice_status = SelectField(
 		'Fattura Stato', validators=[DataRequired("Campo obbligatorio!")], choices=[
@@ -150,8 +150,8 @@ class FormCertConsCreate(FlaskForm):
 
 	head_id = SelectField("Seleziona Capo")
 
-	note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
-	note = StringField('Note', validators=[Length(max=255)])
+	note_certificate = TextAreaField('Note Certificato', validators=[Optional(), Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -238,7 +238,7 @@ class FormCertConsUpdate(FlaskForm):
 	"""Form inserimento dati Certificato Consorzio."""
 	certificate_id = IntegerField('ID', validators=[DataRequired("Campo obbligatorio!")])
 
-	certificate_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
+	certificate_var = StringField('Nota ID', validators=[Optional(), Length(max=10)])
 	certificate_date = DateField(
 		'Data', validators=[DataRequired("Campo obbligatorio!")], format='%Y-%m-%d'
 	)
@@ -247,7 +247,7 @@ class FormCertConsUpdate(FlaskForm):
 	emitted = SelectField("Emesso", choices=["SI", "NO"])
 
 	cockade_id = IntegerField('ID Cocc.', validators=[Optional()])
-	cockade_var = StringField('Nota ID', validators=[Length(max=10), Optional()])
+	cockade_var = StringField('Nota ID', validators=[Optional(), Length(max=10)])
 
 	sale_type = SelectField(
 		"Tipo", validators=[DataRequired("Campo obbligatorio!")],
@@ -256,11 +256,11 @@ class FormCertConsUpdate(FlaskForm):
 	sale_quantity = FloatField("kg", validators=[Optional()])
 	sale_rest = FloatField("Rimanenti", validators=[Optional()])
 
-	head_category = SelectField('Categoria', choices=["Bue", "Manzo"], validators=[Length(max=10), Optional()])
+	head_category = SelectField('Categoria', choices=["Bue", "Manzo"], validators=[Optional(), Length(max=10)])
 	head_age = IntegerField('Età', validators=[Optional()])
-	batch_number = StringField('Lotto NR', validators=[Length(max=20), Optional()])
+	batch_number = StringField('Lotto NR', validators=[Optional(), Length(max=20)])
 
-	invoice_nr = StringField('Fattura Nr.', validators=[Length(max=20), Optional()])
+	invoice_nr = StringField('Fattura Nr.', validators=[Optional(), Length(max=20)])
 	invoice_date = DateField('Fattura Data', format='%Y-%m-%d', validators=[Optional()])
 	invoice_status = SelectField(
 		'Fattura Stato', validators=[DataRequired("Campo obbligatorio!")], choices=[
@@ -273,8 +273,8 @@ class FormCertConsUpdate(FlaskForm):
 	buyer_id = SelectField("Sel. Acquirente")
 	slaughterhouse_id = SelectField("Sel. Macello")
 
-	note_certificate = StringField('Note Certificato', validators=[Length(max=255)])
-	note = StringField('Note', validators=[Length(max=255)])
+	note_certificate = TextAreaField('Note Certificato', validators=[Optional(), Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("Update")
 
@@ -342,6 +342,8 @@ class FormCertConsUpdate(FlaskForm):
 		from ..utilitys.functions import date_to_str, status_true_false, not_empty
 
 		certificate_year = year_cert_calc_update(self.certificate_date.data)
+		slaughterhouse_id = self.slaughterhouse_id.data.split(' - ')[0] \
+			if self.slaughterhouse_id.data not in ['', '-', None] else None
 
 		return {
 			'certificate_id': self.certificate_id.data,
@@ -372,7 +374,7 @@ class FormCertConsUpdate(FlaskForm):
 			'head_id': self.head_id.data.split(' - ')[0] if self.head_id.data not in ['', '-', None] else None,
 			'buyer_id': self.buyer_id.data.split(' - ')[0] if self.buyer_id.data not in ['', '-', None] else None,
 			'farmer_id': self.farmer_id.data.split(' - ')[0] if self.farmer_id.data not in ['', '-', None] else None,
-			'slaughterhouse_id': self.slaughterhouse_id.data.split(' - ')[0] if self.slaughterhouse_id.data not in ['', '-', None] else None,
+			'slaughterhouse_id': slaughterhouse_id,
 
 			'note_certificate': not_empty(self.note_certificate.data),
 			'note': not_empty(self.note.data),

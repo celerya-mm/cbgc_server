@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ..app import db
+from app.app import db
 
 
 class Slaughterhouse(db.Model):

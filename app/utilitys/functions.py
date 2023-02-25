@@ -77,15 +77,15 @@ def token_admin_validate(func):
 			# controlla validità token
 			authenticated = AuthToken.query.filter_by(token=session["token_login"]).first()
 			if authenticated is None:
-				print("AUTHORIZATION_CHECK_FAIL_2")
+				print("AUTHORIZATION_CHECK_FAIL: no valid token.")
 				msg = f"Non è stato passato un token valido, ripetere la login."
 				return redirect(url_for('logout', msg=msg))
 			elif authenticated.expires_at < datetime.now():
-				print("AUTHORIZATION_CHECK_FAIL_3")
+				print("AUTHORIZATION_CHECK_FAIL: token is expired.")
 				msg = f"Il token è scaduto: {authenticated.expires_at}, ripetere la login."
 				return redirect(url_for('logout', msg=msg))
 			elif authenticated.admin_id in ["", None]:
-				print("AUTHORIZATION_CHECK_FAIL_4")
+				print("AUTHORIZATION_CHECK_FAIL: no user_admin returned.")
 				msg = f"Non è stato registrato nessun utente, effettuare la login."
 				return redirect(url_for('logout', msg=msg))
 			else:
@@ -93,7 +93,7 @@ def token_admin_validate(func):
 				# esegue la funzione
 				return func(*args, **kwargs)
 		else:
-			print("AUTHORIZATION_CHECK_FAIL_1")
+			print("AUTHORIZATION_CHECK_FAIL: no token passed.")
 			msg = f'Per accedere devi prima effettuare la login.'
 			return redirect(url_for('logout', msg=msg))
 
@@ -107,7 +107,7 @@ def admin_log_in(form):
 	headers = {'Content-Type': 'application/json'}
 	response = requests.request("POST", url, headers=headers, data=payload, verify=False)
 	try:
-		print("RESPONSE:", response.text)
+		# print("RESPONSE:", response.text)
 		_resp = json.loads(response.text)
 		return _resp["data"]
 	except Exception as err:
@@ -122,7 +122,7 @@ def buyer_log_in(form):
 	headers = {'Content-Type': 'application/json'}
 	response = requests.request("POST", url, headers=headers, data=payload, verify=False)
 	try:
-		print("RESPONSE:", response.text)
+		# print("RESPONSE:", response.text)
 		_resp = json.loads(response.text)
 		return _resp["data"]
 	except Exception as err:
@@ -201,7 +201,6 @@ def not_empty(_v):
 	if _v in ["", "-", None, 0]:
 		return None
 	else:
-		_v = str(_v).strip()
 		return _v
 
 
@@ -228,14 +227,14 @@ def calc_age(birth, slaught):  # noqa
 	if isinstance(slaught, str):
 		slaught = datetime.strptime(slaught, '%Y-%m-%d')  # noqa
 
-	print("BIRTH:", birth, "SLAUGHT:", slaught)
+	# print("BIRTH:", birth, "SLAUGHT:", slaught)
 	difference = relativedelta(slaught, birth)
 	if difference.years > 0:
 		months = difference.years * 12
 		months = difference.months + months
 	else:
 		months = difference.months
-	print("MESI:", months)
+	# print("MESI:", months)
 	return months
 
 

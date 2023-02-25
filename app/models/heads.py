@@ -1,7 +1,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from ..app import db
+from app.app import db
 
 # importazioni per relazioni "backref"
 from .events_db import EventDB  # noqa

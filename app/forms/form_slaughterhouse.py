@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, EmailField, SelectField, DateField
+from wtforms import StringField, SubmitField, EmailField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
 from app.models.certificates_cons import CertificateCons  # noqa
@@ -13,22 +13,12 @@ def list_slaughterhouse():
 	try:
 		records = Slaughterhouse.query.all()
 		_list = [x.to_dict() for x in records]
-		_list = [d["slaughterhouse"] for d in _list if "slaughterhouse" in d]
-		return _list
+		_list = [d["slaughterhouse"].lower() for d in _list if "slaughterhouse" in d]
+		_list_code = [d["slaughterhouse_code"] for d in _list if "slaughterhouse" in d]
+		return _list, _list_code
 	except Exception as err:
-		print('ERROR:', err)
-		return []
-
-
-def list_slaughterhouse_code():
-	try:
-		records = Slaughterhouse.query.all()
-		_list = [x.to_dict() for x in records]
-		_list = [d["slaughterhouse_code"] for d in _list if "slaughterhouse_code" in d]
-		return _list
-	except Exception as err:
-		print('ERROR:', err)
-		return []
+		print('ERROR_LIST_SLAUGHTERHOUSE:', err)
+		return [], []
 
 
 class FormSlaughterhouseCreate(FlaskForm):
@@ -37,20 +27,20 @@ class FormSlaughterhouseCreate(FlaskForm):
 		'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
 	)
 
-	slaughterhouse_code = StringField('Codice Macello', validators=[Length(max=20), Optional()])
+	slaughterhouse_code = StringField('Codice Macello', validators=[Optional(), Length(max=20)])
 
-	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()], default="+39 ")
+	email = EmailField('Email', validators=[Optional(), Email(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=80)], default="+39 ")
 
-	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=5, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
+	coordinates = StringField('Coordinate', validators=[Optional(), Length(max=100)])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()], default="")
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"], default="NO")
 
-	note = StringField('Note', validators=[Length(max=255), Optional()])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -61,11 +51,11 @@ class FormSlaughterhouseCreate(FlaskForm):
 		return f'<SLAUGHTERHOUSE CREATED - Rag. Sociale: {self.slaughterhouse.data}>'
 
 	def validate_slaughterhouse(self, field):  # noqa
-		if self.slaughterhouse.data.strip() in list_slaughterhouse():
+		if self.slaughterhouse.data.strip().lower() in list_slaughterhouse()[0]:
 			raise ValidationError("E' già presente un MACELLO con la stessa Ragione Sociale.")
 
 	def validate_slaughterhouse_code(self, field):  # noqa
-		if self.slaughterhouse_code.data.strip() in list_slaughterhouse_code():
+		if self.slaughterhouse_code.data.strip() in list_slaughterhouse()[1]:
 			raise ValidationError("E' già presente un MACELLO con lo stesso codice.")
 
 
@@ -75,21 +65,21 @@ class FormSlaughterhouseUpdate(FlaskForm):
 		'Ragione Sociale', validators=[DataRequired("Campo obbligatorio!"), Length(min=3, max=100)]
 	)
 
-	slaughterhouse_code = StringField('Codice Macello', validators=[Length(max=20), Optional()])
+	slaughterhouse_code = StringField('Codice Macello', validators=[Optional(), Length(max=20)])
 
-	email = EmailField('Email', validators=[Email(), Length(max=80), Optional()])
-	phone = StringField('Telefono', validators=[Length(min=7, max=80), Optional()])
+	email = EmailField('Email', validators=[Optional(), Email(), Length(max=80)])
+	phone = StringField('Telefono', validators=[Optional(), Length(min=7, max=80)])
 
-	address = StringField('Indirizzo', validators=[Length(min=5, max=255), Optional()])
-	cap = StringField('CAP', validators=[Length(min=5, max=5), Optional()])
-	city = StringField('Città', validators=[Length(min=3, max=55), Optional()])
-	coordinates = StringField('Coordinate', validators=[Length(max=100), Optional()])
+	address = StringField('Indirizzo', validators=[Optional(), Length(min=5, max=150)])
+	cap = StringField('CAP', validators=[Optional(), Length(min=5, max=5)])
+	city = StringField('Città', validators=[Optional(), Length(min=3, max=55)])
+	coordinates = StringField('Coordinate', validators=[Optional(), Length(max=100)])
 
 	affiliation_start_date = DateField('Data affiliazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_end_date = DateField('Cessazione', format='%Y-%m-%d', validators=[Optional()])
 	affiliation_status = SelectField("Affiliazione", choices=["SI", "NO"])
 
-	note = StringField('Note', validators=[Length(max=255)])
+	note = TextAreaField('Note', validators=[Optional(), Length(max=255)])
 
 	submit = SubmitField("CREATE")
 
@@ -104,7 +94,7 @@ class FormSlaughterhouseUpdate(FlaskForm):
 		from ..utilitys.functions import date_to_str, status_true_false, address_mount, not_empty
 		return {
 			'slaughterhouse': self.slaughterhouse.data.strip(),
-			'slaughterhouse_code': self.slaughterhouse_code.data.strip(),
+			'slaughterhouse_code': not_empty(self.slaughterhouse_code.data.strip()),
 
 			'email': not_empty(self.email.data),
 			'phone': not_empty(self.phone.data),
