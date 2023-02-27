@@ -133,17 +133,17 @@ def buyer_log_in(form):
 def address_mount(address, cap, city):
 	"""Monta indirizzo completo."""
 	if address and cap and city:
-		full_address = f"{address.strip()} - {cap.strip()} - {city.strip()}"
+		full_address = f"{address.strip().replace('  ', ' ')} - {cap.strip()} - {city.strip().replace('  ', ' ')}"
 	elif address and cap:
-		full_address = f"{address.strip()} - {cap.strip()}"
+		full_address = f"{address.strip().replace('  ', ' ')} - {cap.strip()}"
 	elif address and city:
-		full_address = f"{address.strip()} - {city.strip()}"
+		full_address = f"{address.strip().replace('  ', ' ')} - {city.strip().replace('  ', ' ')}"
 	elif cap and city:
-		full_address = f"{cap.strip()} - {city.strip()}"
+		full_address = f"{cap.strip()} - {city.strip().replace('  ', ' ')}"
 	elif address:
-		full_address = address.strip()
+		full_address = address.strip().replace('  ', ' ')
 	elif city:
-		full_address = city.strip()
+		full_address = city.strip().replace('  ', ' ')
 	elif cap:
 		full_address = cap.strip()
 	else:
@@ -190,7 +190,9 @@ def date_to_str(_date, _form="%Y-%m-%d"):
 	"""Converte datetime in stringa."""
 	if _date in [None, "None", "nan", ""]:
 		return None
-	elif isinstance(_date, datetime) or isinstance(_date, date):
+	elif isinstance(_date, date):
+		return date.strftime(_date, "%Y-%m-%d")
+	elif isinstance(_date, datetime):
 		return datetime.strftime(_date, _form)
 	else:
 		return _date

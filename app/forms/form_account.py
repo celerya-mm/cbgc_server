@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, SubmitField, EmailField, validators, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
+from app.app import db
 from app.models.accounts import Administrator, User
 from app.utilitys.functions import not_empty
 from app.utilitys.functions_accounts import psw_verify, psw_contain_usr
@@ -13,10 +14,13 @@ def list_admin():
 	try:
 		records = Administrator.query.all()
 		_list = [x.to_dict() for x in records]
-		_user = [d["username"] for d in _list if "username" in d]
-		_email = [d["email"] for d in _list if "email" in d]
+
+		_user = [d["username"] for d in _list if "username" in d].sort()
+		_email = [d["email"] for d in _list if "email" in d].sort()
+		db.session.close()
 		return _user, _email
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_ADMINISTRATORS:', err)
 		return []
 
@@ -25,10 +29,13 @@ def list_user():
 	try:
 		records = User.query.all()
 		_list = [x.to_dict() for x in records]
-		_user = [d["username"] for d in _list if "username" in d]
-		_email = [d["email"] for d in _list if "email" in d]
+		db.session.close()
+		_user = [d["username"] for d in _list if "username" in d].sort()
+		_email = [d["email"] for d in _list if "email" in d].sort()
+
 		return _user, _email
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_USERS:', err)
 		return []
 

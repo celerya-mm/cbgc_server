@@ -61,7 +61,8 @@ class Head(db.Model):
 
 	def __init__(self, headset, birth_date, castration_date=None, slaughter_date=None, sale_date=None,
 	             farmer_id=None, dna_cert=None, cons_cert=None, events=None, note=None):
-		from ..utilitys.functions import year_extract, str_to_date
+
+		from app.utilitys.functions import year_extract, str_to_date
 
 		self.headset = headset
 
@@ -100,7 +101,8 @@ class Head(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from ..utilitys.functions import date_to_str
+		from app.utilitys.functions import date_to_str
+
 		return {
 			'id': self.id,
 			'headset': self.headset,

@@ -51,7 +51,7 @@ def cert_dna_view():
 def cert_dna_create(h_id, f_id, h_set):
 	"""Creazione Certificato DNA."""
 	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
-
+	session['farmer_id'] = int(f_id.split(' - ')[0])
 	form = FormCertDnaCreate()
 	if form.validate_on_submit():
 		try:
@@ -75,6 +75,7 @@ def cert_dna_create(h_id, f_id, h_set):
 			)
 
 			CertificateDna.create(new_data)
+			session.pop('farmer_id')
 			flash("CERTIFICATO DNA creato correttamente.")
 			return redirect(url_for(HEAD_HISTORY, _id=h_id))
 		except IntegrityError as err:
@@ -94,9 +95,6 @@ def cert_dna_view_history(_id):
 	from app.routes.routes_event import HISTORY_FOR as EVENT_HISTORY
 	from app.routes.routes_head import HISTORY_FOR as HEAD_HISTORY
 	from app.routes.routes_farmer import HISTORY_FOR as FARMER_HISTORY
-
-	# Estraggo l' ID dell'utente corrente
-	session["id_user"] = _id
 
 	# Interrogo il DB
 	cert_dna = CertificateDna.query.get(_id)
@@ -134,6 +132,12 @@ def cert_dna_update(_id):
 
 	# recupero i dati
 	_cert = CertificateDna.query.get(_id)
+	# recupera Capo
+	_head = Head.query.get(_cert.head_id)
+	# recupera Allevatore
+	_farmer = Farmer.query.get(_cert.farmer_id)
+	session['farmer_id'] = int(_farmer.id)
+
 	form = FormCertDnaUpdate.update(obj=_cert)
 
 	if form.validate_on_submit():
@@ -168,15 +172,8 @@ def cert_dna_update(_id):
 		_event = event_create(_event, cert_dna_id=_id)
 		return redirect(url_for(HEAD_HISTORY_FOR, _id=new_data["head_id"]))
 	else:
-		# recupera Capo
-		_head = Head.query.get(_cert.head_id)
-		# recupera Allevatore
-		_farmer = Farmer.query.get(_cert.farmer_id)
-
 		form.head_id.data = f"{_head.id} - {_head.headset}"
 		form.farmer_id.data = f"{_farmer.id} - {_farmer.farmer_name}"
-
-		session['farmer_id'] = int(_farmer.id)
 
 		_info = {
 			'created_at': _cert.created_at,

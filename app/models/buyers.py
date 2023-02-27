@@ -88,7 +88,8 @@ class Buyer(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from ..utilitys.functions import date_to_str, status_si_no
+		from app.utilitys.functions import date_to_str, status_si_no
+
 		return {
 			'id': self.id,
 			'buyer_name': self.buyer_name,

@@ -24,7 +24,7 @@ def list_head():
 def list_farmer():
 	_list = ["-"]
 	try:
-		records = Farmer.query.all()
+		records = Farmer.query.order_by(Farmer.farmer_name.asc()).all()
 		_dicts = [x.to_dict() for x in records]
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['farmer_name']}")

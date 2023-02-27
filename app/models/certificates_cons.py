@@ -100,7 +100,8 @@ class CertificateCons(db.Model):
                  head_id=None, farmer_id=None, buyer_id=None, slaughterhouse_id=None,
                  invoice_nr=None, invoice_date=None, invoice_status=None,
                  events=None, note_certificate=None, note=None):
-        from ..utilitys.functions import str_to_date, status_true_false
+
+        from app.utilitys.functions import str_to_date, status_true_false
 
         self.certificate_id = certificate_id
         self.certificate_var = certificate_var or None
@@ -155,7 +156,8 @@ class CertificateCons(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        from app.utilitys.functions import date_to_str
+
         return {
             'id': self.id,
             'certificate_id': self.certificate_id,

@@ -55,7 +55,8 @@ class EventDB(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        from app.utilitys.functions import date_to_str
+
         return {
             'id': self.id,
             'event': self.event,

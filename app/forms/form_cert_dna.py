@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
-from app.app import session
+from app.app import session, db
 from app.models.farmers import Farmer
 from app.models.heads import Head
 
@@ -12,28 +12,30 @@ from app.models.heads import Head
 def list_head():
 	_list = [""]
 	try:
-		records = Head.query.all()
+		records = Head.query.filter_by(farmer_id=session['farmer_id']).order_by(Head.headset.asc()).all()
 		_dicts = [x.to_dict() for x in records]
 		for d in _dicts:
-			if int(d["farmer_id"]) == int(session['farmer_id']):
-				# print('HEAD:', f"{d['id']} - {d['headset']}")
-				_list.append(f"{str(d['id'])} - {d['headset']}")
+			_list.append(f"{str(d['id'])} - {d['headset']}")
 	except Exception as err:
 		print('ERROR_LIST_HEAD:', err)
 		pass
+
+	db.session.close()
 	return _list
 
 
 def list_farmer():
 	_list = [""]
 	try:
-		records = Farmer.query.all()
+		records = Farmer.query.order_by(Farmer.farmer_name.asc()).all()
 		_dicts = [x.to_dict() for x in records]
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
 	except Exception as err:
 		print('ERROR_LIST_FARMER:', err)
 		pass
+
+	db.session.close()
 	return _list
 
 

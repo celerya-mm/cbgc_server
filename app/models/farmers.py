@@ -52,7 +52,8 @@ class Farmer(db.Model):
 	             stable_type=None, stable_productive_orientation=None, stable_breeding_methods=None,
 	             affiliation_start_date=None, affiliation_end_date=None, affiliation_status=None,
 	             heads=None, dna_certs=None, cons_certs=None, coordinates=None, events=None, note=None):
-		from ..utilitys.functions import address_mount, str_to_date, status_true_false
+
+		from app.utilitys.functions import address_mount, str_to_date, status_true_false
 
 		self.farmer_name = farmer_name
 
@@ -97,7 +98,7 @@ class Farmer(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from ..utilitys.functions import date_to_str, status_si_no
+		from app.utilitys.functions import date_to_str, status_si_no
 
 		return {
 			'id': self.id,

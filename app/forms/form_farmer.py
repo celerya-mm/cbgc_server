@@ -14,7 +14,7 @@ def list_farmer():
 	try:
 		records = Farmer.query.all()
 		_list = [x.to_dict() for x in records]
-		_list = [d["farmer_name"] for d in _list if "farmer_name" in d]
+		_list = [d["farmer_name"].lower() for d in _list if "farmer_name" in d]
 		return _list
 	except Exception as err:
 		print('ERROR_LIST_FARMER:', err)
@@ -56,7 +56,7 @@ class FormFarmerCreate(FlaskForm):
 		return f'<FARMER CREATED - Rag. Sociale: {self.farmer_name.data}>'
 
 	def validate_farmer_name(self, field):  # noqa
-		if field.data in list_farmer():
+		if field.data.strip().replace('  ', ' ').lower() in list_farmer():
 			raise ValidationError("E' già presente un ALLEVATORE con la stessa Ragione Sociale.")
 
 
@@ -105,14 +105,14 @@ class FormFarmerUpdate(FlaskForm):
 		"""Esporta in un dict la classe."""
 		from ..utilitys.functions import date_to_str, status_true_false, address_mount, not_empty
 		return {
-			'farmer_name': self.farmer_name.data,
+			'farmer_name': self.farmer_name.data.strip().replace('  ', ' '),
 
 			'email': not_empty(self.email.data),
 			'phone': not_empty(self.phone.data),
 
-			'address': self.address.data.strip(),
-			'cap': self.cap.data.strip(),
-			'city': self.city.data.strip(),
+			'address': self.address.data.strip().replace('  ', ' '),
+			'cap': self.cap.data,
+			'city': self.city.data.strip().replace('  ', ' '),
 			'full_address': address_mount(self.address.data, self.cap.data, self.city.data),
 			'coordinates': not_empty(self.coordinates.data),
 

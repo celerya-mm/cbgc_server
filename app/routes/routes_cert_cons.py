@@ -232,7 +232,7 @@ def cert_cons_update(_id):
 
 	# recupero i dati del record
 	cert = CertificateCons.query.get(int(_id))
-	form = FormCertConsUpdate.new(obj=cert)
+	form = FormCertConsUpdate.update(obj=cert, f_id=cert.farmer_id)
 
 	if form.validate_on_submit():
 		try:

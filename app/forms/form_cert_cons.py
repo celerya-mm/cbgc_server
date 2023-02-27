@@ -10,12 +10,13 @@ from app.models.certificates_cons import CertificateCons, year_cert_calc, year_c
 
 def list_cert():
 	try:
-		records = CertificateCons.query.all()
+		records = CertificateCons.query.order_by(CertificateCons.certificate_nr.asc()).all()
 		_list = [x.to_dict() for x in records]
-		_list = [d["certificate_nr"] for d in _list]
+		_list = [d["certificate_nr"] for d in _list].sort()
 		db.session.close()
 		return _list
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_CERTIFICATES:', err)
 		return []
 
@@ -25,15 +26,15 @@ def list_farmer():
 
 	_list = ["-"]
 	try:
-		records = Farmer.query.all()
+		records = Farmer.query.order_by(Farmer.farmer_name.asc()).all()
 		_dicts = [x.to_dict() for x in records]
-		db.session.close()
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['farmer_name']}")
 	except Exception as err:
-		db.session.close()
 		print('ERROR_LIST_FARMER:', err)
 		pass
+
+	db.session.close()
 	return _list
 
 
@@ -44,6 +45,7 @@ def list_slaughterhouses():
 	try:
 		records = Slaughterhouse.query.all()
 		_dicts = [x.to_dict() for x in records]
+		_dicts = sorted(_dicts, key=lambda k: k['id'])
 		db.session.close()
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
@@ -51,6 +53,8 @@ def list_slaughterhouses():
 		db.session.close()
 		print('ERROR_LIST_SLAUGHTERHOUSE:', err)
 		pass
+
+	_list.sort()
 	return _list
 
 
@@ -61,6 +65,7 @@ def list_buyers():
 	try:
 		records = Buyer.query.all()
 		_dicts = [x.to_dict() for x in records]
+		_dicts = sorted(_dicts, key=lambda k: k['id'])
 		db.session.close()
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['buyer_name']}")
@@ -68,16 +73,23 @@ def list_buyers():
 		db.session.close()
 		print('ERROR_LIST_BUYERS:', err)
 		pass
+
+	_list.sort()
 	return _list
 
 
-def list_heads():
+def list_heads(f_id=None):
 	from ..models.heads import Head
 
 	_list = ["-"]
 	try:
-		records = Head.query.all()
+		if f_id:
+			records = Head.query.filter_by(farmer_id=f_id).all()
+		else:
+			records = Head.query.all()
 		_dicts = [x.to_dict() for x in records]
+		_dicts = sorted(_dicts, key=lambda k: k['id'])
+
 		db.session.close()
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['headset']}")
@@ -85,6 +97,8 @@ def list_heads():
 		db.session.close()
 		print('ERROR_LIST_HEAD:', err)
 		pass
+
+	# _list.sort()
 	return _list
 
 
@@ -285,7 +299,7 @@ class FormCertConsUpdate(FlaskForm):
 		return f'<CERT_CONSORZIO UPDATED - NR: {self.certificate_id.data} del {self.certificate_date.data}>'
 
 	@classmethod
-	def new(cls, obj):
+	def update(cls, obj, f_id=None):
 		# Instantiate the form
 		form = cls()
 
@@ -316,7 +330,7 @@ class FormCertConsUpdate(FlaskForm):
 		form.farmer_id.choices = list_farmer()
 		form.slaughterhouse_id.choices = list_slaughterhouses()
 		form.buyer_id.choices = list_buyers()
-		form.head_id.choices = list_heads()
+		form.head_id.choices = list_heads(f_id=f_id)
 
 		form.note_certificate.data = obj.note_certificate
 		form.note.data = obj.note

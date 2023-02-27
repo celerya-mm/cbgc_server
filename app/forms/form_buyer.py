@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
+from app.app import db
 from app.models.accounts import User
 from app.models.buyers import Buyer
 from app.models.certificates_cons import CertificateCons  # noqa
@@ -15,8 +16,10 @@ def list_buyer():
 		records = Buyer.query.all()
 		_list = [x.to_dict() for x in records]
 		_list = [d["buyer_name"].lower() for d in _list if "buyer_name" in d]
+		db.session.close()
 		return _list
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_BUYERS:', err)
 		return []
 
@@ -24,13 +27,15 @@ def list_buyer():
 def list_user():
 	_list = ["-"]
 	try:
-		records = User.query.all()
+		records = User.query.order_by(User.username.asc()).all()
 		_dicts = [x.to_dict() for x in records]
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['username']}")
 	except Exception as err:
 		print('ERROR_LIST_USER:', err)
 		pass
+
+	db.session.close()
 	return _list
 
 

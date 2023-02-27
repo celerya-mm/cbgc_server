@@ -42,7 +42,8 @@ class Slaughterhouse(db.Model):
 	def __init__(self, slaughterhouse, slaughterhouse_code, email, phone, address, cap, city,
 	             affiliation_start_date, affiliation_status, note, affiliation_end_date=None,
 	             cons_cert=None, events=None, coordinates=None):
-		from ..utilitys.functions import address_mount, str_to_date, status_true_false
+
+		from app.utilitys.functions import address_mount, str_to_date, status_true_false
 
 		self.slaughterhouse = slaughterhouse
 		self.slaughterhouse_code = slaughterhouse_code
@@ -80,7 +81,8 @@ class Slaughterhouse(db.Model):
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""
-		from ..utilitys.functions import date_to_str, status_si_no
+		from app.utilitys.functions import date_to_str, status_si_no
+
 		return {
 			'id': self.id,
 			'slaughterhouse': self.slaughterhouse,

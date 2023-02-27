@@ -46,7 +46,8 @@ class CertificateDna(db.Model):
 
     def to_dict(self):
         """Esporta in un dict la classe."""
-        from ..utilitys.functions import date_to_str
+        from app.utilitys.functions import date_to_str
+
         return {
             'id': self.id,
             'dna_cert_id': self.dna_cert_id,
