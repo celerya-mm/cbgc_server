@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, EmailField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, ValidationError, Optional
 
+from app.app import db
 from app.models.certificates_cons import CertificateCons  # noqa
 from app.models.heads import Head  # noqa
 from app.models.slaughterhouses import Slaughterhouse
@@ -13,10 +14,14 @@ def list_slaughterhouse():
 	try:
 		records = Slaughterhouse.query.all()
 		_list = [x.to_dict() for x in records]
+
 		_list = [d["slaughterhouse"].lower() for d in _list if "slaughterhouse" in d]
-		_list_code = [d["slaughterhouse_code"] for d in _list if "slaughterhouse" in d]
+		_list_code = [d["slaughterhouse_code"] for d in _list if "slaughterhouse_code" in d]
+
+		db.session.close()
 		return _list, _list_code
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_SLAUGHTERHOUSE:', err)
 		return [], []
 

@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
+from app.app import db
 from app.models.certificates_cons import CertificateCons  # noqa
 from app.models.certificates_dna import CertificateDna  # noqa
 from app.models.farmers import Farmer
@@ -15,8 +16,10 @@ def list_head():
 		records = Head.query.all()
 		_list = [x.to_dict() for x in records]
 		_list = [d["headset"] for d in _list if "headset" in d]
+		db.session.close()
 		return _list
 	except Exception as err:
+		db.session.close()
 		print('ERROR_LIST_HEAD:', err)
 		return []
 
@@ -31,6 +34,8 @@ def list_farmer():
 	except Exception as err:
 		print('ERROR_LIST_FARMER', err)
 		pass
+
+	db.session.close()
 	return _list
 
 

@@ -15,8 +15,9 @@ def list_admin():
 		records = Administrator.query.all()
 		_list = [x.to_dict() for x in records]
 
-		_user = [d["username"] for d in _list if "username" in d].sort()
-		_email = [d["email"] for d in _list if "email" in d].sort()
+		_user = [d["username"] for d in _list if "username" in d]
+		_email = [d["email"] for d in _list if "email" in d]
+
 		db.session.close()
 		return _user, _email
 	except Exception as err:
@@ -29,10 +30,11 @@ def list_user():
 	try:
 		records = User.query.all()
 		_list = [x.to_dict() for x in records]
-		db.session.close()
-		_user = [d["username"] for d in _list if "username" in d].sort()
-		_email = [d["email"] for d in _list if "email" in d].sort()
 
+		_user = [d["username"] for d in _list if "username" in d]
+		_email = [d["email"] for d in _list if "email" in d]
+
+		db.session.close()
 		return _user, _email
 	except Exception as err:
 		db.session.close()

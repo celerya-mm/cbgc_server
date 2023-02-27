@@ -12,7 +12,7 @@ def list_cert():
 	try:
 		records = CertificateCons.query.order_by(CertificateCons.certificate_nr.asc()).all()
 		_list = [x.to_dict() for x in records]
-		_list = [d["certificate_nr"] for d in _list].sort()
+		_list = [d["certificate_nr"] for d in _list]
 		db.session.close()
 		return _list
 	except Exception as err:
@@ -43,18 +43,15 @@ def list_slaughterhouses():
 
 	_list = ["-"]
 	try:
-		records = Slaughterhouse.query.all()
+		records = Slaughterhouse.query.order_by(Slaughterhouse.slaughterhouse.asc()).all()
 		_dicts = [x.to_dict() for x in records]
-		_dicts = sorted(_dicts, key=lambda k: k['id'])
-		db.session.close()
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['slaughterhouse']}")
 	except Exception as err:
-		db.session.close()
 		print('ERROR_LIST_SLAUGHTERHOUSE:', err)
 		pass
 
-	_list.sort()
+	db.session.close()
 	return _list
 
 
@@ -63,18 +60,14 @@ def list_buyers():
 
 	_list = ["-"]
 	try:
-		records = Buyer.query.all()
+		records = Buyer.query.order_by(Buyer.buyer_name.asc()).all()
 		_dicts = [x.to_dict() for x in records]
-		_dicts = sorted(_dicts, key=lambda k: k['id'])
-		db.session.close()
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['buyer_name']}")
 	except Exception as err:
-		db.session.close()
 		print('ERROR_LIST_BUYERS:', err)
 		pass
-
-	_list.sort()
+	db.session.close()
 	return _list
 
 
@@ -84,21 +77,20 @@ def list_heads(f_id=None):
 	_list = ["-"]
 	try:
 		if f_id:
-			records = Head.query.filter_by(farmer_id=f_id).all()
+			records = Head.query.filter_by(farmer_id=f_id).order_by(Head.headset.asc()).all()
 		else:
 			records = Head.query.all()
-		_dicts = [x.to_dict() for x in records]
-		_dicts = sorted(_dicts, key=lambda k: k['id'])
 
-		db.session.close()
+		_dicts = [x.to_dict() for x in records]
+
 		for d in _dicts:
 			_list.append(f"{str(d['id'])} - {d['headset']}")
+
 	except Exception as err:
-		db.session.close()
 		print('ERROR_LIST_HEAD:', err)
 		pass
 
-	# _list.sort()
+	db.session.close()
 	return _list
 
 
