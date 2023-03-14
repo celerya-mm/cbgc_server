@@ -86,21 +86,23 @@ def html_to_pdf(template, form, _qrcode):
 	options = {
 		"orientation": "portrait",
 		"page-size": "A4",
-		"margin-top": "0cm",
-		"margin-right": "0cm",
-		"margin-bottom": "0cm",
-		"margin-left": "0cm",
-		"encoding": "UTF-8",
-		"enable-local-file-access": ""
+		"margin-top": "1cm",
+		"margin-right": "1cm",
+		"margin-bottom": "1cm",
+		"margin-left": "1cm",
+		"encoding": "utf-8",
+		"enable-local-file-access": "",
+		"print-media-type": True
 	}
 
 	try:
 		# Build PDF from HTML
 		_file = os.path.join(folder_temp_pdf, "report.pdf")
+		
 		html = render_template(template, form=form, qrcode=_img, logo=logo)
 		_html = os.path.join(folder_temp_pdf, "temp.html")
 
-		with open(_html, 'w') as f:
+		with open(_html.encode('utf-8'), 'w') as f:
 			f.write(html)
 
 		_pdf = pdfkit.from_file(_html, False, options=options)

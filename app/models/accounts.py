@@ -25,7 +25,7 @@ class Administrator(db.Model):
 	email = db.Column(db.String(80), index=False, unique=True, nullable=True)
 	phone = db.Column(db.String(25), index=False, unique=False, nullable=True)
 
-	auth_tokens = db.relationship('AuthToken', backref='administrator', order_by='AuthToken.id.desc()', lazy="dynamic")
+	auth_tokens = db.relationship('AuthToken', backref='administrator', order_by='AuthToken.id.asc()', lazy="dynamic")
 	events = db.relationship('EventDB', backref='administrator', lazy="dynamic")
 
 	note = db.Column(db.String(255), index=False, unique=False, nullable=True)

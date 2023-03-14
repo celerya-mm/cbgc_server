@@ -36,6 +36,11 @@ class AuthToken(db.Model):
 	def update():  # noqa
 		"""Salva le modifiche a un record."""
 		db.session.commit()
+	
+	def remove(self):  # noqa
+		"""Cancella un record per id."""
+		db.session.delete(self)
+		db.session.commit()
 
 	def to_dict(self):
 		"""Esporta in un dict la classe."""

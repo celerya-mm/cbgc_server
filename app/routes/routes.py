@@ -7,6 +7,7 @@ from flask import current_app as app, flash, redirect, render_template, url_for,
 from app.app import session, db
 from app.forms.forms import FormLogin
 from app.models.accounts import Administrator
+from app.models.auth_tokens import AuthToken
 from app.utilitys.functions import buyer_log_in, token_buyer_validate
 from app.utilitys.functions_accounts import psw_hash, __save_auth_token
 
@@ -22,9 +23,20 @@ def login():
 		# print("ACCOUNT:", json.dumps(_admin.to_dict(), indent=2))
 
 		if _admin:
-			_tokens = _admin.auth_tokens.first()
-			if _tokens and _tokens.expires_at > datetime.now():
-				token = str(_tokens.token)
+			_tokens = _admin.auth_tokens.all()
+			if _tokens:
+				count = len(_tokens)
+				token = None
+				for t in _tokens:
+					if t.expires_at > datetime.now():
+						token = t.token
+					else:
+						count -= 1
+						AuthToken.remove(t)
+				
+				if count == 0 and token is None:
+					token = uuid4()
+					_auth_token = __save_auth_token(token, _admin.id)
 			else:
 				token = str(uuid4())
 				_auth_token = __save_auth_token(token, _admin.id)

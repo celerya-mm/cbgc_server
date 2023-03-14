@@ -200,7 +200,7 @@
 
     // Impostazioni grafico ANNO VENDITA
     let sale_labels = JSON.parse({{ sale_labels | tojson }})
-    console.log("LABELS: ", sale_labels)
+    // console.log("LABELS: ", sale_labels)
     let sale_values = JSON.parse({{ sale_values | tojson }})
     // console.log("VALUES: ", sale_values)
     const data1 = {
@@ -259,8 +259,10 @@
 	// Impostazioni grafico Conformità CASTRAZIONE
     let conf_labels = JSON.parse({{ conf_labels | tojson }})
     // console.log("LABELS: ", conf_labels)
+    
     let conf_values = JSON.parse({{ conf_values | tojson }})
     // console.log("VALUES: ", conf_values)
+    
     let not_conf_values = JSON.parse({{ not_conf_values | tojson }})
     // console.log("VALUES: ", not_conf_values)
 
