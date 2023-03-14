@@ -4,7 +4,7 @@
 
 ### docker classico
 cd ../../Multimedia/05_Documenti/Flask/cbgc_server
-docker build --force-rm -t cbgc:latest .
+docker build --force-rm -t cbgc:latest --progress=tty .
 
 # Lanciare il docker usando l'immagine appena creata (fare attenzione a lanciare gunicorn con la porta 5000)
 docker run -d -p 8000:5000 --name cbgc-service --restart=always cbgc:latest

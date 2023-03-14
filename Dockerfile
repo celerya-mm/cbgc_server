@@ -1,5 +1,4 @@
 # Start with Debian Python 3.11 base image
-
 FROM python:3.11-bullseye
 
 MAINTAINER Marco Mazzini <mazzini@celerya.com>

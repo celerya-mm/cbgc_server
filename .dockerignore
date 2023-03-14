@@ -8,4 +8,3 @@ migrations
 flask_session
 docker-compose.yml
 README.md
-app/templates/map.html
