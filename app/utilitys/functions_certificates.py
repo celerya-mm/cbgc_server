@@ -107,13 +107,15 @@ def html_to_pdf(template, form, _qrcode):
 
 		_pdf = pdfkit.from_file(_html, False, options=options)
 
+		# Scrive il file pdf da html
 		with open(_file, "wb") as f:
 			f.write(_pdf)
 
 		# rimuovo il qrcode
 		for f in os.listdir(folder_temp_qrcode):
-			_f = os.path.join(folder_temp_qrcode, f)
-			os.remove(_f)
+			if '.jpg' in str(f):
+				_f = os.path.join(folder_temp_qrcode, f)
+				os.remove(_f)
 
 		return _file
 	except Exception as err:

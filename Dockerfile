@@ -48,8 +48,11 @@ RUN $VIRTUAL_ENV/bin/python3.11 -m pip install -U --no-cache-dir pip setuptools 
 RUN grep -v "pywin32" /home/app/src/requirements.txt | xargs $VIRTUAL_ENV/bin/python3.11 -m pip --no-cache-dir install --use-pep517
 
 # clean package manager cache to reduce your custom image size...
-RUN apt-get clean all \
-    && rm -rvf /var/lib/apt/lists/*
+RUN apt-get remove -y \
+        gcc \
+    && apt-get autoremove -y \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 # Add all files from current directory on host to dockerised directory in container
 COPY . .
